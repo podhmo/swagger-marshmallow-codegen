@@ -8,7 +8,7 @@ import magicalimport
 def titlize(name):
     if not name:
         return name
-    return "{}{}".format(name[0].upper(), name[1:])
+    return "{}{}".format(name[0].upper(), name[1:]).replace("-", "_")
 
 
 def untitlize(name):

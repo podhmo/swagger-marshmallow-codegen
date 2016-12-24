@@ -89,7 +89,7 @@ class Codegen(object):
 
         self.accessor.update_option_on_property(field, opts)
 
-        path = self.dispatcher.dispatch(self.accessor.type_and_format(field))
+        path = self.dispatcher.dispatch(self.accessor.type_and_format(name, field))
         kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
 
         module, field_name = path.rsplit(":", 1)

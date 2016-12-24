@@ -18,11 +18,17 @@ class Accessor(object):
     def properties(self, d):
         return d.get("properties") or {}
 
-    def type_and_format(self, field):
-        typ = field["type"]
-        format = field.get("format")
-        logger.debug("type-and-format: type=%s, format=%s, field=%s", typ, format, lazy_json_dump(field))
-        return Pair(type=typ, format=format)
+    def type_and_format(self, name, field):
+        try:
+            typ = field["type"]
+            format = field.get("format")
+            logger.debug("type-and-format: name=%s type=%s, format=%s, field=%s", name, typ, format, lazy_json_dump(field))
+            return Pair(type=typ, format=format)
+        except KeyError as e:
+            logger.debug("%s is not found. name=%s", e.args[0], name)
+            if "enum" in field:
+                return Pair(type="string", format=None)
+            return Pair(type="object", format=None)
 
     def update_options_pre_properties(self, d, opts):
         for name in d.get("required") or []:
@@ -49,7 +55,9 @@ class Resolver(object):
         return d.get("type") == "array"
 
     def resolve_schema_name(self, name):
-        return titlize(name)
+        schema_name = titlize(name)
+        logger.debug("schema: %s", schema_name)
+        return schema_name
 
     def resolve_ref_definition(self, fulldata, d, name=None, i=0, level=-1):
         # return schema_name, definition_dict
