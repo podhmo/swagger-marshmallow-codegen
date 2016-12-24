@@ -38,10 +38,10 @@ class CodegenTests(DiffTestCase):
 
     def _makeOne(self):
         from ..dispatcher import FormatDispatcher
-        from ..resolver import Resolver
+        from ..accessor import Accessor
         dispatcher = FormatDispatcher()
-        resolver = Resolver()
-        return self._getTargetClass()(dispatcher, resolver)
+        accessor = Accessor()
+        return self._getTargetClass()(dispatcher, accessor)
 
     def _makeContext(self):
         from ..codegen import Context
@@ -61,6 +61,7 @@ class CodegenTests(DiffTestCase):
             ("./src/00person.yaml", "./dst/00person.py"),
             ("./src/01person.yaml", "./dst/01person.py"),
             ("./src/02person.yaml", "./dst/02person.py"),
+            ("./src/03person.yaml", "./dst/03person.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):

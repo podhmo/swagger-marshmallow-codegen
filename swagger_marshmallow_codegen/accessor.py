@@ -3,13 +3,14 @@ import logging
 import sys
 import json
 import dictknife
+from .langhelpers import titlize
 from .dispatcher import Pair
 logger = logging.getLogger(__name__)
 
 
-class Resolver(object):
+class Accessor(object):
     def __init__(self):
-        self.accessor = dictknife.Accessor()
+        self.resolver = Resolver()
 
     def definitions(self, d):
         return d.get("definitions") or {}
@@ -33,23 +34,38 @@ class Resolver(object):
             opts["description"] = field["description"]
         return opts
 
+
+class Resolver(object):
+    def __init__(self):
+        self.accessor = dictknife.Accessor()  # todo: rename
+
     def has_ref(self, d):
         return "$ref" in d
 
     def has_schema(self, d):
         return d.get("type", None) in ("array", "object", None)
 
-    def ref_original(self, fulldata, d, i=0):
+    def has_many(self, d):
+        return d.get("type") == "array"
+
+    def resolve_schema_name(self, name):
+        return titlize(name)
+
+    def resolve_ref_definition(self, fulldata, d, name=None, i=0):
+        # return schema_name, definition_dict
         # todo: support quoted "/"
         if "$ref" not in d:
-            return d
+            return name, d
         logger.debug("%sref: %r", "  " * i, d["$ref"])
+
         path = d["$ref"][len("#/"):].split("/")
+        name = path[-1]
+
         parent = self.accessor.maybe_access_container(fulldata, path)
         if parent is None:
             sys.stderr.write("\t{!r} is not found\n".format(d["$ref"]))
-            return d
-        return self.ref_original(fulldata, parent[path[-1]], i=i + 1)
+            return name, d
+        return self.resolve_ref_definition(fulldata, parent[name], name=self.resolve_schema_name(name), i=i + 1)
 
 
 class LazyCallString(object):

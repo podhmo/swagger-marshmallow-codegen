@@ -1,0 +1,28 @@
+# type array
+definitions:
+  name:
+    type: string
+    description: "name of something"
+  age:
+    type: integer
+    description: "age"
+  person:
+    type: object
+    properties:
+      name:
+        $ref: "#/definitions/name"
+      age:
+        $ref: "#/definitions/age"
+      skills:
+        type: array
+        items:
+          $ref: "#/definitions/skill"
+    required:
+      - name
+  skill:
+    type: object
+    properties:
+      name:
+        type: string
+    required:
+      - name

@@ -17,7 +17,7 @@ TYPE_MAP = {
     Pair(type="number", format="decimal"): "marshmallow.fields:Decimal",  # not matched
     Pair(type="number", format="integer"): "marshmallow.fields:Integer",
     Pair(type="integer", format=None): "marshmallow.fields:Integer",  # swagger
-
+    Pair(type="object", format=None): "marshmallow.fields:Nested",
     Pair(type="string", format=None): "marshmallow.fields:String",
     Pair(type="boolean", format=None): "marshmallow.fields:Boolean",
     Pair(type="string", format="uuid"): "marshmallow.fields:UUID",

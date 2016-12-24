@@ -2,6 +2,7 @@
 import logging
 from . import loading
 from .dispatcher import FormatDispatcher
+from .accessor import Accessor
 from .codegen import Codegen
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,8 @@ class Driver(object):
 
     def transform(self, d):
         dispatcher = FormatDispatcher()
-        return Codegen(dispatcher).codegen(d)
+        accessor = Accessor()
+        return Codegen(dispatcher, accessor).codegen(d)
 
     def run(self, inp, outp):
         data = self.load(inp)
