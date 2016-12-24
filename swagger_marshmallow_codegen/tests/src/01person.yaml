@@ -1,3 +1,4 @@
+# required
 definitions:
   person:
     type: object
@@ -6,3 +7,5 @@ definitions:
         type: string
       age:
         type: integer
+    required:
+      - name

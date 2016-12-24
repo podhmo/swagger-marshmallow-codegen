@@ -6,11 +6,6 @@ from .codegen import Codegen
 logger = logging.getLogger(__name__)
 
 
-class Resolver(object):
-    def resolve(self, ref):
-        pass
-
-
 class Driver(object):
     def load(self, fp):
         return loading.load(fp)

@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import logging
-import json
 from collections import namedtuple
 from .langhelpers import load_function
 logger = logging.getLogger(__name__)
@@ -36,26 +35,5 @@ class FormatDispatcher(object):
         if self.__class__.def_map is None:
             self.__class__.load_def_map(self.__class__.path_map)
 
-    def lookup(self, pair):
-        path = self.path_map.get(pair) or self.path_map.get((pair[0], None))
-        return path
-
-    def dispatch(self, field):
-        typ = field["type"]
-        format = field.get("format")
-        logger.debug("dispatch type=%s, format=%s, field=%s", typ, format, lazy_json_dump(field))
-        return self.lookup((typ, format))
-
-
-class LazyCallString(object):
-    def __init__(self, call, *args, **kwargs):
-        self.call = call
-        self.args = args
-        self.kwargs = kwargs
-
-    def __str__(self):
-        return self.call(*self.args, **self.kwargs)
-
-
-def lazy_json_dump(s):
-    return LazyCallString(json.dumps, s)
+    def dispatch(self, pair):
+        return self.path_map.get(pair) or self.path_map.get((pair[0], None))
