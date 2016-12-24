@@ -21,9 +21,10 @@ class DiffTestCase(unittest.TestCase):
 
             firstlines = first.splitlines(keepends=True)
             secondlines = second.splitlines(keepends=True)
-            if len(firstlines) == 1 and first.strip('\r\n') == first:
-                firstlines = [first + '\n']
-                secondlines = [second + '\n']
+            if not firstlines[-1].endswith("\n"):
+                firstlines[-1] = firstlines[-1] + "\n"
+            if not secondlines[-1].endswith("\n"):
+                secondlines[-1] = secondlines[-1] + "\n"
             diff = '\n' + ''.join(difflib.unified_diff(firstlines, secondlines, fromfile="first", tofile="second"))
             raise self.fail(self._formatMessage(diff, msg))
 
@@ -59,6 +60,7 @@ class CodegenTests(DiffTestCase):
         candidates = [
             ("./src/00person.yaml", "./dst/00person.py"),
             ("./src/01person.yaml", "./dst/01person.py"),
+            ("./src/02person.yaml", "./dst/02person.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
