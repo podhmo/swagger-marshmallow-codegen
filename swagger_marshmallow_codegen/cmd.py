@@ -13,7 +13,7 @@ def main():
     driver = load_function(args.driver)()
 
     # todo: option
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     if args.file is None:
         driver.run(sys.stdin, sys.stdout)
