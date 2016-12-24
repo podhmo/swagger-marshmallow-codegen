@@ -17,6 +17,7 @@ except IOError:
 
 install_requires = [
     'dictknife[load]',
+    "prestring",
 ]
 
 
@@ -52,5 +53,6 @@ setup(name='swagger-marshmallow-codegen',
       tests_require=tests_require,
       test_suite="swagger_marshmallow_codegen.tests",
       entry_points="""
+      [console_scripts]
+swagger-marshmallow-codegen=swagger_marshmallow_codegen.cmd:main
 """)
-
