@@ -50,6 +50,8 @@ class Codegen(object):
                 baseclass = ref_name
 
         with c.m.class_(clsname, baseclass):
+            if "description" in definition:
+                c.m.stmt('"""{}"""'.format(definition["description"]))
             opts = defaultdict(OrderedDict)
             self.accessor.update_options_pre_properties(definition, opts)
 

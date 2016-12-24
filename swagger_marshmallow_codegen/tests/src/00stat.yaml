@@ -1,0 +1,14 @@
+# array ref with primitive type
+definitions:
+  stat:
+    properties:
+      days:
+        $ref: "#/definitions/days"
+      total:
+        type: integer
+      week:
+        type: integer
+  days:
+    type: array
+    items:
+      type: integer
