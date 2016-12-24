@@ -9,6 +9,7 @@ class Context(object):
     def __init__(self):
         self.m = Module()
         self.im = self.m.submodule()
+        self.field_m = Module()
 
 
 class Codegen(object):
@@ -27,16 +28,23 @@ class Codegen(object):
         c.im.from_("marshmallow", "fields")
 
     def write_schema(self, c, d):
-        for name, definition in self.resolver.resolve_definitions(d).items():
+        for name, definition in self.resolver.definitions(d).items():
+            if not self.resolver.has_schema(definition):
+                continue
+
             clsname = titlize(name)
 
             with c.m.class_(clsname, self.schema_class):
                 opts = defaultdict(OrderedDict)
-                self.resolver.resolve_options_pre_properties(definition, opts)
+                self.resolver.update_options_pre_properties(definition, opts)
 
-                for name, field in self.resolver.resolve_properties(definition).items():
-                    # todo: ref
-                    path = self.dispatcher.dispatch(self.resolver.resolve_type_and_format(field))
+                for name, field in self.resolver.properties(definition).items():
+                    if self.resolver.has_ref(field):
+                        field = self.resolver.ref_original(d, field)
+
+                    self.resolver.update_option_on_property(field, opts[name])
+
+                    path = self.dispatcher.dispatch(self.resolver.type_and_format(field))
                     module, field_name = path.rsplit(":", 1)
                     # todo: import module
                     if module == "marshmallow.fields":

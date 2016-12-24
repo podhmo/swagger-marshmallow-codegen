@@ -1,0 +1,17 @@
+# simple $ref
+definitions:
+  name:
+    type: string
+    description: "name of something"
+  age:
+    type: integer
+    description: "age"
+  person:
+    type: object
+    properties:
+      name:
+        $ref: "#/definitions/name"
+      age:
+        $ref: "#/definitions/age"
+    required:
+      - name
