@@ -5,13 +5,13 @@ import importlib
 import magicalimport
 
 
-def titlize(name):
+def titleize(name):
     if not name:
         return name
-    return "{}{}".format(name[0].upper(), name[1:]).replace("-", "_")
+    return "{}{}".format(name[0].upper(), name[1:]).replace("-", "_").replace(".", "")
 
 
-def untitlize(name):
+def untitleize(name):
     if not name:
         return name
     return "{}{}".format(name[0].lower(), name[1:])

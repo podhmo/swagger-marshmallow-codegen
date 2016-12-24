@@ -3,7 +3,7 @@ import logging
 import sys
 import json
 import dictknife
-from .langhelpers import titlize
+from .langhelpers import titleize
 from .dispatcher import Pair
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,8 @@ class Accessor(object):
     def update_option_on_property(self, field, opts):
         if "description" in field:
             opts["description"] = field["description"]
+        if self.resolver.has_many(field):
+            opts["many"] = True
         return opts
 
 
@@ -55,13 +57,19 @@ class Resolver(object):
         return d.get("type") == "array"
 
     def resolve_schema_name(self, name):
-        schema_name = titlize(name)
+        schema_name = titleize(name)
         logger.debug("schema: %s", schema_name)
         return schema_name
 
     def resolve_ref_definition(self, fulldata, d, name=None, i=0, level=-1):
         # return schema_name, definition_dict
         # todo: support quoted "/"
+        # on array
+        if "items" in d:
+            definition = d
+            name, _ = self.resolve_ref_definition(fulldata, d["items"], name=name, i=i, level=level + 1)  # xxx
+            return name, definition
+
         if "$ref" not in d:
             return self.resolve_schema_name(name), d
         if level == 0:

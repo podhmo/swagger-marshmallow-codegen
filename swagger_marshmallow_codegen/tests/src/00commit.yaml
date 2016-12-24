@@ -1,0 +1,86 @@
+definitions:
+  commit:
+    properties:
+      author:
+        $ref: '#/definitions/commitAuthor'
+      commit:
+        $ref: '#/definitions/commitCommit'
+      files:
+        $ref: '#/definitions/commitFiles'
+    type: object
+  commitFiles:
+    type: array
+    items:
+      $ref: '#/definitions/commitFilesItem'
+  commitFilesItem:
+    type: object
+    properties:
+      additions:
+        type: integer
+      blob_url:
+        type: string
+      changes:
+        type: integer
+      deletions:
+        type: integer
+      filename:
+        type: string
+      patch:
+        type: string
+      raw_url:
+        type: string
+      status:
+        type: string
+  commitCommit:
+    type: object
+    properties:
+      author:
+        $ref: '#/definitions/commitCommitAuthor'
+      committer:
+        $ref: '#/definitions/commitCommitCommitter'
+      message:
+        type: string
+      tree:
+        $ref: '#/definitions/commitCommitTree'
+      url:
+        type: string
+  commitCommitTree:
+    type: object
+    properties:
+      sha:
+        type: string
+      url:
+        type: string
+  commitCommitCommitter:
+    type: object
+    properties:
+      date:
+        description: 'ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ'
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+  commitCommitAuthor:
+    type: object
+    properties:
+      date:
+        description: 'ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ'
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+  commitAuthor:
+    type: object
+    properties:
+      avatar_url:
+        type: string
+      gravatar_id:
+        type: string
+      id:
+        type: integer
+      login:
+        type: string
+      url:
+        type: string

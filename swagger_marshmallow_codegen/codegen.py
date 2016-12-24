@@ -70,6 +70,9 @@ class Codegen(object):
             if not self.resolver.has_schema(definition):
                 continue
 
+            if self.resolver.has_many(definition):
+                continue
+
             clsname = self.resolver.resolve_schema_name(schema_name)
             self.write_schema(c, d, clsname, definition, arrived)
 
@@ -90,12 +93,16 @@ class Codegen(object):
         self.accessor.update_option_on_property(field, opts)
 
         path = self.dispatcher.dispatch(self.accessor.type_and_format(name, field))
-        kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
+        if path is None:
+            logger.info("path: matched path is not found. name=%r, schema=%r", name, schema_name)
+            return
 
         module, field_name = path.rsplit(":", 1)
         # todo: import module
         if module == "marshmallow.fields":
             module = self.fields_module
+
+        kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
 
         if self.resolver.has_schema(field) and field_class_name:
             if kwargs:

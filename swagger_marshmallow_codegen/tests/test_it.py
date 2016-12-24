@@ -57,6 +57,7 @@ class CodegenTests(DiffTestCase):
             return rf.read()
 
     def test_it(self):
+        from ..lifting import lifting_definition
         candidates = [
             ("./src/00person.yaml", "./dst/00person.py"),
             ("./src/01person.yaml", "./dst/01person.py"),
@@ -64,14 +65,47 @@ class CodegenTests(DiffTestCase):
             ("./src/03person.yaml", "./dst/03person.py"),
             ("./src/04person.yaml", "./dst/04person.py"),
             ("./src/05person.yaml", "./dst/05person.py"),
+            ("./src/00commit.yaml", "./dst/00commit.py"),
+            ("./src/01commit.yaml", "./dst/01commit.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
                 d = self.load_srcfile(src_file)
                 target = self._makeOne()
                 ctx = self._makeContext()
-                target.write_body(ctx, d)
+
+                target.write_body(ctx, lifting_definition(d))
 
                 expected = self.load_dstfile(dst_file).rstrip("\n")
                 actual = str(ctx.m).rstrip("\n")
                 self.assertEqual(actual, expected)
+
+
+class FlattenTests(unittest.TestCase):
+    here = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
+
+    def _callFUT(self, d):
+        from ..lifting import lifting_definition
+        return lifting_definition(d)
+
+    def load_srcfile(self, src):
+        from ..loading import load
+        with open(os.path.join(self.here, src)) as rf:
+            return load(rf)
+
+    def load_dstfile(self, dst):
+        from ..loading import load
+        with open(os.path.join(self.here, dst)) as rf:
+            return load(rf)
+
+    def test_it(self):
+        candidates = [
+            ("./src/01commit.yaml", "./src/00commit.yaml"),
+        ]
+        for src_file, dst_file in candidates:
+            with self.subTest(src_file=src_file, dst_file=dst_file):
+                noflatten = self.load_srcfile(src_file)
+                actual = self._callFUT(noflatten)
+                flatten = self.load_dstfile(dst_file)
+                from dictknife import deepequal
+                self.assertTrue(deepequal(flatten, actual))

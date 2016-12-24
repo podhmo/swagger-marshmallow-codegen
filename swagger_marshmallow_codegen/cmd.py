@@ -10,7 +10,11 @@ def main():
     parser.add_argument("--driver", default="swagger_marshmallow_codegen.driver:Driver")
     parser.add_argument("file", default=None)
     args = parser.parse_args()
-    driver = load_function(args.driver)()
+
+    driver_cls = args.driver
+    if ":" not in driver_cls:
+        driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
+    driver = load_function(driver_cls)()
 
     # todo: option
     logging.basicConfig(level=logging.DEBUG)
