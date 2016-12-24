@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
-from dictknife import loading
+from . import loading
 from .dispatcher import FormatDispatcher
 from .codegen import Codegen
 logger = logging.getLogger(__name__)
