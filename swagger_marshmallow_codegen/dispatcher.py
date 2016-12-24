@@ -9,17 +9,23 @@ Pair = namedtuple("Pair", "type,format")
 
 # TODO: correct mapping
 
+# http://apispec.readthedocs.io/en/latest/_modules/apispec/ext/marshmallow/swagger.html
 TYPE_MAP = {
-    Pair(type="string", format="time"): "marshmallow.fields:Time",
+    Pair(type="integer", format="int32"): "marshmallow.fields:Integer",
+    Pair(type="number", format=None): "marshmallow.fields:Number",
+    Pair(type="number", format="float"): "marshmallow.fields:Float",
+    Pair(type="number", format="decimal"): "marshmallow.fields:Decimal",  # not matched
+    Pair(type="number", format="integer"): "marshmallow.fields:Integer",
+    Pair(type="integer", format=None): "marshmallow.fields:Integer",  # swagger
+
+    Pair(type="string", format=None): "marshmallow.fields:String",
+    Pair(type="boolean", format=None): "marshmallow.fields:Boolean",
+    Pair(type="string", format="uuid"): "marshmallow.fields:UUID",
     Pair(type="string", format="date-time"): "marshmallow.fields:DateTime",
     Pair(type="string", format="date"): "marshmallow.fields:Date",
-    Pair(type="string", format="uuid"): "marshmallow.fields:UUID",
-    Pair(type="string", format=None): "marshmallow.fields:String",
-    Pair(type="number", format="decimal"): "marshmallow.fields:Decimal",
-    Pair(type="number", format="float"): "marshmallow.fields:Float",
-    Pair(type="number", format="integer"): "marshmallow.fields:Integer",
-    Pair(type="integer", format=None): "marshmallow.fields:Integer",
-    Pair(type="boolean", format=None): "marshmallow.fields:Boolean",
+    Pair(type="string", format="time"): "marshmallow.fields:Time",
+    Pair(type="string", format="email"): "marshmallow.fields:Email",
+    Pair(type="string", format="url"): "marshmallow.fields:URL",
 }
 
 
