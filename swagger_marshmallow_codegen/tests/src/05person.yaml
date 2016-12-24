@@ -1,0 +1,36 @@
+# recursive $ref
+definitions:
+  name:
+    type: string
+    description: "name of something"
+  age:
+    type: integer
+    description: "age"
+  father:
+    $ref: "#/definitions/person"
+  mother:
+    $ref: "#/definitions/person"
+  person:
+    type: object
+    properties:
+      name:
+        $ref: "#/definitions/name"
+      age:
+        $ref: "#/definitions/age"
+      father:
+        $ref: "#/definitions/father"
+      mother:
+        $ref: "#/definitions/mother"
+      skills:
+        type: array
+        items:
+          $ref: "#/definitions/skill"
+    required:
+      - name
+  skill:
+    type: object
+    properties:
+      name:
+        type: string
+    required:
+      - name

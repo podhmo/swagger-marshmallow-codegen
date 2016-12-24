@@ -62,13 +62,15 @@ class CodegenTests(DiffTestCase):
             ("./src/01person.yaml", "./dst/01person.py"),
             ("./src/02person.yaml", "./dst/02person.py"),
             ("./src/03person.yaml", "./dst/03person.py"),
+            ("./src/04person.yaml", "./dst/04person.py"),
+            ("./src/05person.yaml", "./dst/05person.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
                 d = self.load_srcfile(src_file)
                 target = self._makeOne()
                 ctx = self._makeContext()
-                target.write_schema(ctx, d)
+                target.write_body(ctx, d)
 
                 expected = self.load_dstfile(dst_file).rstrip("\n")
                 actual = str(ctx.m).rstrip("\n")

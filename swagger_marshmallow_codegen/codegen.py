@@ -22,6 +22,10 @@ class Codegen(object):
         self.dispatcher = dispatcher
         self.accessor = accessor
 
+    @property
+    def resolver(self):
+        return self.accessor.resolver
+
     def write_header(self, c):
         c.im.stmt("# -*- coding:utf-8 -*-")
 
@@ -29,51 +33,76 @@ class Codegen(object):
         c.im.from_("marshmallow", "Schema")
         c.im.from_("marshmallow", "fields")
 
-    def write_schema(self, c, d):
+    def write_schema(self, c, d, clsname, definition, arrived):
+        if clsname in arrived:
+            return
+        arrived.add(clsname)
+
+        baseclass = self.schema_class
+
+        if self.resolver.has_ref(definition):
+            ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
+            if ref_name is None:
+                logger.info("ref: %r is not found", definition["$ref"])
+                # error is raised?
+            else:
+                self.write_schema(c, d, ref_name, ref_definition, arrived)
+                baseclass = ref_name
+
+        with c.m.class_(clsname, baseclass):
+            opts = defaultdict(OrderedDict)
+            self.accessor.update_options_pre_properties(definition, opts)
+
+            properties = self.accessor.properties(definition)
+            if not properties:
+                c.m.stmt("pass")
+            else:
+                for name, field in properties.items():
+                    if self.resolver.has_many(field):
+                        self.write_field_many(c, d, clsname, definition, name, field, opts[name])
+                    else:
+                        self.write_field_one(c, d, clsname, definition, name, field, opts[name])
+
+    def write_body(self, c, d):
+        arrived = set()
         for schema_name, definition in self.accessor.definitions(d).items():
-            if not self.accessor.resolver.has_schema(definition):
+
+            if not self.resolver.has_schema(definition):
                 continue
 
-            clsname = self.accessor.resolver.resolve_schema_name(schema_name)
-
-            with c.m.class_(clsname, self.schema_class):
-                opts = defaultdict(OrderedDict)
-                self.accessor.update_options_pre_properties(definition, opts)
-
-                for name, field in self.accessor.properties(definition).items():
-                    if self.accessor.resolver.has_many(field):
-                        self.write_field_many(c, d, schema_name, definition, name, field, opts[name])
-                    else:
-                        self.write_field_one(c, d, schema_name, definition, name, field, opts[name])
+            clsname = self.resolver.resolve_schema_name(schema_name)
+            self.write_schema(c, d, clsname, definition, arrived)
 
     def write_field_one(self, c, d, schema_name, definition, name, field, opts):
-        field_name = name
-        if self.accessor.resolver.has_ref(field):
-            ref_name, field = self.accessor.resolver.resolve_ref_definition(d, field)
-            if ref_name is None:
-                logger.info("ref: %r is not found", field["$ref"])
-                return
-            field_name = ref_name
-            if field_name == schema_name and deepequal(field, definition):
-                field_name = "self"
+        field_class_name = None
+        if self.resolver.has_ref(field):
+            field_class_name, field = self.resolver.resolve_ref_definition(d, field, level=1)
+            if field_class_name == schema_name and deepequal(field, definition):
+                field_class_name = "self"
+
+            # finding original definition
+            if self.resolver.has_ref(field):
+                ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                if ref_name is None:
+                    logger.info("ref: %r is not found", field["$ref"])
+                    return
 
         self.accessor.update_option_on_property(field, opts)
 
         path = self.dispatcher.dispatch(self.accessor.type_and_format(field))
         kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
-        if self.accessor.resolver.has_schema(field):
-            field_class_name = field_name
-            module, field_name = path.rsplit(":", 1)
-            # todo: import module
-            if module == "marshmallow.fields":
-                module = self.fields_module
-            c.m.stmt(LazyFormat("{} = {}.{}({!r}, {})", name, module, field_name, field_class_name, kwargs))
+
+        module, field_name = path.rsplit(":", 1)
+        # todo: import module
+        if module == "marshmallow.fields":
+            module = self.fields_module
+
+        if self.resolver.has_schema(field) and field_class_name:
+            if kwargs:
+                kwargs = ", " + kwargs
+            c.m.stmt(LazyFormat("{} = {}.{}({!r}{})", name, module, field_name, field_class_name, kwargs))
         else:
             # field
-            module, field_name = path.rsplit(":", 1)
-            # todo: import module
-            if module == "marshmallow.fields":
-                module = self.fields_module
             c.m.stmt(LazyFormat("{} = {}.{}({})", name, module, field_name, kwargs))
 
     def write_field_many(self, c, d, schema_name, definition, field_name, field, opts):
@@ -86,5 +115,5 @@ class Codegen(object):
         self.write_header(c)
         c.m.sep()
         self.write_import_(c)
-        self.write_schema(c, d)
+        self.write_body(c, d)
         return c.m

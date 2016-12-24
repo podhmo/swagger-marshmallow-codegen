@@ -51,11 +51,14 @@ class Resolver(object):
     def resolve_schema_name(self, name):
         return titlize(name)
 
-    def resolve_ref_definition(self, fulldata, d, name=None, i=0):
+    def resolve_ref_definition(self, fulldata, d, name=None, i=0, level=-1):
         # return schema_name, definition_dict
         # todo: support quoted "/"
         if "$ref" not in d:
-            return name, d
+            return self.resolve_schema_name(name), d
+        if level == 0:
+            return self.resolve_schema_name(name), d
+
         logger.debug("%sref: %r", "  " * i, d["$ref"])
 
         path = d["$ref"][len("#/"):].split("/")
@@ -64,8 +67,8 @@ class Resolver(object):
         parent = self.accessor.maybe_access_container(fulldata, path)
         if parent is None:
             sys.stderr.write("\t{!r} is not found\n".format(d["$ref"]))
-            return name, d
-        return self.resolve_ref_definition(fulldata, parent[name], name=self.resolve_schema_name(name), i=i + 1)
+            return self.resolve_schema_name(name), d
+        return self.resolve_ref_definition(fulldata, parent[name], name=name, i=i + 1, level=level - 1)
 
 
 class LazyCallString(object):
