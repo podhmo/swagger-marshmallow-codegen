@@ -58,6 +58,7 @@ class Codegen(object):
                 c.m.stmt("pass")
             else:
                 for name, field in properties.items():
+                    name = str(name)
                     if self.resolver.has_many(field):
                         self.write_field_many(c, d, clsname, definition, name, field, opts[name])
                     else:
@@ -92,7 +93,7 @@ class Codegen(object):
 
         self.accessor.update_option_on_property(field, opts)
 
-        path = self.dispatcher.dispatch(self.accessor.type_and_format(name, field))
+        path = self.dispatcher.dispatch(self.accessor.type_and_format(name, field), field)
         if path is None:
             logger.info("path: matched path is not found. name=%r, schema=%r", name, schema_name)
             return
@@ -102,15 +103,19 @@ class Codegen(object):
         if module == "marshmallow.fields":
             module = self.fields_module
 
+        normalized_name = self.resolver.resolve_normalized_name(name)
+        if normalized_name != name:
+            opts["dump_to"] = opts["load_from"] = name
+
         kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
 
         if self.resolver.has_schema(field) and field_class_name:
             if kwargs:
                 kwargs = ", " + kwargs
-            c.m.stmt(LazyFormat("{} = {}.{}({!r}{})", name, module, field_name, field_class_name, kwargs))
+            c.m.stmt(LazyFormat("{} = {}.{}({!r}{})", normalized_name, module, field_name, field_class_name, kwargs))
         else:
             # field
-            c.m.stmt(LazyFormat("{} = {}.{}({})", name, module, field_name, kwargs))
+            c.m.stmt(LazyFormat("{} = {}.{}({})", normalized_name, module, field_name, kwargs))
 
     def write_field_many(self, c, d, schema_name, definition, field_name, field, opts):
         opts["many"] = True

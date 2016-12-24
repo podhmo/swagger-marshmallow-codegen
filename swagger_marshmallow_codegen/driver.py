@@ -17,9 +17,6 @@ class Driver(object):
 
     def transform(self, d):
         d = lifting_definition(d)
-        with open("/tmp/x.json", "w") as wf:
-            import json
-            json.dump(d["definitions"], wf, indent=2)
         dispatcher = FormatDispatcher()
         accessor = Accessor()
         return Codegen(dispatcher, accessor).codegen(d)

@@ -28,6 +28,7 @@ TYPE_MAP = {
 
     Pair(type="object", format=None): "marshmallow.fields:Nested",
     Pair(type="array", format=None): "marshmallow.fields:Nested",
+    Pair(type="any", format=None): "marshmallow.fields:Field",
 }
 
 
@@ -43,5 +44,7 @@ class FormatDispatcher(object):
         if self.__class__.def_map is None:
             self.__class__.load_def_map(self.__class__.path_map)
 
-    def dispatch(self, pair):
+    def dispatch(self, pair, field):
+        if pair.type == "object" and len(field) <= 1:
+            return "marshmallow.fields:Field"
         return self.path_map.get(pair) or self.path_map.get((pair[0], None))

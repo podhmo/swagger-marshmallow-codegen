@@ -67,6 +67,7 @@ class CodegenTests(DiffTestCase):
             ("./src/05person.yaml", "./dst/05person.py"),
             ("./src/00commit.yaml", "./dst/00commit.py"),
             ("./src/01commit.yaml", "./dst/01commit.py"),
+            ("./src/00emojis.yaml", "./dst/00emojis.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):

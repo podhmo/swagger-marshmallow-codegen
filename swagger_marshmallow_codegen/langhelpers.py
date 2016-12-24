@@ -5,10 +5,17 @@ import importlib
 import magicalimport
 
 
+def normalize(name):
+    if name[0].isdigit():
+        name = "n" + name
+    return name.replace(".", "").replace("-", "_")
+
+
 def titleize(name):
     if not name:
         return name
-    return "{}{}".format(name[0].upper(), name[1:]).replace("-", "_").replace(".", "")
+    name = str(name)
+    return normalize("{}{}".format(name[0].upper(), name[1:]))
 
 
 def untitleize(name):

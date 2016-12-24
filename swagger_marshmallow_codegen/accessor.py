@@ -3,7 +3,7 @@ import logging
 import sys
 import json
 import dictknife
-from .langhelpers import titleize
+from .langhelpers import titleize, normalize
 from .dispatcher import Pair
 logger = logging.getLogger(__name__)
 
@@ -28,6 +28,8 @@ class Accessor(object):
             logger.debug("%s is not found. name=%s", e.args[0], name)
             if "enum" in field:
                 return Pair(type="string", format=None)
+            if not field:
+                return Pair(type="any", format=None)
             return Pair(type="object", format=None)
 
     def update_options_pre_properties(self, d, opts):
@@ -55,6 +57,9 @@ class Resolver(object):
 
     def has_many(self, d):
         return d.get("type") == "array"
+
+    def resolve_normalized_name(self, name):
+        return normalize(name)
 
     def resolve_schema_name(self, name):
         schema_name = titleize(name)
