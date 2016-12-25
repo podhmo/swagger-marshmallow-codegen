@@ -3,6 +3,10 @@ from marshmallow import(
     Schema,
     fields
 )
+from marshmallow.validate import(
+    Length,
+    OneOf
+)
 
 
 class Asset(Schema):
@@ -88,7 +92,7 @@ class AssigneesItem(Schema):
 
 class Blob(Schema):
     content = fields.String()
-    encoding = fields.String()
+    encoding = fields.String(validate=[OneOf(choices=['utf-8', 'base64'], labels=[])])
     sha = fields.String()
     size = fields.Integer()
 
@@ -849,7 +853,7 @@ class Downloads(Schema):
 
 class EditTeam(Schema):
     name = fields.String(required=True)
-    permission = fields.String()
+    permission = fields.String(validate=[OneOf(choices=['pull', 'push', 'admin'], labels=[])])
 
 
 class Emojis(Schema):
@@ -882,7 +886,7 @@ class EventIssue(Schema):
     milestone = fields.Nested('EventIssueMilestone')
     number = fields.Integer()
     pull_request = fields.Nested('EventIssuePull_request')
-    state = fields.String()
+    state = fields.String(validate=[OneOf(choices=['open', 'closed'], labels=[])])
     title = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     url = fields.String()
@@ -911,7 +915,7 @@ class EventIssueMilestone(Schema):
     due_on = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     number = fields.Integer()
     open_issues = fields.Integer()
-    state = fields.String()
+    state = fields.String(validate=[OneOf(choices=['open', 'closed'], labels=[])])
     title = fields.String()
     url = fields.String()
 
@@ -1316,7 +1320,7 @@ class IssuesItem(Schema):
     milestone = fields.Nested('IssuesItemMilestone')
     number = fields.Integer()
     pull_request = fields.Nested('IssuesItemPull_request')
-    state = fields.String()
+    state = fields.String(validate=[OneOf(choices=['open', 'closed'], labels=[])])
     title = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     url = fields.String()
@@ -1345,7 +1349,7 @@ class IssuesItemMilestone(Schema):
     due_on = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     number = fields.Integer()
     open_issues = fields.Integer()
-    state = fields.String()
+    state = fields.String(validate=[OneOf(choices=['open', 'closed'], labels=[])])
     title = fields.String()
     url = fields.String()
 
@@ -1449,13 +1453,13 @@ class KeysItem(Schema):
 
 
 class Label(Schema):
-    color = fields.String()
+    color = fields.String(validate=[Length(min=6, max=6, equal=None)])
     name = fields.String()
     url = fields.String()
 
 
 class LabelsItem(Schema):
-    color = fields.String()
+    color = fields.String(validate=[Length(min=6, max=6, equal=None)])
     name = fields.String()
     url = fields.String()
 
@@ -1592,7 +1596,7 @@ class Milestone(Schema):
     due_on = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     number = fields.Integer()
     open_issues = fields.Integer()
-    state = fields.String()
+    state = fields.String(validate=[OneOf(choices=['open', 'closed'], labels=[])])
     title = fields.String()
     url = fields.String()
 
@@ -1685,7 +1689,7 @@ class OrgTeamsItem(Schema):
 
 class OrgTeamsPost(Schema):
     name = fields.String(required=True)
-    permission = fields.String()
+    permission = fields.String(validate=[OneOf(choices=['pull', 'push', 'admin'], labels=[])])
     repo_names = fields.String(many=True)
 
 
@@ -1983,7 +1987,7 @@ class PullsItem(Schema):
     merged_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     number = fields.Integer()
     patch_url = fields.String()
-    state = fields.String()
+    state = fields.String(validate=[OneOf(choices=['open', 'closed'], labels=[])])
     title = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     url = fields.String()
@@ -2508,11 +2512,11 @@ class Repo(Schema):
     open_issues_count = fields.Integer()
     organization = fields.Nested('RepoOrganization')
     owner = fields.Nested('RepoOwner')
-    parent = fields.Nested('RepoParent')
+    parent = fields.Nested('RepoParent', description='Is present when the repo is a fork. Parent is the repo this repo was forked from.')
     private = fields.Boolean()
     pushed_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     size = fields.Integer()
-    source = fields.Nested('RepoSource')
+    source = fields.Nested('RepoSource', description='Is present when the repo is a fork. Source is the ultimate source for the network.')
     ssh_url = fields.String()
     svn_url = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
@@ -2522,6 +2526,7 @@ class Repo(Schema):
 
 
 class RepoSource(Schema):
+    """Is present when the repo is a fork. Source is the ultimate source for the network."""
     clone_url = fields.String()
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     description = fields.String()
@@ -2560,6 +2565,7 @@ class RepoSourceOwner(Schema):
 
 
 class RepoParent(Schema):
+    """Is present when the repo is a fork. Parent is the repo this repo was forked from."""
     clone_url = fields.String()
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     description = fields.String()
@@ -3243,10 +3249,10 @@ class Trees(Schema):
 
 
 class TreesTreeItem(Schema):
-    mode = fields.String(description='One of 100644 for file (blob), 100755 for executable (blob), 040000 for subdirectory (tree), 160000 for submodule (commit) or 120000 for a blob that specifies the path of a symlink.')
+    mode = fields.String(description='One of 100644 for file (blob), 100755 for executable (blob), 040000 for subdirectory (tree), 160000 for submodule (commit) or 120000 for a blob that specifies the path of a symlink.', validate=[OneOf(choices=['100644', '100755', '040000', '160000', '120000'], labels=[])])
     path = fields.String()
     sha = fields.String(description='SHA1 checksum ID of the object in the tree.')
-    type = fields.String()
+    type = fields.String(validate=[OneOf(choices=['blob', 'tree', 'commit'], labels=[])])
     url = fields.String()
 
 
