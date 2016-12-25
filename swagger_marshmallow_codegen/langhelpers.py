@@ -1,17 +1,18 @@
 # -*- coding:utf-8 -*-
+import re
 import sys
 import os.path
 import importlib
 import magicalimport
 
 
-def normalize(name):
+def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):
     c = name[0]
     if c.isdigit():
         name = "n" + name
     elif not (c.isalpha() or c == "_"):
         name = "x" + name
-    return name.replace(".", "").replace("-", "_").replace("+", "plus")
+    return ignore_rx.sub("", name.replace("-", "_"))
 
 
 def titleize(name):
