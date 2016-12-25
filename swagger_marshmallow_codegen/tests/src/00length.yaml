@@ -1,0 +1,16 @@
+definitions:
+  x:
+    type: object
+    properties:
+      s0:
+        type: string
+      s1:
+        type: string
+        maxLength: 10
+      s2:
+        type: string
+        minLength: 5
+      s3:
+        type: string
+        maxLength: 10
+        minLength: 5

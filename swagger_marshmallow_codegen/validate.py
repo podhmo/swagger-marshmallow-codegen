@@ -40,3 +40,13 @@ class RangeWithRepr(Range):
         msg = "validate.Range(min={self.min}, max={self.max}, exclusive_max={self.exclusive_max}, exclusive_min={self.exclusive_min})"
         return msg.format(self=self)
 
+
+class LengthWithRepr(v.Length):
+    def __init__(self, *args, c=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.c = c
+
+    def __repr__(self):
+        self.c.im.from_("marshmallow.validate", "Length")
+        msg = "Length(min={self.min}, max={self.max})"
+        return msg.format(self=self)

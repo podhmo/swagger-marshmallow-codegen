@@ -61,6 +61,11 @@ class Accessor(object):
             range_opts["max"] = field.get("maximum")
             range_opts["exclusive_max"] = field.get("exclusiveMaximum", False)
             validators.append(validate.RangeWithRepr(**range_opts))
+        if "minLength" in field or "maxLength" in field:
+            length_opts = OrderedDict(c=c)
+            length_opts["min"] = field.get("minLength")
+            length_opts["max"] = field.get("maxLength")
+            validators.append(validate.LengthWithRepr(**length_opts))
         if validators:
             opts["validate"] = validators
         return opts
