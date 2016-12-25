@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class Context(object):
     def __init__(self):
-        self.m = Module()
+        self.m = Module(import_unique=True)
         self.im = self.m.submodule()
 
 
@@ -89,7 +89,7 @@ class Codegen(object):
                     logger.info("ref: %r is not found", field["$ref"])
                     return
 
-        self.accessor.update_option_on_property(field, opts)
+        self.accessor.update_option_on_property(c, field, opts)
 
         path = self.dispatcher.dispatch(self.accessor.type_and_format(name, field), field)
         if path is None:

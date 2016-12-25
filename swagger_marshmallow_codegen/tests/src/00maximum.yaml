@@ -1,0 +1,26 @@
+definitions:
+  x:
+    type: object
+    properties:
+      n0:
+        type: number
+        maximum: 100
+      n1:
+        type: number
+        maximum: 100
+        exclusiveMaximum: true
+      n2:
+        type: number
+        maximum: 100
+        exclusiveMaximum: false
+      m0:
+        type: number
+        minimum: 100
+      m1:
+        type: number
+        minimum: 100
+        exclusiveMinimum: true
+      m2:
+        type: number
+        minimum: 100
+        exclusiveMinimum: false

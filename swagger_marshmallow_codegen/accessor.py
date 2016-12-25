@@ -2,9 +2,11 @@
 import logging
 import sys
 import json
+from collections import OrderedDict
 import dictknife
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair
+from . import validate
 logger = logging.getLogger(__name__)
 
 
@@ -39,13 +41,28 @@ class Accessor(object):
             opts[name]["required"] = True
         return opts
 
-    def update_option_on_property(self, field, opts):
+    def update_option_on_property(self, c, field, opts):
         if "description" in field:
             opts["description"] = field["description"]
         if self.resolver.has_many(field):
             opts["many"] = True
         if "default" in field:
+            # todo: import on datetime.datetime etc...
             opts["default"] = field["default"]  # xxx
+        return self.update_validate_option_on_property(c, field, opts)
+
+    def update_validate_option_on_property(self, c, field, opts):
+        validators = []
+        # range
+        if "minimum" in field or "maximum" in field:
+            range_opts = OrderedDict(c=c)
+            range_opts["min"] = field.get("minimum")
+            range_opts["exclusive_min"] = field.get("exclusiveMinimum", False)
+            range_opts["max"] = field.get("maximum")
+            range_opts["exclusive_max"] = field.get("exclusiveMaximum", False)
+            validators.append(validate.RangeWithRepr(**range_opts))
+        if validators:
+            opts["validate"] = validators
         return opts
 
 
