@@ -6,9 +6,12 @@ import magicalimport
 
 
 def normalize(name):
-    if name[0].isdigit():
+    c = name[0]
+    if c.isdigit():
         name = "n" + name
-    return name.replace(".", "").replace("-", "_")
+    elif not (c.isalpha() or c == "_"):
+        name = "x" + name
+    return name.replace(".", "").replace("-", "_").replace("+", "plus")
 
 
 def titleize(name):

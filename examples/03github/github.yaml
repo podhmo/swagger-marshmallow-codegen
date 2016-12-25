@@ -12876,9 +12876,9 @@ definitions:
         type: string
       '1234':
         type: string
-      'plus1':
+      '+1':
         type: string
-      'minus1':
+      '-1':
         type: string
       8ball:
         type: string
