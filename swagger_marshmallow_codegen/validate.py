@@ -50,3 +50,14 @@ class LengthWithRepr(v.Length):
         self.c.im.from_("marshmallow.validate", "Length")
         msg = "Length(min={self.min}, max={self.max})"
         return msg.format(self=self)
+
+
+class RegexpWithRepr(v.Regexp):
+    def __init__(self, *args, c=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.c = c
+
+    def __repr__(self):
+        self.c.im.from_("marshmallow.validate", "Regexp")
+        msg = "Regexp(regex={self.regex.pattern!r})"
+        return msg.format(self=self)

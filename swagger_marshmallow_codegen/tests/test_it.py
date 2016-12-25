@@ -72,6 +72,7 @@ class CodegenTests(DiffTestCase):
             ("./src/00default.yaml", "./dst/00default.py"),
             ("./src/00maximum.yaml", "./dst/00maximum.py"),
             ("./src/00length.yaml", "./dst/00length.py"),
+            ("./src/00regex.yaml", "./dst/00regex.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):

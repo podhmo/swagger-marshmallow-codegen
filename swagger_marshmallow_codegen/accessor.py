@@ -66,6 +66,10 @@ class Accessor(object):
             length_opts["min"] = field.get("minLength")
             length_opts["max"] = field.get("maxLength")
             validators.append(validate.LengthWithRepr(**length_opts))
+        if "pattern" in field:
+            regex_opts = OrderedDict(c=c)
+            regex_opts["regex"] = field["pattern"]
+            validators.append(validate.RegexpWithRepr(**regex_opts))
         if validators:
             opts["validate"] = validators
         return opts

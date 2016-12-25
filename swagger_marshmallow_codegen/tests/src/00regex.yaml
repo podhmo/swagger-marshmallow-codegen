@@ -1,0 +1,11 @@
+definitions:
+  x:
+    type: object
+    properties:
+      team:
+        type: string
+        pattern: team[1-9][0-9]+
+      team2:
+        type: string
+        pattern: team[1-9][0-9]+
+        maxLength: 10
