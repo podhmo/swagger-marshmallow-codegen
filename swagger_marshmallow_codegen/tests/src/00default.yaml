@@ -23,6 +23,9 @@ definitions:
           age:
             type: integer
             default: 20
+        default:
+          name: foo
+          age: 20
       array:
         type: array
         items:

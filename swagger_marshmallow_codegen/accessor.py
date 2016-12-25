@@ -4,6 +4,7 @@ import sys
 import json
 import dictknife
 from datetime import (datetime, time, date)  # xxx
+from collections import OrderedDict  # xxx
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair
 from . import validate
@@ -59,6 +60,8 @@ class Accessor(object):
         # xxx:
         if isinstance(repr_wrap.value, (time, date, datetime)):
             repr_wrap.c.im.import_("datetime")
+        if isinstance(repr_wrap.value, OrderedDict):
+            repr_wrap.c.im.from_("collections", "OrderedDict")
 
 
 class _ReprWrap(object):
