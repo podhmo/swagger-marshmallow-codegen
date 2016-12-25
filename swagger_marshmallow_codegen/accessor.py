@@ -44,6 +44,8 @@ class Accessor(object):
             opts["description"] = field["description"]
         if self.resolver.has_many(field):
             opts["many"] = True
+        if "default" in field:
+            opts["default"] = field["default"]  # xxx
         return opts
 
 
