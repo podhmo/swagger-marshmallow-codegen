@@ -280,7 +280,7 @@ class CommitAuthor(Schema):
 
 
 class CommitActivityStatsItem(Schema):
-    days = fields.Nested('CommitActivityStatsItemDays', many=True)
+    days = fields.Integer(many=True)
     total = fields.Integer()
     week = fields.Integer()
 
@@ -1272,7 +1272,7 @@ class HookItem(Schema):
     active = fields.Boolean()
     config = fields.Nested('HookItemConfig')
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
-    events = fields.Nested('HookItemEvents', many=True)
+    events = fields.String(many=True)
     id = fields.Integer()
     name = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
@@ -1286,13 +1286,13 @@ class HookItemConfig(Schema):
 
 class HookBody(Schema):
     active = fields.Boolean()
-    add_events = fields.Nested('HookBodyAdd_events', many=True)
+    add_events = fields.String(many=True)
 
 
 class Issue(Schema):
     assignee = fields.String()
     body = fields.String()
-    labels = fields.Nested('IssueLabels', many=True)
+    labels = fields.String(many=True)
     milestone = fields.Number()
     title = fields.String()
 
@@ -1300,7 +1300,7 @@ class Issue(Schema):
 class IssueBody(Schema):
     assignee = fields.String()
     body = fields.String()
-    labels = fields.Nested('IssueBodyLabels', many=True)
+    labels = fields.String(many=True)
     milestone = fields.Number()
     title = fields.String()
 
@@ -1580,8 +1580,8 @@ class MergesSuccessfulAuthor(Schema):
 
 
 class Meta(Schema):
-    git = fields.Nested('MetaGit', many=True)
-    hooks = fields.Nested('MetaHooks', many=True)
+    git = fields.String(many=True)
+    hooks = fields.String(many=True)
 
 
 class Milestone(Schema):
@@ -1686,7 +1686,7 @@ class OrgTeamsItem(Schema):
 class OrgTeamsPost(Schema):
     name = fields.String(required=True)
     permission = fields.String()
-    repo_names = fields.Nested('OrgTeamsPostRepo_names', many=True)
+    repo_names = fields.String(many=True)
 
 
 class Organization(Schema):
@@ -1720,8 +1720,8 @@ class OrganizationAsTeamMemberErrorsItem(Schema):
 
 
 class ParticipationStats(Schema):
-    all = fields.Nested('ParticipationStatsAll', many=True)
-    owner = fields.Nested('ParticipationStatsOwner', many=True)
+    all = fields.Integer(many=True)
+    owner = fields.Integer(many=True)
 
 
 class PatchGist(Schema):
@@ -2703,7 +2703,7 @@ class RepoCommitAuthor(Schema):
 class RepoCommitBody(Schema):
     author = fields.Nested('RepoCommitBodyAuthor')
     message = fields.String(required=True)
-    parents = fields.Nested('RepoCommitBodyParents', required=True, many=True)
+    parents = fields.String(required=True, many=True)
     tree = fields.String(required=True)
 
 
@@ -2931,7 +2931,7 @@ class Search_issues_by_keywordIssuesItem(Schema):
     created_at = fields.String()
     gravatar_id = fields.String()
     html_url = fields.String()
-    labels = fields.Nested('Search_issues_by_keywordIssuesItemLabels', many=True)
+    labels = fields.String(many=True)
     number = fields.Integer()
     position = fields.Integer()
     state = fields.String()
