@@ -41,3 +41,17 @@ class Flatten(object):
         data = self.load(inp)
         result = self.transform(data)
         self.dump(result, outp)
+
+
+class ProfileDriver(Driver):
+    def run(self, inp, outp):
+        import cProfile
+        import pstats
+        profile = cProfile.Profile()
+        profile.enable()
+        data = self.load(inp)
+        result = self.transform(data)
+        profile.disable()
+        s = pstats.Stats(profile)
+        s.dump_stats("swagger-marshmallow-codegen.prof")
+        self.dump(result, outp)
