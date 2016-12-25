@@ -1,0 +1,36 @@
+definitions:
+  color:
+    type: string
+    enum:
+      - R
+      - G
+      - B
+  yen:
+    type: integer
+    enum:
+      - 1
+      - 5
+      - 10
+      - 50
+      - 100
+      - 500
+      - 1000
+      - 5000
+      - 10000
+  huge-yen:
+    type: integer
+    multipleOf: 10000
+  person:
+    type: object
+    required:
+      - name
+      - color
+    properties:
+      name:
+        type: string
+      money:
+        $ref: "#/definitions/yen"
+      deposit:
+        $ref: "#/definitions/huge-yen"
+      color:
+        $ref: "#/definitions/color"

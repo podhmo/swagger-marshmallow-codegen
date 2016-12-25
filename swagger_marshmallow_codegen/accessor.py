@@ -60,7 +60,7 @@ class Accessor(object):
             range_opts["exclusive_min"] = field.get("exclusiveMinimum", False)
             range_opts["max"] = field.get("maximum")
             range_opts["exclusive_max"] = field.get("exclusiveMaximum", False)
-            validators.append(validate.RangeWithRepr(**range_opts))
+            validators.append(validate.CustomRangeWithRepr(**range_opts))
         if "minLength" in field or "maxLength" in field:
             length_opts = OrderedDict(c=c)
             length_opts["min"] = field.get("minLength")
@@ -70,6 +70,14 @@ class Accessor(object):
             regex_opts = OrderedDict(c=c)
             regex_opts["regex"] = field["pattern"]
             validators.append(validate.RegexpWithRepr(**regex_opts))
+        if "enum" in field:
+            enum_opts = OrderedDict(c=c)
+            enum_opts["choices"] = field["enum"]
+            validators.append(validate.OneOfWithRepr(**enum_opts))
+        if "multipleOf" in field:
+            multipleof_opts = OrderedDict(c=c)
+            multipleof_opts["n"] = field["multipleOf"]
+            validators.append(validate.MultipleOfWithRepr(**multipleof_opts))
         if validators:
             opts["validate"] = validators
         return opts
