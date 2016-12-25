@@ -4,6 +4,8 @@ definitions:
     properties:
       days:
         $ref: "#/definitions/days"
+      days2:
+        $ref: "#/definitions/days2"
       total:
         type: integer
       week:
@@ -12,3 +14,5 @@ definitions:
     type: array
     items:
       type: integer
+  days2:
+    $ref: "#/definitions/days"

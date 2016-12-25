@@ -18,8 +18,10 @@ class Accessor(object):
     def properties(self, d):
         return d.get("properties") or {}
 
-    def type_and_format(self, name, field):
+    def type_and_format(self, name, field, ignore_array=True):
         try:
+            if self.resolver.has_many(field):
+                return self.type_and_format(name, field["items"])
             typ = field["type"]
             format = field.get("format")
             logger.debug("type-and-format: name=%s type=%s, format=%s, field=%s", name, typ, format, lazy_json_dump(field))
@@ -52,11 +54,26 @@ class Resolver(object):
     def has_ref(self, d):
         return "$ref" in d
 
-    def has_schema(self, d):
-        return d.get("type", None) in ("array", "object", None)
+    def has_schema(self, fulldata, d, cand=("object",), fullscan=True):
+        typ = d.get("type", None)
+        if typ in cand:
+            return True
+        if "properties" in d:
+            return True
+        if not self.has_ref(d):
+            return False
+        if not fullscan:
+            return False
+        _, definition = self.resolve_ref_definition(fulldata, d)
+        return self.has_schema(fulldata, definition, fullscan=False)
+
+    def has_nested(self, fulldata, d):
+        if self.has_schema(fulldata, d, fullscan=False):
+            return True
+        return self.has_many(d) and self.has_schema(fulldata, d["items"])
 
     def has_many(self, d):
-        return d.get("type") == "array"
+        return d.get("type") == "array" or "items" in d
 
     def resolve_normalized_name(self, name):
         return normalize(name)

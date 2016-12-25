@@ -11,7 +11,6 @@ class Context(object):
     def __init__(self):
         self.m = Module()
         self.im = self.m.submodule()
-        self.field_m = Module()
 
 
 class Codegen(object):
@@ -70,10 +69,7 @@ class Codegen(object):
         arrived = set()
         for schema_name, definition in self.accessor.definitions(d).items():
 
-            if not self.resolver.has_schema(definition):
-                continue
-
-            if self.resolver.has_many(definition):
+            if not self.resolver.has_schema(d, definition):
                 continue
 
             clsname = self.resolver.resolve_schema_name(schema_name)
@@ -111,7 +107,7 @@ class Codegen(object):
 
         kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
 
-        if self.resolver.has_schema(field) and field_class_name:
+        if self.resolver.has_nested(d, field) and field_class_name:
             if kwargs:
                 kwargs = ", " + kwargs
             c.m.stmt(LazyFormat("{} = {}.{}({!r}{})", normalized_name, module, field_name, field_class_name, kwargs))

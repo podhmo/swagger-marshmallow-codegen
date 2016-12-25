@@ -27,7 +27,6 @@ TYPE_MAP = {
     Pair(type="string", format="url"): "marshmallow.fields:URL",
 
     Pair(type="object", format=None): "marshmallow.fields:Nested",
-    Pair(type="array", format=None): "marshmallow.fields:Nested",
     Pair(type="any", format=None): "marshmallow.fields:Field",
 }
 
