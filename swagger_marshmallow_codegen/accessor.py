@@ -3,6 +3,7 @@ import logging
 import sys
 import json
 import dictknife
+from datetime import (datetime, time, date)  # xxx
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair
 from . import validate
@@ -47,12 +48,35 @@ class Accessor(object):
             opts["many"] = True
         if "default" in field:
             # todo: import on datetime.datetime etc...
-            opts["default"] = field["default"]  # xxx
+            opts["default"] = _ReprWrap(field["default"], c=c, on_repr=self._on_repr)  # xxx
 
         validators = self.resolver.resolve_validators_on_property(c, field)
         if validators:
             opts["validate"] = validators
         return opts
+
+    def _on_repr(self, repr_wrap):
+        # xxx:
+        if isinstance(repr_wrap.value, (time, date, datetime)):
+            repr_wrap.c.im.import_("datetime")
+
+
+class _ReprWrap(object):
+    def __init__(self, value, c, on_repr):
+        self.value = value
+        self.c = c
+        self.on_repr = on_repr
+
+    def __repr__(self):
+        self.on_repr(self)
+        return repr(self.value)
+
+    def __getattr__(self, name):
+        return getattr(self.value, name)
+
+    @property
+    def __class__(self):
+        return self.value.__class__
 
 
 class Resolver(object):

@@ -1,3 +1,4 @@
+import datetime
 class X(Schema):
     string = fields.String(default='default')
     integer = fields.Integer(default=10)
