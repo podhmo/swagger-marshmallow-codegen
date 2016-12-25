@@ -102,3 +102,64 @@ class MultipleOfWithRepr(MultipleOf):
     def __repr__(self):
         self.c.im.from_("swagger_marshmallow_codegen", "validate")
         return "validate.MultipleOf({})".format(self._repr_args())
+
+
+class ItemsRange(v.Range):
+    """for maxItems and minItems"""
+
+    message_min = 'Must be at least {min} items.'
+    message_max = 'Must be at most {max} items.'
+    message_all = 'Must be between {min} and {max} items.'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, value):
+        if self.min is not None and len(value) < self.min:
+            message = self.message_min if self.max is None else self.message_all
+            raise v.ValidationError(self._format_error(value, message))
+
+        if self.max is not None and len(value) > self.max:
+            message = self.message_max if self.min is None else self.message_all
+            raise v.ValidationError(self._format_error(value, message))
+        return value
+
+
+class ItemsRangeWithRepr(ItemsRange):
+    """for code generation"""
+    def __init__(self, *args, c=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.c = c
+
+    def __repr__(self):
+        self.c.im.from_("swagger_marshmallow_codegen", "validate")
+        return "validate.ItemsRange({})".format(self._repr_args())
+
+
+class Unique(v.Validator):
+    message = '{input} is Not unique'
+
+    def __init__(self, error=None):
+        self.error = error
+
+    def _repr_args(self):
+        return ''
+
+    def _format_error(self, value):
+        return self.message.format(input=value)
+
+    def __call__(self, value):
+        if len(value) != len(set(value)):
+            raise v.ValidationError(self._format_error(value))
+        return value
+
+
+class UniqueWithRepr(Unique):
+    """for code generation"""
+    def __init__(self, *args, c=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.c = c
+
+    def __repr__(self):
+        self.c.im.from_("swagger_marshmallow_codegen", "validate")
+        return "validate.Unique({})".format(self._repr_args())

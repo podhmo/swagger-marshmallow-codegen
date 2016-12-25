@@ -1,0 +1,11 @@
+definitions:
+  A:
+    type: object
+    properties:
+      nums:
+        type: array
+        items:
+          type: integer
+        maxItems: 10
+        minItems: 1
+        uniqueItems: true

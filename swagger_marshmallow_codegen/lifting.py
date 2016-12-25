@@ -23,14 +23,14 @@ class ExtractorContext:
     def save_object(self, name, definition):
         newdef = self.r.__class__()
         newdef["type"] = "object"
-        newdef["properties"] = definition
+        newdef.update(definition)
         self.r[name] = newdef
         return newdef
 
     def save_array(self, name, definition):
         newdef = self.r.__class__()
         newdef["type"] = "array"
-        newdef["items"] = definition
+        newdef.update(definition)
         self.r[name] = newdef
         return newdef
 
@@ -69,7 +69,7 @@ class SubDefinitionExtractor:
         if "$ref" in data:
             return data
         fullname = ctx.full_name()
-        ctx.save_object(fullname, data["properties"])
+        ctx.save_object(fullname, data)
         return self.return_definition(data, fullname, typ="object")
 
     def on_array_has_items(self, data, ctx):
@@ -78,7 +78,7 @@ class SubDefinitionExtractor:
         fullname = ctx.full_name()
         ctx.add_array_item()
         data["items"] = self._extract(data["items"], ctx)
-        ctx.save_array(fullname, data["items"])
+        ctx.save_array(fullname, data)
         ctx.pop_name()
         return self.return_definition(data, fullname, typ="array")
 

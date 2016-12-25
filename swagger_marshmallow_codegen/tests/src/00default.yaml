@@ -27,7 +27,6 @@ definitions:
         type: array
         items:
           type: integer
-        # not detected.
         default:
           - 1
           - 2

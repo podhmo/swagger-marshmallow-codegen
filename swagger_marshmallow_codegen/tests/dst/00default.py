@@ -4,7 +4,7 @@ class X(Schema):
     boolean = fields.Boolean(default=True)
     datetime = fields.DateTime(default=datetime.datetime(2000, 1, 1, 1, 1, 1))
     object = fields.Nested('XObject')
-    array = fields.Integer(many=True)
+    array = fields.Integer(many=True, default=[1, 2, 3])
 
 
 class XObject(Schema):
