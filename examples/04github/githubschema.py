@@ -111,7 +111,7 @@ class BranchCommit(Schema):
     author = fields.Nested('BranchCommitAuthor')
     commit = fields.Nested('BranchCommitCommit')
     committer = fields.Nested('BranchCommitCommitter')
-    parents = fields.Nested('BranchCommitParentsItem', many=True)
+    parents = fields.List(fields.Nested('BranchCommitParentsItem', ))
     sha = fields.String()
     url = fields.String()
 
@@ -213,8 +213,8 @@ class Commit(Schema):
     author = fields.Nested('CommitAuthor')
     commit = fields.Nested('CommitCommit')
     committer = fields.Nested('CommitCommitter')
-    files = fields.Nested('CommitFilesItem', many=True)
-    parents = fields.Nested('CommitParentsItem', many=True)
+    files = fields.List(fields.Nested('CommitFilesItem', ))
+    parents = fields.List(fields.Nested('CommitParentsItem', ))
     sha = fields.String()
     stats = fields.Nested('CommitStats')
     url = fields.String()
@@ -284,7 +284,7 @@ class CommitAuthor(Schema):
 
 
 class CommitActivityStatsItem(Schema):
-    days = fields.Integer(many=True)
+    days = fields.List(fields.Integer())
     total = fields.Integer()
     week = fields.Integer()
 
@@ -324,7 +324,7 @@ class CommitsItem(Schema):
     author = fields.Nested('CommitsItemAuthor')
     commit = fields.Nested('CommitsItemCommit')
     committer = fields.Nested('CommitsItemCommitter')
-    parents = fields.Nested('CommitsItemParentsItem', many=True)
+    parents = fields.List(fields.Nested('CommitsItemParentsItem', ))
     sha = fields.String()
     url = fields.String()
 
@@ -379,9 +379,9 @@ class Compare_commits(Schema):
     ahead_by = fields.Integer()
     base_commit = fields.Nested('Compare_commitsBase_commit')
     behind_by = fields.Integer()
-    commits = fields.Nested('Compare_commitsCommitsItem', many=True)
+    commits = fields.List(fields.Nested('Compare_commitsCommitsItem', ))
     diff_url = fields.String()
-    files = fields.Nested('Compare_commitsFilesItem', many=True)
+    files = fields.List(fields.Nested('Compare_commitsFilesItem', ))
     html_url = fields.String()
     patch_url = fields.String()
     permalink_url = fields.String()
@@ -407,7 +407,7 @@ class Compare_commitsCommitsItem(Schema):
     author = fields.Nested('Compare_commitsCommitsItemAuthor')
     commit = fields.Nested('Compare_commitsCommitsItemCommit')
     committer = fields.Nested('Compare_commitsCommitsItemCommitter')
-    parents = fields.Nested('Compare_commitsCommitsItemParentsItem', many=True)
+    parents = fields.List(fields.Nested('Compare_commitsCommitsItemParentsItem', ))
     sha = fields.String()
     url = fields.String()
 
@@ -486,7 +486,7 @@ class Compare_commitsBase_commit(Schema):
     author = fields.Nested('Compare_commitsBase_commitAuthor')
     commit = fields.Nested('Compare_commitsBase_commitCommit')
     committer = fields.Nested('Compare_commitsBase_commitCommitter')
-    parents = fields.Nested('Compare_commitsBase_commitParentsItem', many=True)
+    parents = fields.List(fields.Nested('Compare_commitsBase_commitParentsItem', ))
     sha = fields.String()
     url = fields.String()
 
@@ -593,7 +593,7 @@ class ContributorsItem(Schema):
 class ContributorsStatsItem(Schema):
     author = fields.Nested('ContributorsStatsItemAuthor')
     total = fields.Integer(description='The Total number of commits authored by the contributor.')
-    weeks = fields.Nested('ContributorsStatsItemWeeksItem', many=True)
+    weeks = fields.List(fields.Nested('ContributorsStatsItemWeeksItem', ))
 
 
 class ContributorsStatsItemWeeksItem(Schema):
@@ -661,7 +661,7 @@ class CreateFileCommit(Schema):
     committer = fields.Nested('CreateFileCommitCommitter')
     html_url = fields.String()
     message = fields.String()
-    parents = fields.Nested('CreateFileCommitParentsItem', many=True)
+    parents = fields.List(fields.Nested('CreateFileCommitParentsItem', ))
     sha = fields.String()
     tree = fields.Nested('CreateFileCommitTree')
     url = fields.String()
@@ -882,7 +882,7 @@ class EventIssue(Schema):
     comments = fields.Integer()
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     html_url = fields.String()
-    labels = fields.Nested('EventIssueLabelsItem', many=True)
+    labels = fields.List(fields.Nested('EventIssueLabelsItem', ))
     milestone = fields.Nested('EventIssueMilestone')
     number = fields.Integer()
     pull_request = fields.Nested('EventIssuePull_request')
@@ -1122,10 +1122,10 @@ class Gist(Schema):
     created_at = fields.String(description='Timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.')
     description = fields.String()
     files = fields.Nested('GistFiles')
-    forks = fields.Nested('GistForksItem', many=True)
+    forks = fields.List(fields.Nested('GistForksItem', ))
     git_pull_url = fields.String()
     git_push_url = fields.String()
-    history = fields.Nested('GistHistoryItem', many=True)
+    history = fields.List(fields.Nested('GistHistoryItem', ))
     html_url = fields.String()
     id = fields.String()
     public = fields.Boolean()
@@ -1276,7 +1276,7 @@ class HookItem(Schema):
     active = fields.Boolean()
     config = fields.Nested('HookItemConfig')
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
-    events = fields.String(many=True)
+    events = fields.List(fields.String())
     id = fields.Integer()
     name = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
@@ -1290,13 +1290,13 @@ class HookItemConfig(Schema):
 
 class HookBody(Schema):
     active = fields.Boolean()
-    add_events = fields.String(many=True)
+    add_events = fields.List(fields.String())
 
 
 class Issue(Schema):
     assignee = fields.String()
     body = fields.String()
-    labels = fields.String(many=True)
+    labels = fields.List(fields.String())
     milestone = fields.Number()
     title = fields.String()
 
@@ -1304,7 +1304,7 @@ class Issue(Schema):
 class IssueBody(Schema):
     assignee = fields.String()
     body = fields.String()
-    labels = fields.String(many=True)
+    labels = fields.List(fields.String())
     milestone = fields.Number()
     title = fields.String()
 
@@ -1316,7 +1316,7 @@ class IssuesItem(Schema):
     comments = fields.Integer()
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     html_url = fields.String()
-    labels = fields.Nested('IssuesItemLabelsItem', many=True)
+    labels = fields.List(fields.Nested('IssuesItemLabelsItem', ))
     milestone = fields.Nested('IssuesItemMilestone')
     number = fields.Integer()
     pull_request = fields.Nested('IssuesItemPull_request')
@@ -1509,7 +1509,7 @@ class MergesSuccessful(Schema):
     committer = fields.Nested('MergesSuccessfulCommitter')
     merged = fields.Boolean()
     message = fields.String()
-    parents = fields.Nested('MergesSuccessfulParentsItem', many=True)
+    parents = fields.List(fields.Nested('MergesSuccessfulParentsItem', ))
     sha = fields.String()
     url = fields.String()
 
@@ -1584,8 +1584,8 @@ class MergesSuccessfulAuthor(Schema):
 
 
 class Meta(Schema):
-    git = fields.String(many=True)
-    hooks = fields.String(many=True)
+    git = fields.List(fields.String())
+    hooks = fields.List(fields.String())
 
 
 class Milestone(Schema):
@@ -1690,7 +1690,7 @@ class OrgTeamsItem(Schema):
 class OrgTeamsPost(Schema):
     name = fields.String(required=True)
     permission = fields.String(validate=[OneOf(choices=['pull', 'push', 'admin'], labels=[])])
-    repo_names = fields.String(many=True)
+    repo_names = fields.List(fields.String())
 
 
 class Organization(Schema):
@@ -1713,7 +1713,7 @@ class Organization(Schema):
 
 
 class OrganizationAsTeamMember(Schema):
-    errors = fields.Nested('OrganizationAsTeamMemberErrorsItem', many=True)
+    errors = fields.List(fields.Nested('OrganizationAsTeamMemberErrorsItem', ))
     message = fields.String()
 
 
@@ -1724,8 +1724,8 @@ class OrganizationAsTeamMemberErrorsItem(Schema):
 
 
 class ParticipationStats(Schema):
-    all = fields.Integer(many=True)
-    owner = fields.Integer(many=True)
+    all = fields.List(fields.Integer())
+    owner = fields.List(fields.Integer())
 
 
 class PatchGist(Schema):
@@ -2301,7 +2301,7 @@ class RefStatusItem(Schema):
     repository_url = fields.String()
     sha = fields.String()
     state = fields.String()
-    statuses = fields.Nested('RefStatusItemStatusesItem', many=True)
+    statuses = fields.List(fields.Nested('RefStatusItemStatusesItem', ))
 
 
 class RefStatusItemStatusesItem(Schema):
@@ -2333,7 +2333,7 @@ class RefsBody(Schema):
 
 
 class Release(Schema):
-    assets = fields.Nested('ReleaseAssetsItem', many=True)
+    assets = fields.List(fields.Nested('ReleaseAssetsItem', ))
     assets_url = fields.String()
     author = fields.Nested('ReleaseAuthor')
     body = fields.String()
@@ -2416,7 +2416,7 @@ class Release_create(Schema):
 
 
 class ReleasesItem(Schema):
-    assets = fields.Nested('ReleasesItemAssetsItem', many=True)
+    assets = fields.List(fields.Nested('ReleasesItemAssetsItem', ))
     assets_url = fields.String()
     author = fields.Nested('ReleasesItemAuthor')
     body = fields.String()
@@ -2678,7 +2678,7 @@ class RepoCommit(Schema):
     author = fields.Nested('RepoCommitAuthor')
     committer = fields.Nested('RepoCommitCommitter')
     message = fields.String()
-    parents = fields.Nested('RepoCommitParentsItem', many=True)
+    parents = fields.List(fields.Nested('RepoCommitParentsItem', ))
     sha = fields.String()
     tree = fields.Nested('RepoCommitTree')
     url = fields.String()
@@ -2709,7 +2709,7 @@ class RepoCommitAuthor(Schema):
 class RepoCommitBody(Schema):
     author = fields.Nested('RepoCommitBodyAuthor')
     message = fields.String(required=True)
-    parents = fields.String(required=True, many=True)
+    parents = fields.List(fields.String(required=True))
     tree = fields.String(required=True)
 
 
@@ -2788,7 +2788,7 @@ class RepositoriesItemOwner(Schema):
 
 
 class Search_code(Schema):
-    items = fields.Nested('Search_codeItemsItem', many=True)
+    items = fields.List(fields.Nested('Search_codeItemsItem', ))
     total_count = fields.Integer()
 
 
@@ -2869,7 +2869,7 @@ class Search_codeItemsItemRepositoryOwner(Schema):
 
 
 class Search_issues(Schema):
-    items = fields.Nested('Search_issuesItemsItem', many=True)
+    items = fields.List(fields.Nested('Search_issuesItemsItem', ))
     total_count = fields.Integer()
 
 
@@ -2883,7 +2883,7 @@ class Search_issuesItemsItem(Schema):
     events_url = fields.String()
     html_url = fields.String()
     id = fields.Integer()
-    labels = fields.Nested('Search_issuesItemsItemLabelsItem', many=True)
+    labels = fields.List(fields.Nested('Search_issuesItemsItemLabelsItem', ))
     labels_url = fields.String()
     milestone = fields.Field()
     number = fields.Integer()
@@ -2928,7 +2928,7 @@ class Search_issuesItemsItemLabelsItem(Schema):
 
 
 class Search_issues_by_keyword(Schema):
-    issues = fields.Nested('Search_issues_by_keywordIssuesItem', many=True)
+    issues = fields.List(fields.Nested('Search_issues_by_keywordIssuesItem', ))
 
 
 class Search_issues_by_keywordIssuesItem(Schema):
@@ -2937,7 +2937,7 @@ class Search_issues_by_keywordIssuesItem(Schema):
     created_at = fields.String()
     gravatar_id = fields.String()
     html_url = fields.String()
-    labels = fields.String(many=True)
+    labels = fields.List(fields.String())
     number = fields.Integer()
     position = fields.Integer()
     state = fields.String()
@@ -2948,7 +2948,7 @@ class Search_issues_by_keywordIssuesItem(Schema):
 
 
 class Search_repositories(Schema):
-    items = fields.Nested('Search_repositoriesItemsItem', many=True)
+    items = fields.List(fields.Nested('Search_repositoriesItemsItem', ))
     total_count = fields.Integer()
 
 
@@ -2990,7 +2990,7 @@ class Search_repositoriesItemsItemOwner(Schema):
 
 
 class Search_repositories_by_keyword(Schema):
-    repositories = fields.Nested('Search_repositories_by_keywordRepositoriesItem', many=True)
+    repositories = fields.List(fields.Nested('Search_repositories_by_keywordRepositoriesItem', ))
 
 
 class Search_repositories_by_keywordRepositoriesItem(Schema):
@@ -3042,7 +3042,7 @@ class Search_user_by_emailUser(Schema):
 
 
 class Search_users(Schema):
-    items = fields.Nested('Search_usersItemsItem', many=True)
+    items = fields.List(fields.Nested('Search_usersItemsItem', ))
     total_count = fields.Integer()
 
 
@@ -3063,7 +3063,7 @@ class Search_usersItemsItem(Schema):
 
 
 class Search_users_by_keyword(Schema):
-    users = fields.Nested('Search_users_by_keywordUsersItem', many=True)
+    users = fields.List(fields.Nested('Search_users_by_keywordUsersItem', ))
 
 
 class Search_users_by_keywordUsersItem(Schema):
@@ -3228,7 +3228,7 @@ class Teams_listItemOrganization(Schema):
 
 class Tree(Schema):
     sha = fields.String()
-    tree = fields.Nested('TreeTreeItem', many=True)
+    tree = fields.List(fields.Nested('TreeTreeItem', ))
     url = fields.String()
 
 
@@ -3244,7 +3244,7 @@ class TreeTreeItem(Schema):
 class Trees(Schema):
     base_tree = fields.String()
     sha = fields.String(description='SHA1 checksum ID of the object in the tree.')
-    tree = fields.Nested('TreesTreeItem', many=True)
+    tree = fields.List(fields.Nested('TreesTreeItem', ))
     url = fields.String()
 
 

@@ -10,7 +10,7 @@ class Person(Schema):
     age = fields.Integer(description='age')
     father = fields.Nested('Father')
     mother = fields.Nested('Mother')
-    skills = fields.Nested('Skill', many=True)
+    skills = fields.List(fields.Nested('Skill', ))
 
 
 class Father(Person):

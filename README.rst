@@ -172,6 +172,10 @@ definition.py
       fields
   )
   import datetime
+  from swagger_marshmallow_codegen.fields import(
+      Date,
+      DateTime
+  )
   from collections import OrderedDict
   from marshmallow.validate import(
       Length,
@@ -187,10 +191,10 @@ definition.py
       string = fields.String(missing='default')
       integer = fields.Integer(missing=10)
       boolean = fields.Boolean(missing=True)
-      date = fields.Date(missing=datetime.date(2000, 1, 1))
-      datetime = fields.DateTime(missing=datetime.datetime(2000, 1, 1, 1, 1, 1))
+      date = Date(missing=datetime.date(2000, 1, 1))
+      datetime = DateTime(missing=datetime.datetime(2000, 1, 1, 1, 1, 1))
       object = fields.Nested('DefaultObject', missing=OrderedDict([('name', 'foo'), ('age', 20)]))
-      array = fields.Integer(many=True, missing=[1, 2, 3])
+      array = fields.List(fields.Integer(missing=[1, 2, 3]))
 
 
   class DefaultObject(Schema):
@@ -220,7 +224,7 @@ definition.py
 
 
   class Array_validation(Schema):
-      nums = fields.Integer(many=True, validate=[validate.ItemsRange(min=1, max=10), validate.Unique()])
+      nums = fields.List(fields.Integer(validate=[validate.ItemsRange(min=1, max=10), validate.Unique()]))
 
 
   class Enum_validation(Schema):
