@@ -184,18 +184,18 @@ definition.py
 
 
   class Default(Schema):
-      string = fields.String(default='default')
-      integer = fields.Integer(default=10)
-      boolean = fields.Boolean(default=True)
-      date = fields.Date(default=datetime.date(2000, 1, 1))
-      datetime = fields.DateTime(default=datetime.datetime(2000, 1, 1, 1, 1, 1))
-      object = fields.Nested('DefaultObject', default=OrderedDict([('name', 'foo'), ('age', 20)]))
-      array = fields.Integer(many=True, default=[1, 2, 3])
+      string = fields.String(missing='default')
+      integer = fields.Integer(missing=10)
+      boolean = fields.Boolean(missing=True)
+      date = fields.Date(missing=datetime.date(2000, 1, 1))
+      datetime = fields.DateTime(missing=datetime.datetime(2000, 1, 1, 1, 1, 1))
+      object = fields.Nested('DefaultObject', missing=OrderedDict([('name', 'foo'), ('age', 20)]))
+      array = fields.Integer(many=True, missing=[1, 2, 3])
 
 
   class DefaultObject(Schema):
-      name = fields.String(default='foo')
-      age = fields.Integer(default=20)
+      name = fields.String(missing='foo')
+      age = fields.Integer(missing=20)
 
 
   class Length_validation(Schema):

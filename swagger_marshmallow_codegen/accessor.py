@@ -49,7 +49,7 @@ class Accessor(object):
             opts["many"] = True
         if "default" in field:
             # todo: import on datetime.datetime etc...
-            opts["default"] = _ReprWrap(field["default"], c=c, on_repr=self._on_repr)  # xxx
+            opts["missing"] = _ReprWrap(field["default"], c=c, on_repr=self._on_repr)  # xxx
 
         validators = self.resolver.resolve_validators_on_property(c, field)
         if validators:
