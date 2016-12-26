@@ -49,19 +49,20 @@ class Accessor(object):
             opts["many"] = True
         if "default" in field:
             # todo: import on datetime.datetime etc...
-            opts["missing"] = _ReprWrap(field["default"], c=c, on_repr=self._on_repr)  # xxx
+            self.attach_import(c, field["default"])
+            opts["missing"] = field["default"]  # xxx
 
         validators = self.resolver.resolve_validators_on_property(c, field)
         if validators:
             opts["validate"] = validators
         return opts
 
-    def _on_repr(self, repr_wrap):
+    def attach_import(self, c, value):
         # xxx:
-        if isinstance(repr_wrap.value, (time, date, datetime)):
-            repr_wrap.c.im.import_("datetime")
-        if isinstance(repr_wrap.value, OrderedDict):
-            repr_wrap.c.im.from_("collections", "OrderedDict")
+        if isinstance(value, (time, date, datetime)):
+            c.im.import_("datetime")
+        if isinstance(value, OrderedDict):
+            c.im.from_("collections", "OrderedDict")
 
 
 class _ReprWrap(object):
@@ -177,6 +178,9 @@ class Resolver(object):
             validators.append(validate.ItemsRangeWithRepr(**itemrange_opts))
         if field.get("uniqueItems", False):
             validators.append(validate.UniqueWithRepr(c=c))
+        # xxx:
+        for v in validators:
+            repr(v)
         return validators
 
 

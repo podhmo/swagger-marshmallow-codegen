@@ -1,5 +1,5 @@
 class Stat(Schema):
-    days = fields.Integer(many=True)
-    days2 = fields.Integer(many=True)
+    days = fields.List(fields.Integer())
+    days2 = fields.List(fields.Integer())
     total = fields.Integer()
     week = fields.Integer()

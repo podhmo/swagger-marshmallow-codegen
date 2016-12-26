@@ -1,7 +1,7 @@
 class Commit(Schema):
     author = fields.Nested('CommitAuthor')
     commit = fields.Nested('CommitCommit')
-    files = fields.Nested('CommitFilesItem', many=True)
+    files = fields.List(fields.Nested('CommitFilesItem', ))
 
 
 class CommitFilesItem(Schema):

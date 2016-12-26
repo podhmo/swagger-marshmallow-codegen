@@ -1,7 +1,7 @@
 class Person(Schema):
     name = fields.String(required=True, description='name of something')
     age = fields.Integer(description='age')
-    skills = fields.Nested('Skill', many=True)
+    skills = fields.List(fields.Nested('Skill', ))
 
 
 class Skill(Schema):

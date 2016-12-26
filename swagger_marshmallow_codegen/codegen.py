@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
-from prestring.python import Module, LazyFormat
+from prestring.python import Module, LazyFormat, LazyKeywords
 from dictknife import deepequal
 from collections import defaultdict
 from collections import OrderedDict
@@ -99,21 +99,27 @@ class Codegen(object):
         module, field_name = path.rsplit(":", 1)
         # todo: import module
         if module == "marshmallow.fields":
-            module = self.fields_module
+            module = "{}.".format(self.fields_module)
+        else:
+            c.im.from_(module, field_name)  # xxx
+            module = ""
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name
 
-        kwargs = ", ".join(("{}={}".format(k, repr(v)) for k, v in opts.items()))
+        kwargs = LazyKeywordsRepr(opts)
 
         if self.resolver.has_nested(d, field) and field_class_name:
-            if kwargs:
-                kwargs = ", " + kwargs
-            c.m.stmt(LazyFormat("{} = {}.{}({!r}{})", normalized_name, module, field_name, field_class_name, kwargs))
+            if opts:
+                kwargs = LazyFormat(", {}", kwargs)
+            value = LazyFormat("{}{}({!r}{})", module, field_name, field_class_name, kwargs)
         else:
             # field
-            c.m.stmt(LazyFormat("{} = {}.{}({})", normalized_name, module, field_name, kwargs))
+            value = LazyFormat("{}{}({})", module, field_name, kwargs)
+        if opts.pop("many", False):
+            value = LazyFormat("fields.List({})", value)
+        c.m.stmt(LazyFormat("{} = {}", normalized_name, value))
 
     def write_field_many(self, c, d, schema_name, definition, field_name, field, opts):
         opts["many"] = True
@@ -127,3 +133,8 @@ class Codegen(object):
         self.write_import_(c)
         self.write_body(c, d)
         return c.m
+
+
+class LazyKeywordsRepr(LazyKeywords):
+    def _string(self):
+        return ", ".join(["{}={}".format(str(k), repr(v)) for k, v in self.kwargs.items()])
