@@ -153,7 +153,7 @@ class Resolver(object):
             range_opts["exclusive_min"] = field.get("exclusiveMinimum", False)
             range_opts["max"] = field.get("maximum")
             range_opts["exclusive_max"] = field.get("exclusiveMaximum", False)
-            validators.append(validate.CustomRangeWithRepr(**range_opts))
+            validators.append(validate.RangeWithRepr(**range_opts))
         if "minLength" in field or "maxLength" in field:
             length_opts = dict(c=c)
             length_opts["min"] = field.get("minLength")

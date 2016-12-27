@@ -4,8 +4,8 @@ from collections import namedtuple
 
 class RangeTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
-        from swagger_marshmallow_codegen.validate import CustomRange
-        return CustomRange(*args, **kwargs)
+        from swagger_marshmallow_codegen.validate import Range
+        return Range(*args, **kwargs)
 
     def test_maximum(self):
         from marshmallow.validate import ValidationError

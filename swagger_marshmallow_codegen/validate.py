@@ -1,7 +1,7 @@
 from marshmallow import validate as v
 
 
-class CustomRange(v.Range):
+class Range(v.Range):
     def __init__(self, min=None, max=None, error=None, exclusive_max=False, exclusive_min=False):
         super().__init__(min=min, max=max, error=error)
         self.exclusive_max = exclusive_max
@@ -32,7 +32,7 @@ class CustomRange(v.Range):
         return value
 
 
-class CustomRangeWithRepr(CustomRange):
+class RangeWithRepr(Range):
     """for code generation"""
     def __init__(self, *args, c=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -40,7 +40,7 @@ class CustomRangeWithRepr(CustomRange):
 
     def __repr__(self):
         self.c.im.from_("swagger_marshmallow_codegen", "validate")
-        return "validate.CustomRange({})".format(self._repr_args())
+        return "validate.Range({})".format(self._repr_args())
 
 
 class LengthWithRepr(v.Length):
