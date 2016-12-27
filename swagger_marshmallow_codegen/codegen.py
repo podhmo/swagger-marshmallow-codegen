@@ -112,10 +112,13 @@ class Codegen(object):
         kwargs = LazyKeywordsRepr(opts)
 
         if self.resolver.has_nested(d, field) and field_class_name:
+            logger.debug("      nested: %s, %s", caller_name, field_class_name)
             if opts:
                 kwargs = LazyFormat(", {}", kwargs)
             value = LazyFormat("{}({!r}{})", caller_name, field_class_name, kwargs)
         else:
+            if caller_name == "fields.Nested":
+                caller_name = "fields.Field"
             # field
             value = LazyFormat("{}({})", caller_name, kwargs)
         if opts.pop("many", False):
