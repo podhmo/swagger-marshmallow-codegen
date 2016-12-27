@@ -14,9 +14,13 @@ from marshmallow.validate import(
     OneOf,
     Regexp
 )
-from swagger_marshmallow_codegen import(
-    validate
+from swagger_marshmallow_codegen.validate import(
+    ItemsRange,
+    MultipleOf,
+    Range,
+    Unique
 )
+import re
 
 
 class Default(Schema):
@@ -42,25 +46,25 @@ class Length_validation(Schema):
 
 
 class Maximum_validation(Schema):
-    n0 = fields.Number(validate=[validate.Range(min=None, max=100, exclusive_min=False, exclusive_max=False)])
-    n1 = fields.Number(validate=[validate.Range(min=None, max=100, exclusive_min=False, exclusive_max=True)])
-    n2 = fields.Number(validate=[validate.Range(min=None, max=100, exclusive_min=False, exclusive_max=False)])
-    m0 = fields.Number(validate=[validate.Range(min=100, max=None, exclusive_min=False, exclusive_max=False)])
-    m1 = fields.Number(validate=[validate.Range(min=100, max=None, exclusive_min=True, exclusive_max=False)])
-    m2 = fields.Number(validate=[validate.Range(min=100, max=None, exclusive_min=False, exclusive_max=False)])
+    n0 = fields.Number(validate=[Range(min=None, max=100, exclusive_min=False, exclusive_max=False)])
+    n1 = fields.Number(validate=[Range(min=None, max=100, exclusive_min=False, exclusive_max=True)])
+    n2 = fields.Number(validate=[Range(min=None, max=100, exclusive_min=False, exclusive_max=False)])
+    m0 = fields.Number(validate=[Range(min=100, max=None, exclusive_min=False, exclusive_max=False)])
+    m1 = fields.Number(validate=[Range(min=100, max=None, exclusive_min=True, exclusive_max=False)])
+    m2 = fields.Number(validate=[Range(min=100, max=None, exclusive_min=False, exclusive_max=False)])
 
 
 class Regex_validation(Schema):
-    team = fields.String(validate=[Regexp(regex='team[1-9][0-9]+')])
-    team2 = fields.String(validate=[Length(min=None, max=10, equal=None), Regexp(regex='team[1-9][0-9]+')])
+    team = fields.String(validate=[Regexp(regex=re.compile('team[1-9][0-9]+'))])
+    team2 = fields.String(validate=[Length(min=None, max=10, equal=None), Regexp(regex=re.compile('team[1-9][0-9]+'))])
 
 
 class Array_validation(Schema):
-    nums = fields.List(fields.Integer(validate=[validate.ItemsRange(min=1, max=10), validate.Unique()]))
+    nums = fields.List(fields.Integer(validate=[ItemsRange(min=1, max=10), Unique()]))
 
 
 class Enum_validation(Schema):
     name = fields.String(required=True)
     money = fields.Integer(validate=[OneOf(choices=[1, 5, 10, 50, 100, 500, 1000, 5000, 10000], labels=[])])
-    deposit = fields.Integer(validate=[validate.MultipleOf(n=10000)])
+    deposit = fields.Integer(validate=[MultipleOf(n=10000)])
     color = fields.String(required=True, validate=[OneOf(choices=['R', 'G', 'B'], labels=[])])
