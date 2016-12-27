@@ -8,6 +8,7 @@ from swagger_marshmallow_codegen.langhelpers import load_function
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--driver", default="swagger_marshmallow_codegen.driver:Driver")
+    parser.add_argument("--logging", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     parser.add_argument("file", default=None)
     args = parser.parse_args()
 
@@ -17,7 +18,7 @@ def main():
     driver = load_function(driver_cls)()
 
     # todo: option
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging._nameToLevel[args.logging])
 
     if args.file is None:
         driver.run(sys.stdin, sys.stdout)
