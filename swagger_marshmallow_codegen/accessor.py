@@ -95,6 +95,15 @@ class Resolver(object):
         logger.debug("schema: %s", schema_name)
         return schema_name
 
+    def resolve_caller_name(self, c, path):
+        module, cls_name = path.rsplit(":", 1)
+        # todo: import module
+        if module == "marshmallow.fields":
+            return "{}.{}".format("fields", cls_name)
+        else:
+            c.im.from_(module, cls_name)  # xxx
+            return cls_name
+
     def resolve_ref_definition(self, fulldata, d, name=None, i=0, level=-1):
         # return schema_name, definition_dict
         # todo: support quoted "/"

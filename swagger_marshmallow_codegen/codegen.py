@@ -14,8 +14,7 @@ class Context(object):
 
 
 class Codegen(object):
-    schema_class = "Schema"
-    fields_module = "fields"
+    schema_class = "Schema"  # xxx
 
     def __init__(self, dispatcher, accessor):
         self.dispatcher = dispatcher
@@ -96,14 +95,7 @@ class Codegen(object):
             logger.info("path: matched path is not found. name=%r, schema=%r", name, schema_name)
             return
 
-        module, field_name = path.rsplit(":", 1)
-        # todo: import module
-        if module == "marshmallow.fields":
-            module = "{}.".format(self.fields_module)
-        else:
-            c.im.from_(module, field_name)  # xxx
-            module = ""
-
+        caller_name = self.accessor.resolver.resolve_caller_name(c, path)
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name
@@ -113,10 +105,10 @@ class Codegen(object):
         if self.resolver.has_nested(d, field) and field_class_name:
             if opts:
                 kwargs = LazyFormat(", {}", kwargs)
-            value = LazyFormat("{}{}({!r}{})", module, field_name, field_class_name, kwargs)
+            value = LazyFormat("{}({!r}{})", caller_name, field_class_name, kwargs)
         else:
             # field
-            value = LazyFormat("{}{}({})", module, field_name, kwargs)
+            value = LazyFormat("{}({})", caller_name, kwargs)
         if opts.pop("many", False):
             value = LazyFormat("fields.List({})", value)
         c.m.stmt(LazyFormat("{} = {}", normalized_name, value))
