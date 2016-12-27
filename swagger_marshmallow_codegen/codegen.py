@@ -13,11 +13,14 @@ class Context(object):
         self.im = self.m.submodule()
 
 
+class CodegenError(Exception):
+    pass
+
+
 class Codegen(object):
     schema_class = "Schema"  # xxx
 
-    def __init__(self, dispatcher, accessor):
-        self.dispatcher = dispatcher
+    def __init__(self, accessor):
         self.accessor = accessor
 
     @property
@@ -41,8 +44,7 @@ class Codegen(object):
         if self.resolver.has_ref(definition):
             ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
             if ref_name is None:
-                logger.info("ref: %r is not found", definition["$ref"])
-                # error is raised?
+                raise CodegenError("$ref %r is not found", definition["$ref"])
             else:
                 self.write_schema(c, d, ref_name, ref_definition, arrived)
                 baseclass = ref_name
@@ -85,17 +87,13 @@ class Codegen(object):
             if self.resolver.has_ref(field):
                 ref_name, field = self.resolver.resolve_ref_definition(d, field)
                 if ref_name is None:
-                    logger.info("ref: %r is not found", field["$ref"])
-                    return
+                    raise CodegenError("ref: %r is not found", field["$ref"])
 
         self.accessor.update_option_on_property(c, field, opts)
+        caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
+        if caller_name is None:
+            raise CodegenError("matched field class is not found. name=%r, schema=%r", name, schema_name)
 
-        path = self.dispatcher.dispatch(self.accessor.type_and_format(name, field), field)
-        if path is None:
-            logger.info("path: matched path is not found. name=%r, schema=%r", name, schema_name)
-            return
-
-        caller_name = self.accessor.resolver.resolve_caller_name(c, path)
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name

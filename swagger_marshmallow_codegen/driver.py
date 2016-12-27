@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
 from . import loading
-from .dispatcher import FormatDispatcher
 from .accessor import Accessor
 from .codegen import Codegen
 from .lifting import lifting_definition
@@ -17,9 +16,8 @@ class Driver(object):
 
     def transform(self, d):
         d = lifting_definition(d)
-        dispatcher = FormatDispatcher()
         accessor = Accessor()
-        return Codegen(dispatcher, accessor).codegen(d)
+        return Codegen(accessor).codegen(d)
 
     def run(self, inp, outp):
         data = self.load(inp)

@@ -4,7 +4,7 @@ import sys
 import json
 import dictknife
 from .langhelpers import titleize, normalize, LazyCallString
-from .dispatcher import Pair
+from .dispatcher import Pair, FormatDispatcher
 from . import validate
 logger = logging.getLogger(__name__)
 
@@ -18,22 +18,6 @@ class Accessor(object):
 
     def properties(self, d):
         return d.get("properties") or {}
-
-    def type_and_format(self, name, field, ignore_array=True):
-        try:
-            if self.resolver.has_many(field):
-                return self.type_and_format(name, field["items"])
-            typ = field["type"]
-            format = field.get("format")
-            logger.debug("type-and-format: name=%s type=%s, format=%s, field=%s", name, typ, format, lazy_json_dump(field))
-            return Pair(type=typ, format=format)
-        except KeyError as e:
-            logger.debug("%s is not found. name=%s", e.args[0], name)
-            if "enum" in field:
-                return Pair(type="string", format=None)
-            if not field:
-                return Pair(type="any", format=None)
-            return Pair(type="object", format=None)
 
     def update_options_pre_properties(self, d, opts):
         for name in d.get("required") or []:
@@ -61,6 +45,7 @@ class Accessor(object):
 class Resolver(object):
     def __init__(self):
         self.accessor = dictknife.Accessor()  # todo: rename
+        self.dispatcher = FormatDispatcher()
         self.import_handler = ImportHandler()
 
     def has_ref(self, d):
@@ -95,11 +80,30 @@ class Resolver(object):
         logger.debug("schema: %s", schema_name)
         return schema_name
 
-    def resolve_caller_name(self, c, path):
+    def resolve_type_and_format(self, name, field, ignore_array=True):
+        try:
+            if self.has_many(field):
+                return self.resolve_type_and_format(name, field["items"])
+            typ = field["type"]
+            format = field.get("format")
+            logger.debug("type-and-format: name=%s type=%s, format=%s, field=%s", name, typ, format, lazy_json_dump(field))
+            return Pair(type=typ, format=format)
+        except KeyError as e:
+            logger.debug("%s is not found. name=%s", e.args[0], name)
+            if "enum" in field:
+                return Pair(type="string", format=None)
+            if not field:
+                return Pair(type="any", format=None)
+            return Pair(type="object", format=None)
+
+    def resolve_caller_name(self, c, field_name, field):
+        path = self.dispatcher.dispatch(self.resolve_type_and_format(field_name, field), field)
+        if path is None:
+            return None
+
         module, cls_name = path.rsplit(":", 1)
-        # todo: import module
         if module == "marshmallow.fields":
-            return "{}.{}".format("fields", cls_name)
+            return "{}.{}".format("fields", cls_name)  # xxx:
         else:
             c.im.from_(module, cls_name)  # xxx
             return cls_name
