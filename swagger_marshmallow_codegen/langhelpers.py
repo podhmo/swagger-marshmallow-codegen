@@ -40,3 +40,13 @@ def load_function(sym, here=None):
     except (ImportError, AttributeError) as e:
         sys.stderr.write("could not import {!r}\n{}\n".format(sym, e))
         raise
+
+
+class LazyCallString(object):
+    def __init__(self, call, *args, **kwargs):
+        self.call = call
+        self.args = args
+        self.kwargs = kwargs
+
+    def __str__(self):
+        return self.call(*self.args, **self.kwargs)

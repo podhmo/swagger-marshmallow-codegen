@@ -1,4 +1,9 @@
 from marshmallow import validate as v
+from marshmallow.validate import (  # NOQA
+    Length,
+    Regexp,
+    OneOf,
+)
 
 
 class Range(v.Range):
@@ -32,48 +37,6 @@ class Range(v.Range):
         return value
 
 
-class RangeWithRepr(Range):
-    """for code generation"""
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("swagger_marshmallow_codegen", "validate")
-        return "validate.Range({})".format(self._repr_args())
-
-
-class LengthWithRepr(v.Length):
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("marshmallow.validate", "Length")
-        return "Length({})".format(self._repr_args())
-
-
-class RegexpWithRepr(v.Regexp):
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("marshmallow.validate", "Regexp")
-        msg = "Regexp(regex={self.regex.pattern!r})"
-        return msg.format(self=self)
-
-
-class OneOfWithRepr(v.OneOf):
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("marshmallow.validate", "OneOf")
-        return "OneOf({})".format(self._repr_args())
-
-
 class MultipleOf(v.Validator):
     message = '{input} is Not divisible by {n}'
 
@@ -91,17 +54,6 @@ class MultipleOf(v.Validator):
         if value % self.n != 0:
             raise v.ValidationError(self._format_error(value))
         return value
-
-
-class MultipleOfWithRepr(MultipleOf):
-    """for code generation"""
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("swagger_marshmallow_codegen", "validate")
-        return "validate.MultipleOf({})".format(self._repr_args())
 
 
 class ItemsRange(v.Range):
@@ -125,17 +77,6 @@ class ItemsRange(v.Range):
         return value
 
 
-class ItemsRangeWithRepr(ItemsRange):
-    """for code generation"""
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("swagger_marshmallow_codegen", "validate")
-        return "validate.ItemsRange({})".format(self._repr_args())
-
-
 class Unique(v.Validator):
     message = '{input} is Not unique'
 
@@ -152,14 +93,3 @@ class Unique(v.Validator):
         if len(value) != len(set(value)):
             raise v.ValidationError(self._format_error(value))
         return value
-
-
-class UniqueWithRepr(Unique):
-    """for code generation"""
-    def __init__(self, *args, c=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.c = c
-
-    def __repr__(self):
-        self.c.im.from_("swagger_marshmallow_codegen", "validate")
-        return "validate.Unique({})".format(self._repr_args())

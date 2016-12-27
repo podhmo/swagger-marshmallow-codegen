@@ -3,9 +3,7 @@ import logging
 import sys
 import json
 import dictknife
-from datetime import (datetime, time, date)  # xxx
-from collections import OrderedDict  # xxx
-from .langhelpers import titleize, normalize
+from .langhelpers import titleize, normalize, LazyCallString
 from .dispatcher import Pair
 from . import validate
 logger = logging.getLogger(__name__)
@@ -48,44 +46,22 @@ class Accessor(object):
         if self.resolver.has_many(field):
             opts["many"] = True
         if "default" in field:
-            # todo: import on datetime.datetime etc...
-            self.attach_import(c, field["default"])
-            opts["missing"] = field["default"]  # xxx
+            opts["missing"] = self.import_handler.handle_default_value(c, field["default"])  # xxx
 
         validators = self.resolver.resolve_validators_on_property(c, field)
         if validators:
             opts["validate"] = validators
         return opts
 
-    def attach_import(self, c, value):
-        # xxx:
-        if isinstance(value, (time, date, datetime)):
-            c.im.import_("datetime")
-        if isinstance(value, OrderedDict):
-            c.im.from_("collections", "OrderedDict")
-
-
-class _ReprWrap(object):
-    def __init__(self, value, c, on_repr):
-        self.value = value
-        self.c = c
-        self.on_repr = on_repr
-
-    def __repr__(self):
-        self.on_repr(self)
-        return repr(self.value)
-
-    def __getattr__(self, name):
-        return getattr(self.value, name)
-
     @property
-    def __class__(self):
-        return self.value.__class__
+    def import_handler(self):
+        return self.resolver.import_handler
 
 
 class Resolver(object):
     def __init__(self):
         self.accessor = dictknife.Accessor()  # todo: rename
+        self.import_handler = ImportHandler()
 
     def has_ref(self, d):
         return "$ref" in d
@@ -146,52 +122,96 @@ class Resolver(object):
 
     def resolve_validators_on_property(self, c, field):
         validators = []
+
+        def add(validator):
+            return validators.append(self.import_handler.handle_validator(c, validator))
+
         # range
         if "minimum" in field or "maximum" in field:
-            range_opts = dict(c=c)
-            range_opts["min"] = field.get("minimum")
-            range_opts["exclusive_min"] = field.get("exclusiveMinimum", False)
-            range_opts["max"] = field.get("maximum")
-            range_opts["exclusive_max"] = field.get("exclusiveMaximum", False)
-            validators.append(validate.RangeWithRepr(**range_opts))
+            range_opts = {
+                "min": field.get("minimum"),
+                "exclusive_min": field.get("exclusiveMinimum", False),
+                "max": field.get("maximum"),
+                "exclusive_max": field.get("exclusiveMaximum", False),
+            }
+            add(validate.Range(**range_opts))
         if "minLength" in field or "maxLength" in field:
-            length_opts = dict(c=c)
-            length_opts["min"] = field.get("minLength")
-            length_opts["max"] = field.get("maxLength")
-            validators.append(validate.LengthWithRepr(**length_opts))
+            length_opts = {
+                "min": field.get("minLength"),
+                "max": field.get("maxLength")
+            }
+            add(validate.Length(**length_opts))
         if "pattern" in field:
-            regex_opts = dict(c=c)
-            regex_opts["regex"] = field["pattern"]
-            validators.append(validate.RegexpWithRepr(**regex_opts))
+            regex_opts = {
+                "regex": field["pattern"]
+            }
+            add(validate.Regexp(**regex_opts))
         if "enum" in field:
-            enum_opts = dict(c=c)
-            enum_opts["choices"] = field["enum"]
-            validators.append(validate.OneOfWithRepr(**enum_opts))
+            enum_opts = {
+                "choices": field["enum"]
+            }
+            add(validate.OneOf(**enum_opts))
         if "multipleOf" in field:
-            multipleof_opts = dict(c=c)
-            multipleof_opts["n"] = field["multipleOf"]
-            validators.append(validate.MultipleOfWithRepr(**multipleof_opts))
+            multipleof_opts = {
+                "n": field["multipleOf"]
+            }
+            add(validate.MultipleOf(**multipleof_opts))
         if "maxItems" in field or "minItems" in field:
-            itemrange_opts = dict(c=c)
-            itemrange_opts["max"] = field.get("maxItems")
-            itemrange_opts["min"] = field.get("minItems")
-            validators.append(validate.ItemsRangeWithRepr(**itemrange_opts))
+            itemrange_opts = {
+                "max": field.get("maxItems"),
+                "min": field.get("minItems"),
+            }
+            add(validate.ItemsRange(**itemrange_opts))
         if field.get("uniqueItems", False):
-            validators.append(validate.UniqueWithRepr(c=c))
-        # xxx:
-        for v in validators:
-            repr(v)
+            add(validate.Unique())
         return validators
 
 
-class LazyCallString(object):
-    def __init__(self, call, *args, **kwargs):
-        self.call = call
-        self.args = args
-        self.kwargs = kwargs
+class ImportHandler(object):
+    def handle_validator(self, c, value):
+        from marshmallow.validate import (
+            Length,
+            Regexp,
+            OneOf,
+        )
+        from .validate import (
+            Range,
+            MultipleOf,
+            Unique,
+            ItemsRange
+        )
+        if isinstance(value, (Regexp)):
+            c.im.import_("re")  # xxx
+            c.im.from_("marshmallow.validate", value.__class__.__name__)
+        elif isinstance(value, (Length, OneOf)):
+            c.im.from_("marshmallow.validate", value.__class__.__name__)
+        elif isinstance(value, (Range, MultipleOf, Unique, ItemsRange)):
+            c.im.from_("swagger_marshmallow_codegen.validate", value.__class__.__name__)
+        return _ReprWrapValidator(value)
 
-    def __str__(self):
-        return self.call(*self.args, **self.kwargs)
+    def handle_default_value(self, c, value):
+        from datetime import (datetime, time, date)  # xxx
+        from collections import OrderedDict  # xxx
+        if isinstance(value, (time, date, datetime)):
+            c.im.import_("datetime")
+        elif isinstance(value, OrderedDict):
+            c.im.from_("collections", "OrderedDict")
+        return value
+
+
+class _ReprWrapValidator(object):
+    def __init__(self, validator):
+        self.validator = validator
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({args})".format(self=self, args=self._repr_args())
+
+    def __getattr__(self, name):
+        return getattr(self.validator, name)
+
+    @property
+    def __class__(self):
+        return self.validator.__class__
 
 
 def lazy_json_dump(s):

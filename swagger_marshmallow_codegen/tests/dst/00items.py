@@ -1,5 +1,6 @@
-from swagger_marshmallow_codegen import(
-    validate
+from swagger_marshmallow_codegen.validate import(
+    ItemsRange,
+    Unique
 )
 class A(Schema):
-    nums = fields.List(fields.Integer(validate=[validate.ItemsRange(min=1, max=10), validate.Unique()]))
+    nums = fields.List(fields.Integer(validate=[ItemsRange(min=1, max=10), Unique()]))
