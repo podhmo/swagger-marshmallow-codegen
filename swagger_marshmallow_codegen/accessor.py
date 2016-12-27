@@ -209,22 +209,29 @@ class ImportHandler(object):
             c.im.import_("datetime")
         elif isinstance(value, OrderedDict):
             c.im.from_("collections", "OrderedDict")
-        return value
+        return _ReprWrapDefault(value)
 
 
-class _ReprWrapValidator(object):
-    def __init__(self, validator):
-        self.validator = validator
-
-    def __repr__(self):
-        return "{self.__class__.__name__}({args})".format(self=self, args=self._repr_args())
+class _ReprWrap(object):
+    def __init__(self, value):
+        self.value = value
 
     def __getattr__(self, name):
-        return getattr(self.validator, name)
+        return getattr(self.value, name)
 
     @property
     def __class__(self):
-        return self.validator.__class__
+        return self.value.__class__
+
+
+class _ReprWrapValidator(_ReprWrap):
+    def __repr__(self):
+        return "{self.__class__.__name__}({args})".format(self=self, args=self.value._repr_args())
+
+
+class _ReprWrapDefault(_ReprWrap):
+    def __repr__(self):
+        return "lambda: {self.value!r}".format(self=self)
 
 
 def lazy_json_dump(s):
