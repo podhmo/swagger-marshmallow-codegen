@@ -2,5 +2,5 @@ SRC ?= ./00simple/person.yaml
 DST ?= ./00simple/person.py
 
 default:
-	swagger-marshmallow-codegen ${SRC} > ${DST}
+	swagger-marshmallow-codegen --logging=DEBUG ${SRC} > ${DST}
 	python `dirname ${DST}`/main.py

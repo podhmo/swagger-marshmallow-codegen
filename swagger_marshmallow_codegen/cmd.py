@@ -18,7 +18,10 @@ def main():
     driver = load_function(driver_cls)()
 
     # todo: option
-    logging.basicConfig(level=logging._nameToLevel[args.logging])
+    logging.basicConfig(
+        format="%(levelname)5s:%(name)36s:%(message)s",
+        level=logging._nameToLevel[args.logging]
+    )
 
     if args.file is None:
         driver.run(sys.stdin, sys.stdout)

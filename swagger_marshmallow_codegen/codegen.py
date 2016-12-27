@@ -4,6 +4,7 @@ from prestring.python import Module, LazyFormat, LazyKeywords
 from dictknife import deepequal
 from collections import defaultdict
 from collections import OrderedDict
+from .langhelpers import LazyCallString
 logger = logging.getLogger(__name__)
 
 
@@ -11,6 +12,14 @@ class Context(object):
     def __init__(self):
         self.m = Module(import_unique=True)
         self.im = self.m.submodule()
+
+    def from_(self, module, name):
+        logger.debug("      import: module=%s, name=%s", module, name)
+        self.im.from_(module, name)
+
+    def import_(self, module):
+        logger.debug("      import: module=%s", module)
+        self.im.import_(module)
 
 
 class CodegenError(Exception):
@@ -31,14 +40,13 @@ class Codegen(object):
         c.im.stmt("# -*- coding:utf-8 -*-")
 
     def write_import_(self, c):
-        c.im.from_("marshmallow", "Schema")
-        c.im.from_("marshmallow", "fields")
+        c.from_("marshmallow", "Schema")
+        c.from_("marshmallow", "fields")
 
     def write_schema(self, c, d, clsname, definition, arrived):
         if clsname in arrived:
             return
         arrived.add(clsname)
-
         baseclass = self.schema_class
 
         if self.resolver.has_ref(definition):
@@ -71,9 +79,11 @@ class Codegen(object):
         for schema_name, definition in self.accessor.definitions(d).items():
 
             if not self.resolver.has_schema(d, definition):
+                logger.info("write schema: skip %s", schema_name)
                 continue
 
             clsname = self.resolver.resolve_schema_name(schema_name)
+            logger.info("write schema: write %s", schema_name)
             self.write_schema(c, d, clsname, definition, arrived)
 
     def write_field_one(self, c, d, schema_name, definition, name, field, opts):
@@ -89,6 +99,7 @@ class Codegen(object):
                 if ref_name is None:
                     raise CodegenError("ref: %r is not found", field["$ref"])
 
+        logger.debug("      field: %s", lazy_json_dump(field))
         self.accessor.update_option_on_property(c, field, opts)
         caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
         if caller_name is None:
@@ -109,6 +120,7 @@ class Codegen(object):
             value = LazyFormat("{}({})", caller_name, kwargs)
         if opts.pop("many", False):
             value = LazyFormat("fields.List({})", value)
+        logger.info("  write field: write %s, field=%s", name, caller_name)
         c.m.stmt(LazyFormat("{} = {}", normalized_name, value))
 
     def write_field_many(self, c, d, schema_name, definition, field_name, field, opts):
@@ -128,3 +140,8 @@ class Codegen(object):
 class LazyKeywordsRepr(LazyKeywords):
     def _string(self):
         return ", ".join(["{}={}".format(str(k), repr(v)) for k, v in self.kwargs.items()])
+
+
+def lazy_json_dump(s):
+    import json
+    return LazyCallString(json.dumps, s)
