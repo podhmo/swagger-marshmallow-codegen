@@ -2,7 +2,7 @@
 import sys
 import logging
 import argparse
-from swagger_marshmallow_codegen.langhelpers import load_function
+from magicalimport import import_symbol
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     driver_cls = args.driver
     if ":" not in driver_cls:
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
-    driver = load_function(driver_cls)()
+    driver = import_symbol(driver_cls)()
 
     # todo: option
     logging.basicConfig(

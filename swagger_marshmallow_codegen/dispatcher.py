@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 from collections import namedtuple
-from .langhelpers import load_function
+from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
@@ -37,7 +37,7 @@ class FormatDispatcher(object):
 
     @classmethod
     def load_def_map(cls, path_map):
-        return {pair: load_function(path) for pair, path in path_map.items()}
+        return {pair: import_symbol(path) for pair, path in path_map.items()}
 
     def __init__(self):
         if self.__class__.def_map is None:

@@ -18,6 +18,8 @@ except IOError:
 install_requires = [
     'dictknife[load]',
     "prestring",
+    "marshmallow",
+    "magicalimport",
 ]
 
 
@@ -31,7 +33,7 @@ testing_extras = tests_require + [
 ]
 
 setup(name='swagger-marshmallow-codegen',
-      version='0.1',
+      version='0.1.1',
       description='generating marshmallow\'s schema from swagger definition file',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
