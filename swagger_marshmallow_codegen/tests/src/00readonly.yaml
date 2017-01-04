@@ -1,0 +1,12 @@
+definitions:
+  foo:
+    type: object
+    properties:
+      value0:
+        type: string
+      value1:
+        type: string
+        readOnly: false
+      value2:
+        type: string
+        readOnly: true

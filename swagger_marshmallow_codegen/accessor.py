@@ -32,6 +32,9 @@ class Accessor(object):
         if "default" in field:
             logger.debug("    resolve: default=%r", field["default"])
             opts["missing"] = self.import_handler.handle_default_value(c, field["default"])  # xxx
+        if field.get("readOnly", False):
+            logger.debug("    resolve: dump_only=True")
+            opts["dump_only"] = True
 
         validators = self.resolver.resolve_validators_on_property(c, field)
         if validators:
