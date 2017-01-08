@@ -2,12 +2,16 @@
 import logging
 from . import loading
 from .accessor import Accessor
+from .resolver import Resolver
 from .codegen import Codegen
+from .dispatcher import FormatDispatcher
 from .lifting import lifting_definition
 logger = logging.getLogger(__name__)
 
 
 class Driver(object):
+    dispatcher_factory = FormatDispatcher
+    resolver_factory = Resolver
     accessor_factory = Accessor
     codegen_factory = Codegen
 
@@ -19,13 +23,18 @@ class Driver(object):
 
     def transform(self, d):
         d = lifting_definition(d)
-        accessor = self.accessor_factory()
-        return self.codegen_factory(accessor).codegen(d)
+        return self.create_codegen().codegen(d)
 
     def run(self, inp, outp):
         data = self.load(inp)
         result = self.transform(data)
         self.dump(result, outp)
+
+    def create_codegen(self):
+        dispatcher = self.dispatcher_factory()
+        resolver = self.resolver_factory(dispatcher)
+        accessor = self.accessor_factory(resolver)
+        return self.codegen_factory(accessor)
 
 
 class Flatten(object):

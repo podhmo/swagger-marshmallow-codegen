@@ -38,7 +38,9 @@ class CodegenTests(DiffTestCase):
 
     def _makeOne(self):
         from ..accessor import Accessor
-        accessor = Accessor()
+        from ..resolver import Resolver
+        from ..dispatcher import FormatDispatcher
+        accessor = Accessor(Resolver(FormatDispatcher()))
         return self._getTargetClass()(accessor)
 
     def _makeContext(self):

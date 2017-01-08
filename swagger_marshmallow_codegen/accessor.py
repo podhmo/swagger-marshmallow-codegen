@@ -1,12 +1,11 @@
 # -*- coding:utf-8 -*-
 import logging
-from .resolver import Resolver
 logger = logging.getLogger(__name__)
 
 
 class Accessor(object):
-    def __init__(self):
-        self.resolver = Resolver()
+    def __init__(self, resolver):
+        self.resolver = resolver
 
     def definitions(self, d):
         return d.get("definitions") or {}

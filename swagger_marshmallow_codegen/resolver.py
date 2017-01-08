@@ -4,15 +4,15 @@ import sys
 from collections import OrderedDict
 import dictknife
 from .langhelpers import titleize, normalize
-from .dispatcher import Pair, FormatDispatcher
+from .dispatcher import Pair
 from . import validate
 logger = logging.getLogger(__name__)
 
 
 class Resolver(object):
-    def __init__(self):
+    def __init__(self, dispatcher):
+        self.dispatcher = dispatcher
         self.accessor = dictknife.Accessor()  # todo: rename
-        self.dispatcher = FormatDispatcher()
         self.import_handler = ImportHandler()
 
     def has_ref(self, d):
