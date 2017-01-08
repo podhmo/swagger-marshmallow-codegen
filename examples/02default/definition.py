@@ -1,20 +1,20 @@
 # -*- coding:utf-8 -*-
-from marshmallow import(
+from marshmallow import (
     Schema,
     fields
 )
 import datetime
-from swagger_marshmallow_codegen.fields import(
+from swagger_marshmallow_codegen.fields import (
     Date,
     DateTime
 )
 from collections import OrderedDict
-from marshmallow.validate import(
+from marshmallow.validate import (
     Length,
     OneOf,
     Regexp
 )
-from swagger_marshmallow_codegen.validate import(
+from swagger_marshmallow_codegen.validate import (
     ItemsRange,
     MultipleOf,
     Range,

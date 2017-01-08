@@ -1,0 +1,14 @@
+definitions:
+  person:
+    type: object
+    properties:
+      id:
+        type: string
+        format: objectId
+        default: 5872bad4c54d2d4e78b34c9d
+      name:
+        type: string
+      age:
+        type: integer
+    required:
+      - name
