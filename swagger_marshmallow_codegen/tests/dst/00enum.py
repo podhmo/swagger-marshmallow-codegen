@@ -1,4 +1,4 @@
-from marshmallow.validate import(
+from marshmallow.validate import (
     OneOf
 )
 from swagger_marshmallow_codegen.validate import MultipleOf

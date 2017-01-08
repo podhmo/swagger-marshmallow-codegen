@@ -1,4 +1,4 @@
-from swagger_marshmallow_codegen.validate import(
+from swagger_marshmallow_codegen.validate import (
     Range
 )
 class X(Schema):

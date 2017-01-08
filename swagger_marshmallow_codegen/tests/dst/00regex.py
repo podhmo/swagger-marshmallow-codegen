@@ -1,5 +1,5 @@
 import re
-from marshmallow.validate import(
+from marshmallow.validate import (
     Length,
     Regexp
 )
