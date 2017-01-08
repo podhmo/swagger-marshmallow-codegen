@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
+from functools import partial
 from collections import namedtuple
 from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
@@ -32,18 +33,19 @@ TYPE_MAP = {
 
 
 class FormatDispatcher(object):
-    path_map = TYPE_MAP
-    def_map = None  # singleton
+    @classmethod
+    def override(cls, type_map):
+        return partial(cls, type_map=type_map)
 
     @classmethod
-    def load_def_map(cls, path_map):
-        return {pair: import_symbol(path) for pair, path in path_map.items()}
+    def load_def_map(cls, type_map):
+        return {pair: import_symbol(path) for pair, path in type_map.items()}
 
-    def __init__(self):
-        if self.__class__.def_map is None:
-            self.__class__.load_def_map(self.__class__.path_map)
+    def __init__(self, type_map=TYPE_MAP, use_def_map=True):
+        self.type_map = type_map
+        self.def_map = self.load_def_map(type_map) if use_def_map else {}
 
     def dispatch(self, pair, field):
         if pair.type == "object" and len(field) <= 1:
             return "marshmallow.fields:Field"
-        return self.path_map.get(pair) or self.path_map.get((pair[0], None))
+        return self.type_map.get(pair) or self.type_map.get((pair[0], None))

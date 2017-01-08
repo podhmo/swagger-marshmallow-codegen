@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
+from functools import partial
 from prestring.python import Module, LazyFormat, LazyKeywords
 from dictknife import deepequal
 from collections import defaultdict
@@ -27,7 +28,9 @@ class CodegenError(Exception):
 
 
 class Codegen(object):
-    schema_class_path = "marshmallow:Schema"  # xxx
+    @classmethod
+    def override(cls, schema_class_path):
+        return partial(cls, schema_class_path=schema_class_path)
 
     def __init__(self, accessor, schema_class_path="marshmallow:Schema"):
         self.accessor = accessor
