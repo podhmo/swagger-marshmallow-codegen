@@ -28,13 +28,15 @@ class CodegenError(Exception):
 
 
 class Codegen(object):
+    schema_class_path = "marshmallow:Schema"
+
     @classmethod
     def override(cls, schema_class_path):
         return partial(cls, schema_class_path=schema_class_path)
 
-    def __init__(self, accessor, schema_class_path="marshmallow:Schema"):
+    def __init__(self, accessor, schema_class_path=None):
         self.accessor = accessor
-        self.schema_class_path = schema_class_path
+        self.schema_class_path = schema_class_path or self.__class__.schema_class_path
         self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
     @property
