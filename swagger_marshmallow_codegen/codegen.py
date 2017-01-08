@@ -27,10 +27,12 @@ class CodegenError(Exception):
 
 
 class Codegen(object):
-    schema_class = "Schema"  # xxx
+    schema_class_path = "marshmallow:Schema"  # xxx
 
-    def __init__(self, accessor):
+    def __init__(self, accessor, schema_class_path="marshmallow:Schema"):
         self.accessor = accessor
+        self.schema_class_path = schema_class_path
+        self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
     @property
     def resolver(self):
@@ -40,7 +42,7 @@ class Codegen(object):
         c.im.stmt("# -*- coding:utf-8 -*-")
 
     def write_import_(self, c):
-        c.from_("marshmallow", "Schema")
+        c.from_(*self.schema_class_path.rsplit(":", 1))
         c.from_("marshmallow", "fields")
 
     def write_schema(self, c, d, clsname, definition, arrived):

@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class Driver(object):
+    accessor_factory = Accessor
+    codegen_factory = Codegen
+
     def load(self, fp):
         return loading.load(fp)
 
@@ -16,8 +19,8 @@ class Driver(object):
 
     def transform(self, d):
         d = lifting_definition(d)
-        accessor = Accessor()
-        return Codegen(accessor).codegen(d)
+        accessor = self.accessor_factory()
+        return self.codegen_factory(accessor).codegen(d)
 
     def run(self, inp, outp):
         data = self.load(inp)
