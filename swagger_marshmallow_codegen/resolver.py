@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
+from collections import OrderedDict
 import dictknife
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair, FormatDispatcher
@@ -17,11 +18,16 @@ class Resolver(object):
     def has_ref(self, d):
         return "$ref" in d
 
+    def has_allof(self, d):
+        return "allOf" in d
+
     def has_schema(self, fulldata, d, cand=("object",), fullscan=True):
         typ = d.get("type", None)
         if typ in cand:
             return True
         if "properties" in d:
+            return True
+        if self.has_allof(d):
             return True
         if not self.has_ref(d):
             return False
@@ -75,6 +81,16 @@ class Resolver(object):
             caller_name = cls_name
         logger.debug("    resolve: field=%s", caller_name)
         return caller_name
+
+    def resolve_allof_definision(self, fulldata, d):
+        ref_list = []
+        r = OrderedDict()
+        for subdef in d["allOf"]:
+            if self.has_ref(subdef):
+                ref_list.append(self.resolve_ref_definition(fulldata, subdef))
+            else:
+                r = dictknife.deepmerge(r, subdef)
+        return ref_list, r
 
     def resolve_ref_definition(self, fulldata, d, name=None, i=0, level=-1):
         # return schema_name, definition_dict

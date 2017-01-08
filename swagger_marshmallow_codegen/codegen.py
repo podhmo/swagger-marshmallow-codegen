@@ -47,7 +47,7 @@ class Codegen(object):
         if clsname in arrived:
             return
         arrived.add(clsname)
-        baseclass = self.schema_class
+        base_classes = [self.schema_class]
 
         if self.resolver.has_ref(definition):
             ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
@@ -55,9 +55,19 @@ class Codegen(object):
                 raise CodegenError("$ref %r is not found", definition["$ref"])
             else:
                 self.write_schema(c, d, ref_name, ref_definition, arrived)
-                baseclass = ref_name
+                base_classes = [ref_name]
+        elif self.resolver.has_allof(definition):
+            ref_list, definition = self.resolver.resolve_allof_definision(d, definition)
+            if ref_list:
+                base_classes = []
+                for ref_name, ref_definition in ref_list:
+                    if ref_name is None:
+                        raise CodegenError("$ref %r is not found", ref_definition)  # xxx
+                    else:
+                        self.write_schema(c, d, ref_name, ref_definition, arrived)
+                        base_classes.append(ref_name)
 
-        with c.m.class_(clsname, baseclass):
+        with c.m.class_(clsname, *base_classes):
             if "description" in definition:
                 c.m.stmt('"""{}"""'.format(definition["description"]))
             opts = defaultdict(OrderedDict)
