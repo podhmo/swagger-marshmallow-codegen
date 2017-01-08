@@ -7,6 +7,10 @@ class Accessor(object):
     def __init__(self, resolver):
         self.resolver = resolver
 
+    @property
+    def dispatcher(self):
+        return self.resolver.dispatcher
+
     def definitions(self, d):
         return d.get("definitions") or {}
 
@@ -26,7 +30,7 @@ class Accessor(object):
             opts["many"] = True
         if "default" in field:
             logger.debug("    resolve: default=%r", field["default"])
-            opts["missing"] = self.import_handler.handle_default_value(c, field["default"])  # xxx
+            opts["missing"] = self.dispatcher.handle_default(c, field["default"], field)  # xxx
         if field.get("readOnly", False):
             logger.debug("    resolve: dump_only=True")
             opts["dump_only"] = True
@@ -35,7 +39,3 @@ class Accessor(object):
         if validators:
             opts["validate"] = validators
         return opts
-
-    @property
-    def import_handler(self):
-        return self.resolver.import_handler

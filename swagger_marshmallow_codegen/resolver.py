@@ -13,7 +13,6 @@ class Resolver(object):
     def __init__(self, dispatcher):
         self.dispatcher = dispatcher
         self.accessor = dictknife.Accessor()  # todo: rename
-        self.import_handler = ImportHandler()
 
     def has_ref(self, d):
         return "$ref" in d
@@ -122,7 +121,7 @@ class Resolver(object):
 
         def add(validator):
             logger.debug("    resolve: validator=%s", validator.__class__.__name__)
-            return validators.append(self.import_handler.handle_validator(c, validator))
+            return validators.append(self.dispatcher.handle_validator(c, validator))
 
         # range
         if "minimum" in field or "maximum" in field:
@@ -163,57 +162,3 @@ class Resolver(object):
         if field.get("uniqueItems", False):
             add(validate.Unique())
         return validators
-
-
-class _ReprWrap(object):
-    def __init__(self, value):
-        self.value = value
-
-    def __getattr__(self, name):
-        return getattr(self.value, name)
-
-    @property
-    def __class__(self):
-        return self.value.__class__
-
-
-class _ReprWrapValidator(_ReprWrap):
-    def __repr__(self):
-        return "{self.__class__.__name__}({args})".format(self=self, args=self.value._repr_args())
-
-
-class _ReprWrapDefault(_ReprWrap):
-    def __repr__(self):
-        return "lambda: {self.value!r}".format(self=self)
-
-
-class ImportHandler(object):
-    def handle_validator(self, c, value):
-        from marshmallow.validate import (
-            Length,
-            Regexp,
-            OneOf,
-        )
-        from .validate import (
-            Range,
-            MultipleOf,
-            Unique,
-            ItemsRange
-        )
-        if isinstance(value, (Regexp)):
-            c.import_("re")  # xxx
-            c.from_("marshmallow.validate", value.__class__.__name__)
-        elif isinstance(value, (Length, OneOf)):
-            c.from_("marshmallow.validate", value.__class__.__name__)
-        elif isinstance(value, (Range, MultipleOf, Unique, ItemsRange)):
-            c.from_("swagger_marshmallow_codegen.validate", value.__class__.__name__)
-        return _ReprWrapValidator(value)
-
-    def handle_default_value(self, c, value):
-        from datetime import (datetime, time, date)  # xxx
-        from collections import OrderedDict  # xxx
-        if isinstance(value, (time, date, datetime)):
-            c.import_("datetime")
-        elif isinstance(value, OrderedDict):
-            c.from_("collections", "OrderedDict")
-        return _ReprWrapDefault(value)

@@ -33,6 +33,8 @@ TYPE_MAP = {
 
 
 class FormatDispatcher(object):
+    type_map = TYPE_MAP
+
     @classmethod
     def override(cls, type_map):
         return partial(cls, type_map=type_map)
@@ -41,11 +43,74 @@ class FormatDispatcher(object):
     def load_def_map(cls, type_map):
         return {pair: import_symbol(path) for pair, path in type_map.items()}
 
-    def __init__(self, type_map=TYPE_MAP, use_def_map=True):
-        self.type_map = type_map
-        self.def_map = self.load_def_map(type_map) if use_def_map else {}
+    def __init__(self, type_map=None, use_def_map=True):
+        self.type_map = type_map or self.__class__.type_map
+        self.def_map = self.load_def_map(self.type_map) if use_def_map else {}
 
     def dispatch(self, pair, field):
         if pair.type == "object" and len(field) <= 1:
             return "marshmallow.fields:Field"
         return self.type_map.get(pair) or self.type_map.get((pair[0], None))
+
+    def handle_validator(self, c, value):
+        return ReprWrapValidator(self.dispatch_validator(c, value))
+
+    def dispatch_validator(self, c, value):
+        from marshmallow.validate import (
+            Length,
+            Regexp,
+            OneOf,
+        )
+        from .validate import (
+            Range,
+            MultipleOf,
+            Unique,
+            ItemsRange
+        )
+        if isinstance(value, (Regexp)):
+            c.import_("re")  # xxx
+            c.from_("marshmallow.validate", value.__class__.__name__)
+        elif isinstance(value, (Length, OneOf)):
+            c.from_("marshmallow.validate", value.__class__.__name__)
+        elif isinstance(value, (Range, MultipleOf, Unique, ItemsRange)):
+            c.from_("swagger_marshmallow_codegen.validate", value.__class__.__name__)
+        return value
+
+    def handle_default(self, c, value, field):
+        return ReprWrapDefault(self.dispatch_default(c, value, field))
+
+    def dispatch_default(self, c, value, field):
+        from datetime import (datetime, time, date)  # xxx
+        from collections import OrderedDict  # xxx
+        if isinstance(value, (time, date, datetime)):
+            c.import_("datetime")
+        elif isinstance(value, OrderedDict):
+            c.from_("collections", "OrderedDict")
+        return value
+
+
+class ReprWrap(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __getattr__(self, name):
+        return getattr(self.value, name)
+
+    @property
+    def __class__(self):
+        return self.value.__class__
+
+
+class ReprWrapValidator(ReprWrap):
+    def __repr__(self):
+        return "{self.__class__.__name__}({args})".format(self=self, args=self.value._repr_args())
+
+
+class ReprWrapDefault(ReprWrap):
+    def __repr__(self):
+        return "lambda: {self.value!r}".format(self=self)
+
+
+class ReprWrapString(ReprWrap):
+    def __repr__(self):
+        return str(self.value)
