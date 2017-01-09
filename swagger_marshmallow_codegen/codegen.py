@@ -90,7 +90,7 @@ class SchemaWriter(object):
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, field_name, field, opts)
 
-    def write_schema(self, c, d, clsname, definition, force=False):
+    def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None):
         if not force and clsname in self.arrived:
             return
         self.arrived.add(clsname)
@@ -117,11 +117,15 @@ class SchemaWriter(object):
         with c.m.class_(clsname, *base_classes):
             if "description" in definition:
                 c.m.stmt('"""{}"""'.format(definition["description"]))
+
+            if meta_writer is not None:
+                meta_writer(c.m)
+
             opts = defaultdict(OrderedDict)
             self.accessor.update_options_pre_properties(definition, opts)
 
             properties = self.accessor.properties(definition)
-            if not properties:
+            if not properties and not meta_writer:
                 c.m.stmt("pass")
             else:
                 for name, field in properties.items():
@@ -202,6 +206,43 @@ class PathsSchemaWriter(object):
         )
 
 
+class ResponsesSchemaWriter(object):
+    def __init__(self, accessor, schema_writer):
+        self.accessor = accessor
+        self.schema_writer = schema_writer
+        self.separate_rx = re.compile("[/_]")
+        self.ignore_rx = re.compile("[^0-9a-zA-Z_]+")
+
+    @property
+    def resolver(self):
+        return self.accessor.resolver
+
+    def write(self, c, d):
+        for path, methods in self.accessor.paths(d):
+            path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
+            clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
+            sc = c.create_child()
+            found = False
+            with sc.m.class_(clsname + "Output"):
+                for method, definition in self.accessor.methods(methods):
+                    for status, definition in self.accessor.responses(definition):
+                        if "schema" in definition:
+                            found = True
+                            clsname = titleize(method) + status
+                            definition = definition["schema"]
+                            # xxx:
+                            if "items" in definition:
+                                def meta(m):
+                                    with m.def_("__init__", "self", "*args", "**kwargs"):
+                                        m.stmt("kwargs['many'] = True")
+                                        m.stmt("super().__init__(*args, **kwargs)")
+                                self.schema_writer.write_schema(sc, d, clsname, definition["items"], force=True, meta_writer=meta)
+                            else:
+                                self.schema_writer.write_schema(sc, d, clsname, definition, force=True)
+            if not found:
+                sc.m.clear()
+
+
 class Codegen(object):
     schema_class_path = "marshmallow:Schema"
 
@@ -229,6 +270,7 @@ class Codegen(object):
         sw = SchemaWriter(self.accessor, self.schema_class)
         DefinitionsSchemaWriter(self.accessor, sw).write(c, d)
         PathsSchemaWriter(self.accessor, sw).write(c, d)
+        ResponsesSchemaWriter(self.accessor, sw).write(c, d)
 
     def codegen(self, d, ctx=None):
         c = ctx or Context()
