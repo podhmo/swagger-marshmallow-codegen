@@ -11,8 +11,19 @@ class Accessor(object):
     def dispatcher(self):
         return self.resolver.dispatcher
 
+    def paths(self, d):
+        return (d.get("paths") or {}).items()
+
+    def methods(self, d, candidates=["get", "post", "put", "delete"]):
+        for method, definition in d.items():
+            if method in candidates:
+                yield method, definition
+
+    def parameters(self, d):
+        return d.get("parameters") or []
+
     def definitions(self, d):
-        return d.get("definitions") or {}
+        return (d.get("definitions") or {}).items()
 
     def properties(self, d):
         return d.get("properties") or {}

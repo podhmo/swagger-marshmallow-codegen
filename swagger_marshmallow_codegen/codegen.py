@@ -1,18 +1,23 @@
 # -*- coding:utf-8 -*-
+import re
 import logging
 from functools import partial
 from prestring.python import Module, LazyFormat, LazyKeywords
 from dictknife import deepequal
 from collections import defaultdict
 from collections import OrderedDict
-from .langhelpers import LazyCallString
+from collections import namedtuple
+from .langhelpers import LazyCallString, titleize
+
+
 logger = logging.getLogger(__name__)
+PathInfo = namedtuple("PathInfo", "matchdict, GET, POST, json_body")
 
 
 class Context(object):
-    def __init__(self):
-        self.m = Module(import_unique=True)
-        self.im = self.m.submodule()
+    def __init__(self, m=None, im=None):
+        self.m = m or Module(import_unique=True)
+        self.im = im or self.m.submodule()
 
     def from_(self, module, name):
         logger.debug("      import: module=%s, name=%s", module, name)
@@ -21,6 +26,9 @@ class Context(object):
     def import_(self, module):
         logger.debug("      import: module=%s", module)
         self.im.import_(module)
+
+    def create_child(self):
+        return self.__class__(self.m.submodule(), self.im)
 
 
 class CodegenError(Exception):
@@ -31,6 +39,7 @@ class SchemaWriter(object):
     def __init__(self, accessor, schema_class):
         self.accessor = accessor
         self.schema_class = schema_class
+        self.arrived = set()
 
     @property
     def resolver(self):
@@ -81,10 +90,10 @@ class SchemaWriter(object):
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, field_name, field, opts)
 
-    def write_schema(self, c, d, clsname, definition, arrived):
-        if clsname in arrived:
+    def write_schema(self, c, d, clsname, definition, force=False):
+        if not force and clsname in self.arrived:
             return
-        arrived.add(clsname)
+        self.arrived.add(clsname)
         base_classes = [self.schema_class]
 
         if self.resolver.has_ref(definition):
@@ -92,17 +101,17 @@ class SchemaWriter(object):
             if ref_name is None:
                 raise CodegenError("$ref %r is not found", definition["$ref"])
             else:
-                self.write_schema(c, d, ref_name, ref_definition, arrived)
+                self.write_schema(c, d, ref_name, ref_definition)
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
-            ref_list, definition = self.resolver.resolve_allof_definision(d, definition)
+            ref_list, definition = self.resolver.resolve_allof_definition(d, definition)
             if ref_list:
                 base_classes = []
                 for ref_name, ref_definition in ref_list:
                     if ref_name is None:
                         raise CodegenError("$ref %r is not found", ref_definition)  # xxx
                     else:
-                        self.write_schema(c, d, ref_name, ref_definition, arrived)
+                        self.write_schema(c, d, ref_name, ref_definition)
                         base_classes.append(ref_name)
 
         with c.m.class_(clsname, *base_classes):
@@ -133,8 +142,7 @@ class DefinitionsSchemaWriter(object):
         return self.accessor.resolver
 
     def write(self, c, d):
-        arrived = set()
-        for schema_name, definition in self.accessor.definitions(d).items():
+        for schema_name, definition in self.accessor.definitions(d):
 
             if not self.resolver.has_schema(d, definition):
                 logger.info("write schema: skip %s", schema_name)
@@ -142,7 +150,56 @@ class DefinitionsSchemaWriter(object):
 
             clsname = self.resolver.resolve_schema_name(schema_name)
             logger.info("write schema: write %s", schema_name)
-            self.schema_writer.write_schema(c, d, clsname, definition, arrived)
+            self.schema_writer.write_schema(c, d, clsname, definition)
+
+
+class PathsSchemaWriter(object):
+    def __init__(self, accessor, schema_writer):
+        self.accessor = accessor
+        self.schema_writer = schema_writer
+        self.separate_rx = re.compile("[/_]")
+        self.ignore_rx = re.compile("[^0-9a-zA-Z_]+")
+
+    @property
+    def resolver(self):
+        return self.accessor.resolver
+
+    def write(self, c, d):
+        for path, methods in self.accessor.paths(d):
+            path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
+            clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
+            sc = c.create_child()
+            with sc.m.class_(clsname + "Input"):
+                for method, definition in self.accessor.methods(methods):
+                    ssc = sc.create_child()
+                    with ssc.m.class_(titleize(method)):
+                        path_info = self.build_path_info(d, definition)
+                        if path_info.matchdict:
+                            clsname = "Path"
+                            self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.matchdict}, force=True)
+                        if path_info.GET:
+                            clsname = "GET"
+                            self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.GET}, force=True)
+                        if path_info.POST:
+                            clsname = "POST"
+                            self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.POST}, force=True)
+                        if path_info.json_body:
+                            clsname = "Body"
+                            definition = next(iter(path_info.json_body.values()))["schema"]
+                            self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
+
+    def build_path_info(self, fulldata, d):
+        info = defaultdict(OrderedDict)
+        for p in self.accessor.parameters(d):
+            if self.resolver.has_ref(p):
+                _, p = self.resolver.resolve_ref_definition(fulldata, p)
+            info[p.get("in")][p.get("name")] = p
+        return PathInfo(
+            matchdict=(info.get("path") or {}),
+            GET=(info.get("query") or {}),
+            POST=(info.get("forData") or {}),
+            json_body=(info.get("body") or {}),
+        )
 
 
 class Codegen(object):
@@ -170,8 +227,8 @@ class Codegen(object):
 
     def write_body(self, c, d):
         sw = SchemaWriter(self.accessor, self.schema_class)
-        dsw = DefinitionsSchemaWriter(self.accessor, sw)
-        dsw.write(c, d)
+        DefinitionsSchemaWriter(self.accessor, sw).write(c, d)
+        PathsSchemaWriter(self.accessor, sw).write(c, d)
 
     def codegen(self, d, ctx=None):
         c = ctx or Context()

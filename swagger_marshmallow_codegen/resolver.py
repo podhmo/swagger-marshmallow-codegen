@@ -81,7 +81,7 @@ class Resolver(object):
         logger.debug("    resolve: field=%s", caller_name)
         return caller_name
 
-    def resolve_allof_definision(self, fulldata, d):
+    def resolve_allof_definition(self, fulldata, d):
         ref_list = []
         r = OrderedDict()
         for subdef in d["allOf"]:
