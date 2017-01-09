@@ -27,81 +27,14 @@ class CodegenError(Exception):
     pass
 
 
-class Codegen(object):
-    schema_class_path = "marshmallow:Schema"
-
-    @classmethod
-    def override(cls, schema_class_path):
-        return partial(cls, schema_class_path=schema_class_path)
-
-    def __init__(self, accessor, schema_class_path=None):
+class SchemaWriter(object):
+    def __init__(self, accessor, schema_class):
         self.accessor = accessor
-        self.schema_class_path = schema_class_path or self.__class__.schema_class_path
-        self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
+        self.schema_class = schema_class
 
     @property
     def resolver(self):
         return self.accessor.resolver
-
-    def write_header(self, c):
-        c.im.stmt("# -*- coding:utf-8 -*-")
-
-    def write_import_(self, c):
-        c.from_(*self.schema_class_path.rsplit(":", 1))
-        c.from_("marshmallow", "fields")
-
-    def write_schema(self, c, d, clsname, definition, arrived):
-        if clsname in arrived:
-            return
-        arrived.add(clsname)
-        base_classes = [self.schema_class]
-
-        if self.resolver.has_ref(definition):
-            ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
-            if ref_name is None:
-                raise CodegenError("$ref %r is not found", definition["$ref"])
-            else:
-                self.write_schema(c, d, ref_name, ref_definition, arrived)
-                base_classes = [ref_name]
-        elif self.resolver.has_allof(definition):
-            ref_list, definition = self.resolver.resolve_allof_definision(d, definition)
-            if ref_list:
-                base_classes = []
-                for ref_name, ref_definition in ref_list:
-                    if ref_name is None:
-                        raise CodegenError("$ref %r is not found", ref_definition)  # xxx
-                    else:
-                        self.write_schema(c, d, ref_name, ref_definition, arrived)
-                        base_classes.append(ref_name)
-
-        with c.m.class_(clsname, *base_classes):
-            if "description" in definition:
-                c.m.stmt('"""{}"""'.format(definition["description"]))
-            opts = defaultdict(OrderedDict)
-            self.accessor.update_options_pre_properties(definition, opts)
-
-            properties = self.accessor.properties(definition)
-            if not properties:
-                c.m.stmt("pass")
-            else:
-                for name, field in properties.items():
-                    name = str(name)
-                    if self.resolver.has_many(field):
-                        self.write_field_many(c, d, clsname, definition, name, field, opts[name])
-                    else:
-                        self.write_field_one(c, d, clsname, definition, name, field, opts[name])
-
-    def write_body(self, c, d):
-        arrived = set()
-        for schema_name, definition in self.accessor.definitions(d).items():
-
-            if not self.resolver.has_schema(d, definition):
-                logger.info("write schema: skip %s", schema_name)
-                continue
-
-            clsname = self.resolver.resolve_schema_name(schema_name)
-            logger.info("write schema: write %s", schema_name)
-            self.write_schema(c, d, clsname, definition, arrived)
 
     def write_field_one(self, c, d, schema_name, definition, name, field, opts):
         field_class_name = None
@@ -147,6 +80,98 @@ class Codegen(object):
         opts["many"] = True
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, field_name, field, opts)
+
+    def write_schema(self, c, d, clsname, definition, arrived):
+        if clsname in arrived:
+            return
+        arrived.add(clsname)
+        base_classes = [self.schema_class]
+
+        if self.resolver.has_ref(definition):
+            ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
+            if ref_name is None:
+                raise CodegenError("$ref %r is not found", definition["$ref"])
+            else:
+                self.write_schema(c, d, ref_name, ref_definition, arrived)
+                base_classes = [ref_name]
+        elif self.resolver.has_allof(definition):
+            ref_list, definition = self.resolver.resolve_allof_definision(d, definition)
+            if ref_list:
+                base_classes = []
+                for ref_name, ref_definition in ref_list:
+                    if ref_name is None:
+                        raise CodegenError("$ref %r is not found", ref_definition)  # xxx
+                    else:
+                        self.write_schema(c, d, ref_name, ref_definition, arrived)
+                        base_classes.append(ref_name)
+
+        with c.m.class_(clsname, *base_classes):
+            if "description" in definition:
+                c.m.stmt('"""{}"""'.format(definition["description"]))
+            opts = defaultdict(OrderedDict)
+            self.accessor.update_options_pre_properties(definition, opts)
+
+            properties = self.accessor.properties(definition)
+            if not properties:
+                c.m.stmt("pass")
+            else:
+                for name, field in properties.items():
+                    name = str(name)
+                    if self.resolver.has_many(field):
+                        self.write_field_many(c, d, clsname, definition, name, field, opts[name])
+                    else:
+                        self.write_field_one(c, d, clsname, definition, name, field, opts[name])
+
+
+class DefinitionsSchemaWriter(object):
+    def __init__(self, accessor, schema_writer):
+        self.accessor = accessor
+        self.schema_writer = schema_writer
+
+    @property
+    def resolver(self):
+        return self.accessor.resolver
+
+    def write(self, c, d):
+        arrived = set()
+        for schema_name, definition in self.accessor.definitions(d).items():
+
+            if not self.resolver.has_schema(d, definition):
+                logger.info("write schema: skip %s", schema_name)
+                continue
+
+            clsname = self.resolver.resolve_schema_name(schema_name)
+            logger.info("write schema: write %s", schema_name)
+            self.schema_writer.write_schema(c, d, clsname, definition, arrived)
+
+
+class Codegen(object):
+    schema_class_path = "marshmallow:Schema"
+
+    @classmethod
+    def override(cls, schema_class_path):
+        return partial(cls, schema_class_path=schema_class_path)
+
+    def __init__(self, accessor, schema_class_path=None):
+        self.accessor = accessor
+        self.schema_class_path = schema_class_path or self.__class__.schema_class_path
+        self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
+
+    @property
+    def resolver(self):
+        return self.accessor.resolver
+
+    def write_header(self, c):
+        c.im.stmt("# -*- coding:utf-8 -*-")
+
+    def write_import_(self, c):
+        c.from_(*self.schema_class_path.rsplit(":", 1))
+        c.from_("marshmallow", "fields")
+
+    def write_body(self, c, d):
+        sw = SchemaWriter(self.accessor, self.schema_class)
+        dsw = DefinitionsSchemaWriter(self.accessor, sw)
+        dsw.write(c, d)
 
     def codegen(self, d, ctx=None):
         c = ctx or Context()
