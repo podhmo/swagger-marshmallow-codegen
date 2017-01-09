@@ -14,13 +14,19 @@ class Accessor(object):
     def paths(self, d):
         return (d.get("paths") or {}).items()
 
-    def methods(self, d, candidates=["get", "post", "put", "delete"]):
+    def methods(self, d):
         for method, definition in d.items():
-            if method in candidates:
+            if not method.startswith("x-"):
                 yield method, definition
 
     def parameters(self, d):
         return d.get("parameters") or []
+
+    def responses(self, d):
+        for name, definition in (d.get("responses") or {}).items():
+            name = str(name)
+            if not name.startswith("x-"):
+                yield name, definition
 
     def definitions(self, d):
         return (d.get("definitions") or {}).items()

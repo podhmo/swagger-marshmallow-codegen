@@ -39,3 +39,19 @@ class PetsPetIdInput(object):
     class Delete(object):
         class Path(Schema):
             pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
+
+
+
+
+class PetsOutput(object):
+    class Get200(Pet):
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
+
+
+
+class PetsPetIdOutput(object):
+    class Get200(Pet):
+        pass
