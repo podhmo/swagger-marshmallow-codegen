@@ -173,24 +173,35 @@ class PathsSchemaWriter(object):
             path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
             clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
             sc = c.create_child()
+            found = False
             with sc.m.class_(clsname + "Input"):
                 for method, definition in self.accessor.methods(methods):
                     ssc = sc.create_child()
+                    sfound = False
                     with ssc.m.class_(titleize(method)):
                         path_info = self.build_path_info(d, definition)
                         if path_info.matchdict:
                             clsname = "Path"
+                            sfound = True
                             self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.matchdict}, force=True)
                         if path_info.GET:
                             clsname = "GET"
+                            sfound = True
                             self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.GET}, force=True)
                         if path_info.POST:
                             clsname = "POST"
+                            sfound = True
                             self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.POST}, force=True)
                         if path_info.json_body:
                             clsname = "Body"
+                            sfound = True
                             definition = next(iter(path_info.json_body.values()))["schema"]
                             self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
+                    if not sfound:
+                        ssc.m.clear()
+                    found = found or sfound
+            if not found:
+                sc.m.clear()
 
     def build_path_info(self, fulldata, d):
         info = defaultdict(OrderedDict)
