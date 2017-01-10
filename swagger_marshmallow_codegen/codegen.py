@@ -6,12 +6,10 @@ from prestring.python import Module, LazyFormat, LazyKeywords
 from dictknife import deepequal
 from collections import defaultdict
 from collections import OrderedDict
-from collections import namedtuple
 from .langhelpers import LazyCallString, titleize
 
 
 logger = logging.getLogger(__name__)
-PathInfo = namedtuple("PathInfo", "matchdict, GET, POST, json_body")
 
 
 class Context(object):
@@ -27,8 +25,8 @@ class Context(object):
         logger.debug("      import: module=%s", module)
         self.im.import_(module)
 
-    def create_child(self):
-        return self.__class__(self.m.submodule(), self.im)
+    def new_child(self):
+        return self.__class__(self.m.submodule(newline=False), self.im)
 
 
 class CodegenError(Exception):
@@ -90,7 +88,7 @@ class SchemaWriter(object):
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, field_name, field, opts)
 
-    def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None):
+    def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, init_writer=None):
         if not force and clsname in self.arrived:
             return
         self.arrived.add(clsname)
@@ -100,6 +98,25 @@ class SchemaWriter(object):
             ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
             if ref_name is None:
                 raise CodegenError("$ref %r is not found", definition["$ref"])
+            elif "items" in ref_definition:
+                # work around
+                items = ref_definition["items"]
+                if self.resolver.has_ref(items):
+                    _, items = self.resolver.resolve_ref_definition(d, ref_definition["items"])
+                if not self.resolver.has_schema(d, items):
+                    c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
+                    with c.m.class_(clsname, "PrimitiveValueSchema"):
+                        self.write_field_one(c, d, clsname, {}, "v", items, OrderedDict())
+                    return
+                else:
+                    self.write_schema(c, d, ref_name, items)
+                    base_classes = [ref_name]
+
+                    def init(m):
+                        with m.def_("__init__", "self", "*args", "**kwargs"):
+                            m.stmt("kwargs['many'] = True")
+                            m.stmt("super().__init__(*args, **kwargs)")
+                    init_writer = init  # xxx : overwrite
             else:
                 self.write_schema(c, d, ref_name, ref_definition)
                 base_classes = [ref_name]
@@ -121,11 +138,14 @@ class SchemaWriter(object):
             if meta_writer is not None:
                 meta_writer(c.m)
 
+            if init_writer is not None:
+                init_writer(c.m)
+
             opts = defaultdict(OrderedDict)
             self.accessor.update_options_pre_properties(definition, opts)
 
             properties = self.accessor.properties(definition)
-            if not properties and not meta_writer:
+            if not properties and not init_writer:
                 c.m.stmt("pass")
             else:
                 for name, field in properties.items():
@@ -172,34 +192,28 @@ class PathsSchemaWriter(object):
         for path, methods in self.accessor.paths(d):
             path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
             clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
-            sc = c.create_child()
+            sc = c.new_child()
             found = False
             with sc.m.class_(clsname + "Input"):
                 for method, definition in self.accessor.methods(methods):
-                    ssc = sc.create_child()
-                    sfound = False
+                    ssc = sc.new_child()
                     with ssc.m.class_(titleize(method)):
+                        if "summary" in definition:
+                            ssc.m.stmt('"""{}"""\n'.format(definition["summary"]))
+
                         path_info = self.build_path_info(d, definition)
-                        if path_info.matchdict:
-                            clsname = "Path"
-                            sfound = True
-                            self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.matchdict}, force=True)
-                        if path_info.GET:
-                            clsname = "GET"
-                            sfound = True
-                            self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.GET}, force=True)
-                        if path_info.POST:
-                            clsname = "POST"
-                            sfound = True
-                            self.schema_writer.write_schema(ssc, d, clsname, {"properties": path_info.POST}, force=True)
-                        if path_info.json_body:
-                            clsname = "Body"
-                            sfound = True
-                            definition = next(iter(path_info.json_body.values()))["schema"]
-                            self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
-                    if not sfound:
+                        for section, properties in sorted(path_info.items()):
+                            if section is None:
+                                continue
+                            clsname = titleize(section)
+                            if section == "body":
+                                definition = next(iter(properties.values()))["schema"]
+                                self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
+                            else:
+                                self.schema_writer.write_schema(ssc, d, clsname, {"properties": properties}, force=True)
+                    if not path_info:
                         ssc.m.clear()
-                    found = found or sfound
+                    found = found or bool(path_info)
             if not found:
                 sc.m.clear()
 
@@ -209,12 +223,7 @@ class PathsSchemaWriter(object):
             if self.resolver.has_ref(p):
                 _, p = self.resolver.resolve_ref_definition(fulldata, p)
             info[p.get("in")][p.get("name")] = p
-        return PathInfo(
-            matchdict=(info.get("path") or {}),
-            GET=(info.get("query") or {}),
-            POST=(info.get("forData") or {}),
-            json_body=(info.get("body") or {}),
-        )
+        return info
 
 
 class ResponsesSchemaWriter(object):
@@ -232,7 +241,7 @@ class ResponsesSchemaWriter(object):
         for path, methods in self.accessor.paths(d):
             path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
             clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
-            sc = c.create_child()
+            sc = c.new_child()
             found = False
             with sc.m.class_(clsname + "Output"):
                 for method, definition in self.accessor.methods(methods):
@@ -240,16 +249,23 @@ class ResponsesSchemaWriter(object):
                         if "schema" in definition:
                             found = True
                             clsname = titleize(method) + status
-                            definition = definition["schema"]
+                            schema_definition = definition["schema"]
                             # xxx:
-                            if "items" in definition:
+                            if "items" in schema_definition:
                                 def meta(m):
+                                    if "description" in definition:
+                                        m.stmt('"""{}"""\n'.format(definition["description"]))
+
+                                def init(m):
                                     with m.def_("__init__", "self", "*args", "**kwargs"):
                                         m.stmt("kwargs['many'] = True")
                                         m.stmt("super().__init__(*args, **kwargs)")
-                                self.schema_writer.write_schema(sc, d, clsname, definition["items"], force=True, meta_writer=meta)
+                                self.schema_writer.write_schema(sc, d, clsname, schema_definition["items"], force=True, meta_writer=meta, init_writer=init)
                             else:
-                                self.schema_writer.write_schema(sc, d, clsname, definition, force=True)
+                                def meta(m):
+                                    if "description" in definition:
+                                        m.stmt('"""{}"""'.format(definition["description"]))
+                                self.schema_writer.write_schema(sc, d, clsname, schema_definition, force=True, meta_writer=meta)
             if not found:
                 sc.m.clear()
 
@@ -279,9 +295,9 @@ class Codegen(object):
 
     def write_body(self, c, d):
         sw = SchemaWriter(self.accessor, self.schema_class)
-        DefinitionsSchemaWriter(self.accessor, sw).write(c, d)
-        PathsSchemaWriter(self.accessor, sw).write(c, d)
-        ResponsesSchemaWriter(self.accessor, sw).write(c, d)
+        DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+        PathsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+        ResponsesSchemaWriter(self.accessor, sw).write(c.new_child(), d)
 
     def codegen(self, d, ctx=None):
         c = ctx or Context()
