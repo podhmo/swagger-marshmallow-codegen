@@ -15,7 +15,9 @@ class Pet(Schema):
 
 class PetsInput(object):
     class Get(object):
-        class GET(Schema):
+        """Get all pets"""
+
+        class Query(Schema):
             animal_type = fields.String(validate=[Regexp(regex=re.compile('^[a-zA-Z0-9]*$'))])
             limit = fields.Integer(missing=lambda: 100, validate=[Range(min=0, max=None, exclusive_min=False, exclusive_max=False)])
 
@@ -24,19 +26,25 @@ class PetsInput(object):
 
 class PetsPetIdInput(object):
     class Get(object):
+        """Get a single pet"""
+
         class Path(Schema):
             pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
 
     class Put(object):
-        class Path(Schema):
-            pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
+        """Create or update a pet"""
 
         class Body(Pet):
             pass
 
+        class Path(Schema):
+            pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
+
 
     class Delete(object):
+        """Remove a pet"""
+
         class Path(Schema):
             pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
@@ -45,6 +53,8 @@ class PetsPetIdInput(object):
 
 class PetsOutput(object):
     class Get200(Pet):
+        """Return pets"""
+
         def __init__(self, *args, **kwargs):
             kwargs['many'] = True
             super().__init__(*args, **kwargs)
@@ -54,4 +64,5 @@ class PetsOutput(object):
 
 class PetsPetIdOutput(object):
     class Get200(Pet):
+        """Return pet"""
         pass
