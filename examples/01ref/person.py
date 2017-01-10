@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from marshmallow import(
+from marshmallow import (
     Schema,
     fields
 )

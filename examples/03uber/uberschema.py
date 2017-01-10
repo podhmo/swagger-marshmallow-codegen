@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from marshmallow import(
+from marshmallow import (
     Schema,
     fields
 )
@@ -50,3 +50,117 @@ class Error(Schema):
     code = fields.Integer()
     message = fields.String()
     fields = fields.String()
+
+
+class ProductsInput(object):
+    class Get(object):
+        """Product Types"""
+
+        class Query(Schema):
+            latitude = fields.Number(description='Latitude component of location.')
+            longitude = fields.Number(description='Longitude component of location.')
+
+
+
+
+class EstimatesPriceInput(object):
+    class Get(object):
+        """Price Estimates"""
+
+        class Query(Schema):
+            start_latitude = fields.Number(description='Latitude component of start location.')
+            start_longitude = fields.Number(description='Longitude component of start location.')
+            end_latitude = fields.Number(description='Latitude component of end location.')
+            end_longitude = fields.Number(description='Longitude component of end location.')
+
+
+
+
+class EstimatesTimeInput(object):
+    class Get(object):
+        """Time Estimates"""
+
+        class Query(Schema):
+            start_latitude = fields.Number(description='Latitude component of start location.')
+            start_longitude = fields.Number(description='Longitude component of start location.')
+            customer_uuid = fields.UUID(description='Unique customer identifier to be used for experience customization.')
+            product_id = fields.String(description='Unique identifier representing a specific product for a given latitude & longitude.')
+
+
+
+
+class HistoryInput(object):
+    class Get(object):
+        """User Activity"""
+
+        class Query(Schema):
+            offset = fields.Integer(description='Offset the list of returned results by this amount. Default is zero.')
+            limit = fields.Integer(description='Number of items to retrieve. Default is 5, maximum is 100.')
+
+
+
+
+class ProductsOutput(object):
+    class Get200(Product):
+        """An array of products"""
+
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
+
+    class Getdefault(Error):
+        """Unexpected error"""
+        pass
+
+
+
+class EstimatesPriceOutput(object):
+    class Get200(PriceEstimate):
+        """An array of price estimates by product"""
+
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
+
+    class Getdefault(Error):
+        """Unexpected error"""
+        pass
+
+
+
+class EstimatesTimeOutput(object):
+    class Get200(Product):
+        """An array of products"""
+
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
+
+    class Getdefault(Error):
+        """Unexpected error"""
+        pass
+
+
+
+class MeOutput(object):
+    class Get200(Profile):
+        """Profile information for a user"""
+        pass
+
+    class Getdefault(Error):
+        """Unexpected error"""
+        pass
+
+
+
+class HistoryOutput(object):
+    class Get200(Activities):
+        """History information for the given user"""
+        pass
+
+    class Getdefault(Error):
+        """Unexpected error"""
+        pass
