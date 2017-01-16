@@ -215,6 +215,8 @@ class PathsSchemaWriter(object):
                     with ssc.m.class_(titleize(method)):
                         if "summary" in definition:
                             ssc.m.stmt('"""{}"""\n'.format(definition["summary"]))
+                        elif "description" in definition:
+                            ssc.m.stmt('"""{}"""\n'.format(definition["description"]))
 
                         path_info = self.build_path_info(d, definition)
                         for section, properties in sorted(path_info.items()):
