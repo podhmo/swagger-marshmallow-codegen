@@ -1,0 +1,176 @@
+definitions:
+  emailsPost:
+    items:
+      type: string
+      pattern: ".+@.+"
+    type: array
+  label:
+    properties:
+      color:
+        maxLength: 6
+        minLength: 6
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  labels:
+    items:
+      $ref: '#/definitions/label'
+    type: array
+  labelsBody:
+    items:
+      type: string
+    type: array
+
+parameters:
+  owner:
+    description: Name of repository owner.
+    in: path
+    name: owner
+    required: true
+    type: string
+  repo:
+    description: Name of repository.
+    in: path
+    name: repo
+    required: true
+    type: string
+  number:
+    description: Number of issue.
+    in: path
+    name: number
+    required: true
+    type: integer
+  X-Github-Media-Type:
+    description: |
+      You can check the current version of media type in responses.
+    in: header
+    name: X-GitHub-Media-Type
+    type: string
+  Accept:
+    description: Is used to set specified media type.
+    in: header
+    name: Accept
+    type: string
+  X-RateLimit-Limit:
+    in: header
+    name: X-RateLimit-Limit
+    type: integer
+  X-RateLimit-Remaining:
+    in: header
+    name: X-RateLimit-Remaining
+    type: integer
+  X-RateLimit-Reset:
+    in: header
+    name: X-RateLimit-Reset
+    type: integer
+  X-GitHub-Request-Id:
+    in: header
+    name: X-GitHub-Request-Id
+    type: integer
+
+
+responses:
+  labels:
+    description: OK
+    schema:
+      $ref: '#/definitions/labels'
+  label-created:
+    description: Created
+    schema:
+      $ref: '#/definitions/label'
+
+
+paths:
+  '/repos/{owner}/{repo}/issues/{number}/labels':
+    delete:
+      description: Remove all labels from an issue.
+      parameters:
+        - $ref: "#/parameters/owner"
+        - $ref: "#/parameters/repo"
+        - $ref: "#/parameters/number"
+        - $ref: "#/parameters/X-Github-Media-Type"
+        - $ref: "#/parameters/Accept"
+        - $ref: "#/parameters/X-RateLimit-Limit"
+        - $ref: "#/parameters/X-RateLimit-Remaining"
+        - $ref: "#/parameters/X-RateLimit-Reset"
+        - $ref: "#/parameters/X-GitHub-Request-Id"
+      responses:
+        '204':
+          description: |
+            No content.
+        '403':
+          description: |
+            API rate limit exceeded. See http://developer.github.com/v3/#rate-limiting
+            for details.
+    get:
+      description: List labels on an issue.
+      parameters:
+        - $ref: "#/parameters/owner"
+        - $ref: "#/parameters/repo"
+        - $ref: "#/parameters/number"
+        - $ref: "#/parameters/X-Github-Media-Type"
+        - $ref: "#/parameters/Accept"
+        - $ref: "#/parameters/X-RateLimit-Limit"
+        - $ref: "#/parameters/X-RateLimit-Remaining"
+        - $ref: "#/parameters/X-RateLimit-Reset"
+        - $ref: "#/parameters/X-GitHub-Request-Id"
+      responses:
+        '200':
+          $ref: "#/responses/labels"
+        '403':
+          description: |
+            API rate limit exceeded. See http://developer.github.com/v3/#rate-limiting
+            for details.
+    post:
+      description: Add labels to an issue.
+      parameters:
+        - $ref: "#/parameters/owner"
+        - $ref: "#/parameters/repo"
+        - $ref: "#/parameters/number"
+        - $ref: "#/parameters/X-Github-Media-Type"
+        - $ref: "#/parameters/Accept"
+        - $ref: "#/parameters/X-RateLimit-Limit"
+        - $ref: "#/parameters/X-RateLimit-Remaining"
+        - $ref: "#/parameters/X-RateLimit-Reset"
+        - $ref: "#/parameters/X-GitHub-Request-Id"
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/emailsPost'
+      responses:
+        '201':
+          $ref: "#/responses/label-created"
+        '403':
+          description: |
+            API rate limit exceeded. See http://developer.github.com/v3/#rate-limiting
+            for details.
+    put:
+      description: |
+        Replace all labels for an issue.
+        Sending an empty array ([]) will remove all Labels from the Issue.
+      parameters:
+        - $ref: "#/parameters/owner"
+        - $ref: "#/parameters/repo"
+        - $ref: "#/parameters/number"
+        - $ref: "#/parameters/X-Github-Media-Type"
+        - $ref: "#/parameters/Accept"
+        - $ref: "#/parameters/X-RateLimit-Limit"
+        - $ref: "#/parameters/X-RateLimit-Remaining"
+        - $ref: "#/parameters/X-RateLimit-Reset"
+        - $ref: "#/parameters/X-GitHub-Request-Id"
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/emailsPost'
+      responses:
+        '201':
+          $ref: "#/responses/label-created"
+        '403':
+          description: |
+            API rate limit exceeded. See http://developer.github.com/v3/#rate-limiting
+            for details.

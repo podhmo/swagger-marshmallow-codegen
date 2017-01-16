@@ -246,6 +246,8 @@ class ResponsesSchemaWriter(object):
             with sc.m.class_(clsname + "Output"):
                 for method, definition in self.accessor.methods(methods):
                     for status, definition in self.accessor.responses(definition):
+                        if self.resolver.has_ref(definition):
+                            _, definition = self.resolver.resolve_ref_definition(d, definition)
                         if "schema" in definition:
                             found = True
                             clsname = titleize(method) + status
