@@ -1,6 +1,9 @@
 swagger-marshmallow-codegen
 ========================================
 
+.. image:: https://travis-ci.org/podhmo/swagger-marshmallow-codegen.svg?branch=master
+  :target: https://travis-ci.org/podhmo/swagger-marshmallow-codegen
+
 concepts
 ----------------------------------------
 
@@ -236,3 +239,8 @@ definition.py
       money = fields.Integer(validate=[OneOf(choices=[1, 5, 10, 50, 100, 500, 1000, 5000, 10000], labels=[])])
       deposit = fields.Integer(validate=[MultipleOf(n=10000)])
       color = fields.String(required=True, validate=[OneOf(choices=['R', 'G', 'B'], labels=[])])
+
+todo:
+----------------------------------------
+
+- `x-marshmallow-name`
