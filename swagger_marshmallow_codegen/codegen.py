@@ -2,6 +2,7 @@
 import re
 import logging
 from functools import partial
+from prestring import PreString
 from prestring.python import Module, LazyFormat, LazyKeywords
 from dictknife import deepequal
 from collections import defaultdict
@@ -10,6 +11,7 @@ from .langhelpers import LazyCallString, titleize
 
 
 logger = logging.getLogger(__name__)
+NAME_MARKER = "x-marshmallow-name"
 
 
 class Context(object):
@@ -178,6 +180,8 @@ class DefinitionsSchemaWriter(object):
 
 
 class PathsSchemaWriter(object):
+    OVERRIDE_NAME_MARKER = NAME_MARKER
+
     def __init__(self, accessor, schema_writer):
         self.accessor = accessor
         self.schema_writer = schema_writer
@@ -188,14 +192,25 @@ class PathsSchemaWriter(object):
     def resolver(self):
         return self.accessor.resolver
 
+    def get_lazy_clsname(self, path):
+        path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
+        clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
+        return PreString(clsname)
+
     def write(self, c, d):
         for path, methods in self.accessor.paths(d):
-            path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
-            clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
             sc = c.new_child()
             found = False
-            with sc.m.class_(clsname + "Input"):
+            lazy_clsname = self.get_lazy_clsname(path)
+            with sc.m.class_(LazyFormat("{}Input", lazy_clsname)):
                 for method, definition in self.accessor.methods(methods):
+                    if method == self.__class__.OVERRIDE_NAME_MARKER:
+                        lazy_clsname.pop()
+                        lazy_clsname.append(definition)
+                        continue
+                    elif method.startswith("x-"):
+                        continue
+
                     ssc = sc.new_child()
                     with ssc.m.class_(titleize(method)):
                         if "summary" in definition:
@@ -227,6 +242,8 @@ class PathsSchemaWriter(object):
 
 
 class ResponsesSchemaWriter(object):
+    OVERRIDE_NAME_MARKER = NAME_MARKER
+
     def __init__(self, accessor, schema_writer):
         self.accessor = accessor
         self.schema_writer = schema_writer
@@ -237,14 +254,25 @@ class ResponsesSchemaWriter(object):
     def resolver(self):
         return self.accessor.resolver
 
+    # todo: move
+    def get_lazy_clsname(self, path):
+        path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
+        return PreString("".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated))
+
     def write(self, c, d):
         for path, methods in self.accessor.paths(d):
-            path_separated = self.separate_rx.split(path.lstrip("/"))  # xxx:
-            clsname = "".join(titleize(self.ignore_rx.sub("", name)) for name in path_separated)
+            lazy_clsname = self.get_lazy_clsname(path)
             sc = c.new_child()
             found = False
-            with sc.m.class_(clsname + "Output"):
+            with sc.m.class_(LazyFormat("{}Output", lazy_clsname)):
                 for method, definition in self.accessor.methods(methods):
+                    if method == self.__class__.OVERRIDE_NAME_MARKER:
+                        lazy_clsname.pop()
+                        lazy_clsname.append(definition)
+                        continue
+                    elif method.startswith("x-"):
+                        continue
+
                     for status, definition in self.accessor.responses(definition):
                         if self.resolver.has_ref(definition):
                             _, definition = self.resolver.resolve_ref_definition(d, definition)
