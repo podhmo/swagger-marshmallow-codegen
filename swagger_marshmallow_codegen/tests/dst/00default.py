@@ -1,6 +1,13 @@
+# -*- coding:utf-8 -*-
+from marshmallow import (
+    Schema,
+    fields
+)
 import datetime
 from swagger_marshmallow_codegen.fields import DateTime
 from collections import OrderedDict
+
+
 class X(Schema):
     string = fields.String(missing=lambda: 'default')
     integer = fields.Integer(missing=lambda: 10)

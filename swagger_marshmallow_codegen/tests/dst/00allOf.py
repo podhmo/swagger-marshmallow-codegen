@@ -1,5 +1,12 @@
+# -*- coding:utf-8 -*-
+from marshmallow import (
+    Schema,
+    fields
+)
 from marshmallow.validate import OneOf
 from swagger_marshmallow_codegen.validate import Range
+
+
 class Pet(Schema):
     name = fields.String(required=True)
     petType = fields.String(required=True)
