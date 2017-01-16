@@ -124,6 +124,7 @@ paths:
           description: |
             API rate limit exceeded. See http://developer.github.com/v3/#rate-limiting
             for details.
+    x-marshmallow-name: IssuedLabels
     post:
       description: Add labels to an issue.
       parameters:

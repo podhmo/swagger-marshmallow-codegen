@@ -19,7 +19,7 @@ class Label(Schema):
     url = fields.String()
 
 
-class ReposOwnerRepoIssuesNumberLabelsInput(object):
+class IssuedLabelsInput(object):
     class Delete(object):
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
@@ -88,7 +88,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
 
 
-class ReposOwnerRepoIssuesNumberLabelsOutput(object):
+class IssuedLabelsOutput(object):
     class Get200(Label):
         """OK"""
         def __init__(self, *args, **kwargs):

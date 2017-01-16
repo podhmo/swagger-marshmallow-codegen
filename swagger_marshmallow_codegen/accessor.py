@@ -16,8 +16,7 @@ class Accessor(object):
 
     def methods(self, d):
         for method, definition in d.items():
-            if not method.startswith("x-"):
-                yield method, definition
+            yield method, definition
 
     def parameters(self, d):
         return d.get("parameters") or []
