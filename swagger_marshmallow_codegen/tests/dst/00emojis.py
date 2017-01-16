@@ -1,3 +1,10 @@
+# -*- coding:utf-8 -*-
+from marshmallow import (
+    Schema,
+    fields
+)
+
+
 class Emojis(Schema):
     n100 = fields.String(dump_to='100', load_from='100')
     n1234 = fields.String(dump_to='1234', load_from='1234')

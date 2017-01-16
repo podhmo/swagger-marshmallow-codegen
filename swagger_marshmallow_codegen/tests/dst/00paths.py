@@ -1,3 +1,8 @@
+# -*- coding:utf-8 -*-
+from marshmallow import (
+    Schema,
+    fields
+)
 from marshmallow.validate import (
     Length,
     Regexp
@@ -5,6 +10,8 @@ from marshmallow.validate import (
 from swagger_marshmallow_codegen.fields import DateTime
 import re
 from swagger_marshmallow_codegen.validate import Range
+
+
 class Pet(Schema):
     id = fields.String(description='Unique identifier', dump_only=True)
     name = fields.String(required=True, description="Pet's name", validate=[Length(min=1, max=100, equal=None)])

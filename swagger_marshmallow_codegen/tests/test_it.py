@@ -86,7 +86,7 @@ class CodegenTests(DiffTestCase):
                 target = self._makeOne()
                 ctx = self._makeContext()
 
-                target.write_body(ctx, lifting_definition(d))
+                target.codegen(lifting_definition(d), ctx)
 
                 expected = self.load_dstfile(dst_file).rstrip("\n")
                 actual = str(ctx.m).rstrip("\n")

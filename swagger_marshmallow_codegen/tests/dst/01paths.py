@@ -1,3 +1,8 @@
+# -*- coding:utf-8 -*-
+from marshmallow import (
+    Schema,
+    fields
+)
 from marshmallow.validate import (
     Length,
     Regexp
@@ -6,6 +11,8 @@ from swagger_marshmallow_codegen.schema import (
     PrimitiveValueSchema
 )
 import re
+
+
 class Label(Schema):
     color = fields.String(validate=[Length(min=6, max=6, equal=None)])
     name = fields.String()
