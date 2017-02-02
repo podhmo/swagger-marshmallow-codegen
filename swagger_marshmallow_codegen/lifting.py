@@ -45,11 +45,11 @@ class SubDefinitionExtractor:
             ctx.r[k] = copy.deepcopy(ctx.r[k])
         return ctx.r
 
-    def _extract(self, data, ctx):
+    def _extract(self, data, ctx, from_array=False):
         typ = data.get("type")
         if typ == "array" and "items" in data:
             return self.on_array_has_items(data, ctx)
-        elif (typ is None or typ == "object") and "properties" in data:
+        elif (typ is None or typ == "object") and (from_array or "properties" in data):
             return self.on_object_has_properties(data, ctx)
         else:
             return data
@@ -61,7 +61,7 @@ class SubDefinitionExtractor:
             return definition
 
     def on_object_has_properties(self, data, ctx):
-        for name in data["properties"]:
+        for name in data.get("properties") or {}:
             ctx.add_name(name)
             data["properties"][name] = self._extract(data["properties"][name], ctx)
             ctx.pop_name()
@@ -77,7 +77,7 @@ class SubDefinitionExtractor:
             return data
         fullname = ctx.full_name()
         ctx.add_array_item()
-        data["items"] = self._extract(data["items"], ctx)
+        data["items"] = self._extract(data["items"], ctx, from_array=True)
         ctx.save_array(fullname, data)
         ctx.pop_name()
         return self.return_definition(data, fullname, typ="array")
