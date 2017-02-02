@@ -80,6 +80,8 @@ class CodegenTests(DiffTestCase):
             ("./src/00paths.yaml", "./dst/00paths.py"),
             ("./src/01paths.yaml", "./dst/01paths.py"),
             ("./src/02paths.yaml", "./dst/02paths.py"),
+            ("./src/00empty.yaml", "./dst/00empty.py"),
+            ("./src/01empty.yaml", "./dst/01empty.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
@@ -114,6 +116,7 @@ class FlattenTests(unittest.TestCase):
     def test_it(self):
         candidates = [
             ("./src/01commit.yaml", "./src/00commit.yaml"),
+            ("./src/01empty.yaml", "./src/02empty.yaml"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):

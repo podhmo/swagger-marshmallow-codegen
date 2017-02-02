@@ -1,0 +1,13 @@
+definitions:
+  wrap:
+    type: object
+    properties:
+      empties:
+        $ref: '#/definitions/wrapEmpties'
+  wrapEmpties:
+    type: array
+    items:
+      $ref: '#/definitions/wrapEmptiesItem'
+  wrapEmptiesItem:
+    type: object
+    title: empty

@@ -1,0 +1,9 @@
+definitions:
+  wrap:
+    type: object
+    properties:
+      empties:
+        type: array
+        items:
+          title: empty
+          type: object
