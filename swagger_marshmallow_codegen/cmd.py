@@ -9,13 +9,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--driver", default="swagger_marshmallow_codegen.driver:Driver")
     parser.add_argument("--logging", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+    parser.add_argument("--full", default=False, action="store_true")
     parser.add_argument("file", default=None)
     args = parser.parse_args()
 
     driver_cls = args.driver
     if ":" not in driver_cls:
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
-    driver = import_symbol(driver_cls)()
+
+    if args.full:
+        options = {"targets": {"schema": True, "input": True, "output": True}}
+    else:
+        options = {"targets": {"schema": True}}
+
+    driver = import_symbol(driver_cls)(options)
 
     # todo: option
     logging.basicConfig(

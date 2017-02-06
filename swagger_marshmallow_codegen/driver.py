@@ -15,6 +15,9 @@ class Driver(object):
     accessor_factory = Accessor
     codegen_factory = Codegen
 
+    def __init__(self, options):
+        self.options = options
+
     def load(self, fp):
         return loading.load(fp)
 
@@ -23,7 +26,7 @@ class Driver(object):
 
     def transform(self, d):
         d = lifting_definition(d)
-        return self.create_codegen().codegen(d)
+        return self.create_codegen().codegen(d, targets=self.options["targets"])
 
     def run(self, inp, outp):
         data = self.load(inp)
@@ -38,6 +41,9 @@ class Driver(object):
 
 
 class Flatten(object):
+    def __init__(self, options):
+        self.options = options
+
     def load(self, fp):
         return loading.load(fp)
 
