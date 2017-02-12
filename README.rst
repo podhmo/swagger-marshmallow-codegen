@@ -170,22 +170,22 @@ definition.py
 .. code-block:: python
 
   # -*- coding:utf-8 -*-
-  from marshmallow import(
+  from marshmallow import (
       Schema,
       fields
   )
   import datetime
-  from swagger_marshmallow_codegen.fields import(
+  from swagger_marshmallow_codegen.fields import (
       Date,
       DateTime
   )
   from collections import OrderedDict
-  from marshmallow.validate import(
+  from marshmallow.validate import (
       Length,
       OneOf,
       Regexp
   )
-  from swagger_marshmallow_codegen.validate import(
+  from swagger_marshmallow_codegen.validate import (
       ItemsRange,
       MultipleOf,
       Range,
@@ -201,7 +201,7 @@ definition.py
       date = Date(missing=lambda: datetime.date(2000, 1, 1))
       datetime = DateTime(missing=lambda: datetime.datetime(2000, 1, 1, 1, 1, 1))
       object = fields.Nested('DefaultObject', missing=lambda: OrderedDict([('name', 'foo'), ('age', 20)]))
-      array = fields.List(fields.Integer(missing=lambda: [1, 2, 3]))
+      array = fields.List(fields.Integer(), missing=lambda: [1, 2, 3])
 
 
   class DefaultObject(Schema):
@@ -231,7 +231,7 @@ definition.py
 
 
   class Array_validation(Schema):
-      nums = fields.List(fields.Integer(validate=[ItemsRange(min=1, max=10), Unique()]))
+      nums = fields.List(fields.Integer(), validate=[ItemsRange(min=1, max=10), Unique()])
 
 
   class Enum_validation(Schema):
