@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-
 import os
 import sys
 
@@ -16,7 +15,7 @@ except IOError:
 
 
 install_requires = [
-    'dictknife[load]',
+    'dictknife[load] >= 0.3.1',
     "prestring",
     "marshmallow",
     "magicalimport",
