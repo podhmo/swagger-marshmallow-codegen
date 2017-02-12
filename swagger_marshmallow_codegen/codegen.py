@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import re
+import keyword
 import logging
 from functools import partial
 from prestring import PreString
@@ -72,6 +73,9 @@ class SchemaWriter(object):
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name
+        if keyword.iskeyword(normalized_name):
+            opts["dump_to"] = opts["load_from"] = normalized_name
+            normalized_name = normalized_name + "_"
 
         kwargs = LazyKeywordsRepr(opts)
 
@@ -90,9 +94,16 @@ class SchemaWriter(object):
             value = wrap(value)
         c.m.stmt(LazyFormat("{} = {}", normalized_name, value))
 
-    def write_field_many(self, c, d, schema_name, definition, field_name, field, opts):
+    def write_field_many(self, c, d, schema_name, definition, name, field, opts):
         self.accessor.update_option_on_property(c, field, opts)
         opts.pop("many", None)
+
+        normalized_name = self.resolver.resolve_normalized_name(name)
+        if normalized_name != name:
+            opts["dump_to"] = opts["load_from"] = name
+        if keyword.iskeyword(normalized_name):
+            opts["dump_to"] = opts["load_from"] = normalized_name
+            normalized_name = normalized_name + "_"
 
         def wrap(value, opts=opts):
             if opts:
@@ -100,7 +111,7 @@ class SchemaWriter(object):
             else:
                 return LazyFormat("fields.List({})", value)
         field = field["items"]
-        return self.write_field_one(c, d, schema_name, definition, field_name, field, {}, wrap=wrap)
+        return self.write_field_one(c, d, schema_name, definition, normalized_name, field, {}, wrap=wrap)
 
     def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, init_writer=None):
         if not force and clsname in self.arrived:

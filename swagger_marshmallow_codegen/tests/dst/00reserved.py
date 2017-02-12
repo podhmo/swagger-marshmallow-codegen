@@ -6,7 +6,7 @@ from marshmallow import (
 
 
 class Reserved(Schema):
-    not_ = fields.Boolean(load_from="not", dump_to="not")
-    as_ = fields.String(load_from="as", dump_to="as")
-    in_ = fields.List(fields.String(), load_from="in", dump_to="in"))
-    yield_ = fields.String(load_from="yield", dump_to="yield"))
+    not_ = fields.Boolean(dump_to='not', load_from='not')
+    as_ = fields.String(dump_to='as', load_from='as')
+    in_ = fields.List(fields.String(), dump_to='in', load_from='in')
+    yield_ = fields.String(dump_to='yield', load_from='yield')
