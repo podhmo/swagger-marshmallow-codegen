@@ -1,0 +1,14 @@
+definitions:
+  reserved:
+    type: object
+    properties:
+      not:
+        type: boolean
+      as:
+        type: string
+      in:
+        type: array
+        items:
+          type: string
+      yield:
+        type: string
