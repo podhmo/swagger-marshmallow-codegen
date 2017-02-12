@@ -45,16 +45,21 @@ class SchemaWriter(object):
     def resolver(self):
         return self.accessor.resolver
 
-    def write_field_one(self, c, d, schema_name, definition, name, field, opts):
+    def write_field_one(self, c, d, schema_name, definition, name, field, opts, wrap=None):
         field_class_name = None
         if self.resolver.has_ref(field):
             field_class_name, field = self.resolver.resolve_ref_definition(d, field, level=1)
             if field_class_name == schema_name and deepequal(field, definition):
                 field_class_name = "self"
 
+            if self.resolver.has_many(field):
+                return self.write_field_many(c, d, field_class_name, definition, name, field, opts)
+
             # finding original definition
             if self.resolver.has_ref(field):
                 ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                if self.resolver.has_many(field):
+                    return self.write_field_many(c, d, field_class_name, definition, name, field, opts)
                 if ref_name is None:
                     raise CodegenError("ref: %r is not found", field["$ref"])
 
@@ -80,15 +85,22 @@ class SchemaWriter(object):
                 caller_name = "fields.Field"
             # field
             value = LazyFormat("{}({})", caller_name, kwargs)
-        if opts.pop("many", False):
-            value = LazyFormat("fields.List({})", value)
         logger.info("  write field: write %s, field=%s", name, caller_name)
+        if wrap is not None:
+            value = wrap(value)
         c.m.stmt(LazyFormat("{} = {}", normalized_name, value))
 
     def write_field_many(self, c, d, schema_name, definition, field_name, field, opts):
-        opts["many"] = True
+        self.accessor.update_option_on_property(c, field, opts)
+        opts.pop("many", None)
+
+        def wrap(value, opts=opts):
+            if opts:
+                return LazyFormat("fields.List({}, {})", value, LazyKeywordsRepr(opts))
+            else:
+                return LazyFormat("fields.List({})", value)
         field = field["items"]
-        return self.write_field_one(c, d, schema_name, definition, field_name, field, opts)
+        return self.write_field_one(c, d, schema_name, definition, field_name, field, {}, wrap=wrap)
 
     def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, init_writer=None):
         if not force and clsname in self.arrived:
