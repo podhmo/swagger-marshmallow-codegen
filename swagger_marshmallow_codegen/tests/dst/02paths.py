@@ -21,7 +21,9 @@ class Label(Schema):
 
 class IssuedLabelsInput(object):
     class Delete(object):
-        """Remove all labels from an issue."""
+        """
+        Remove all labels from an issue.
+        """
 
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
@@ -38,7 +40,9 @@ class IssuedLabelsInput(object):
 
 
     class Get(object):
-        """List labels on an issue."""
+        """
+        List labels on an issue.
+        """
 
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
@@ -55,7 +59,9 @@ class IssuedLabelsInput(object):
 
 
     class Post(object):
-        """Add labels to an issue."""
+        """
+        Add labels to an issue.
+        """
 
         class Body(PrimitiveValueSchema):
             v = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
@@ -75,9 +81,10 @@ class IssuedLabelsInput(object):
 
 
     class Put(object):
-        """Replace all labels for an issue.
-Sending an empty array ([]) will remove all Labels from the Issue.
-"""
+        """
+        Replace all labels for an issue.
+        Sending an empty array ([]) will remove all Labels from the Issue.
+        """
 
         class Body(PrimitiveValueSchema):
             v = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])

@@ -213,10 +213,17 @@ class PathsSchemaWriter(object):
 
                     ssc = sc.new_child()
                     with ssc.m.class_(titleize(method)):
-                        if "summary" in definition:
-                            ssc.m.stmt('"""{}"""\n'.format(definition["summary"]))
-                        elif "description" in definition:
-                            ssc.m.stmt('"""{}"""\n'.format(definition["description"]))
+                        if "summary" in definition or "description" in definition:
+                            ssc.m.stmt('"""')
+                            if "summary" in definition:
+                                for line in definition["summary"].rstrip("\n").split("\n"):
+                                    ssc.m.stmt(line)
+                            elif "description" in definition:
+                                for line in definition["description"].rstrip("\n").split("\n"):
+                                    ssc.m.stmt(line)
+                            ssc.m.stmt('"""')
+                            ssc.m.stmt("")
+
                         path_info = self.build_path_info(d, definition)
                         for section, properties in sorted(path_info.items()):
                             if section is None:
@@ -324,21 +331,18 @@ class Codegen(object):
         c.from_(*self.schema_class_path.rsplit(":", 1))
         c.from_("marshmallow", "fields")
 
-    def write_body(self, c, d, targets):
+    def write_body(self, c, d):
         sw = SchemaWriter(self.accessor, self.schema_class)
-        if targets.get("schema", False):
-            DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
-        if targets.get("input", False):
-            PathsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
-        if targets.get("output", False):
-            ResponsesSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+        DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+        PathsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+        ResponsesSchemaWriter(self.accessor, sw).write(c.new_child(), d)
 
-    def codegen(self, d, targets, ctx=None):
+    def codegen(self, d, ctx=None):
         c = ctx or Context()
         self.write_header(c)
         c.m.sep()
         self.write_import_(c)
-        self.write_body(c, d, targets)
+        self.write_body(c, d)
         return c.m
 
 
