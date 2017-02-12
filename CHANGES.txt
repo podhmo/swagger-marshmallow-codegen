@@ -1,3 +1,7 @@
+0.3.2
+
+- fix bug validation for array type
+
 0.3.1
 
 - fix bug for lifting schema
