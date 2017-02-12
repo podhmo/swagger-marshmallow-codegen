@@ -1,0 +1,28 @@
+definitions:
+  ys:
+    type: array
+    items:
+      type: string
+      enum:
+      - x
+      - y
+      - z
+  member:
+    type: object
+    properties:
+      name:
+        type: string
+      color:
+        type: string
+        enum:
+          - r
+          - g
+          - b
+      xs:
+        type: array
+        items:
+          type: string
+          enum:
+          - x
+          - y
+          - z
