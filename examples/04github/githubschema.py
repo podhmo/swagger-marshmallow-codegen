@@ -114,7 +114,7 @@ class BranchCommit(Schema):
     author = fields.Nested('BranchCommitAuthor')
     commit = fields.Nested('BranchCommitCommit')
     committer = fields.Nested('BranchCommitCommitter')
-    parents = fields.List(fields.Nested('BranchCommitParentsItem', ))
+    parents = fields.List(fields.Nested('BranchCommitParentsItem'))
     sha = fields.String()
     url = fields.String()
 
@@ -216,8 +216,8 @@ class Commit(Schema):
     author = fields.Nested('CommitAuthor')
     commit = fields.Nested('CommitCommit')
     committer = fields.Nested('CommitCommitter')
-    files = fields.List(fields.Nested('CommitFilesItem', ))
-    parents = fields.List(fields.Nested('CommitParentsItem', ))
+    files = fields.List(fields.Nested('CommitFilesItem'))
+    parents = fields.List(fields.Nested('CommitParentsItem'))
     sha = fields.String()
     stats = fields.Nested('CommitStats')
     url = fields.String()
@@ -327,7 +327,7 @@ class CommitsItem(Schema):
     author = fields.Nested('CommitsItemAuthor')
     commit = fields.Nested('CommitsItemCommit')
     committer = fields.Nested('CommitsItemCommitter')
-    parents = fields.List(fields.Nested('CommitsItemParentsItem', ))
+    parents = fields.List(fields.Nested('CommitsItemParentsItem'))
     sha = fields.String()
     url = fields.String()
 
@@ -382,9 +382,9 @@ class Compare_commits(Schema):
     ahead_by = fields.Integer()
     base_commit = fields.Nested('Compare_commitsBase_commit')
     behind_by = fields.Integer()
-    commits = fields.List(fields.Nested('Compare_commitsCommitsItem', ))
+    commits = fields.List(fields.Nested('Compare_commitsCommitsItem'))
     diff_url = fields.String()
-    files = fields.List(fields.Nested('Compare_commitsFilesItem', ))
+    files = fields.List(fields.Nested('Compare_commitsFilesItem'))
     html_url = fields.String()
     patch_url = fields.String()
     permalink_url = fields.String()
@@ -410,7 +410,7 @@ class Compare_commitsCommitsItem(Schema):
     author = fields.Nested('Compare_commitsCommitsItemAuthor')
     commit = fields.Nested('Compare_commitsCommitsItemCommit')
     committer = fields.Nested('Compare_commitsCommitsItemCommitter')
-    parents = fields.List(fields.Nested('Compare_commitsCommitsItemParentsItem', ))
+    parents = fields.List(fields.Nested('Compare_commitsCommitsItemParentsItem'))
     sha = fields.String()
     url = fields.String()
 
@@ -489,7 +489,7 @@ class Compare_commitsBase_commit(Schema):
     author = fields.Nested('Compare_commitsBase_commitAuthor')
     commit = fields.Nested('Compare_commitsBase_commitCommit')
     committer = fields.Nested('Compare_commitsBase_commitCommitter')
-    parents = fields.List(fields.Nested('Compare_commitsBase_commitParentsItem', ))
+    parents = fields.List(fields.Nested('Compare_commitsBase_commitParentsItem'))
     sha = fields.String()
     url = fields.String()
 
@@ -596,7 +596,7 @@ class ContributorsItem(Schema):
 class ContributorsStatsItem(Schema):
     author = fields.Nested('ContributorsStatsItemAuthor')
     total = fields.Integer(description='The Total number of commits authored by the contributor.')
-    weeks = fields.List(fields.Nested('ContributorsStatsItemWeeksItem', ))
+    weeks = fields.List(fields.Nested('ContributorsStatsItemWeeksItem'))
 
 
 class ContributorsStatsItemWeeksItem(Schema):
@@ -664,7 +664,7 @@ class CreateFileCommit(Schema):
     committer = fields.Nested('CreateFileCommitCommitter')
     html_url = fields.String()
     message = fields.String()
-    parents = fields.List(fields.Nested('CreateFileCommitParentsItem', ))
+    parents = fields.List(fields.Nested('CreateFileCommitParentsItem'))
     sha = fields.String()
     tree = fields.Nested('CreateFileCommitTree')
     url = fields.String()
@@ -885,7 +885,7 @@ class EventIssue(Schema):
     comments = fields.Integer()
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     html_url = fields.String()
-    labels = fields.List(fields.Nested('EventIssueLabelsItem', ))
+    labels = fields.List(fields.Nested('EventIssueLabelsItem'))
     milestone = fields.Nested('EventIssueMilestone')
     number = fields.Integer()
     pull_request = fields.Nested('EventIssuePull_request')
@@ -1125,10 +1125,10 @@ class Gist(Schema):
     created_at = fields.String(description='Timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.')
     description = fields.String()
     files = fields.Nested('GistFiles')
-    forks = fields.List(fields.Nested('GistForksItem', ))
+    forks = fields.List(fields.Nested('GistForksItem'))
     git_pull_url = fields.String()
     git_push_url = fields.String()
-    history = fields.List(fields.Nested('GistHistoryItem', ))
+    history = fields.List(fields.Nested('GistHistoryItem'))
     html_url = fields.String()
     id = fields.String()
     public = fields.Boolean()
@@ -1241,6 +1241,10 @@ class GitRefPatch(Schema):
     sha = fields.String()
 
 
+class GitignoreItem(Schema):
+    pass
+
+
 class Gitignore_lang(Schema):
     name = fields.String()
     source = fields.String()
@@ -1279,11 +1283,15 @@ class HookItem(Schema):
     active = fields.Boolean()
     config = fields.Nested('HookItemConfig')
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
-    events = fields.List(fields.String())
+    events = fields.List(fields.Nested('HookItemEventsItem', validate=[OneOf(choices=['push', 'issues', 'issue_comment', 'commit_comment', 'pull_request', 'pull_request_review_comment', 'gollum', 'watch', 'download', 'fork', 'fork_apply', 'member', 'public', 'team_add', 'status'], labels=[])]))
     id = fields.Integer()
     name = fields.String()
     updated_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     url = fields.String()
+
+
+class HookItemEventsItem(Schema):
+    pass
 
 
 class HookItemConfig(Schema):
@@ -1319,7 +1327,7 @@ class IssuesItem(Schema):
     comments = fields.Integer()
     created_at = fields.String(description='ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ')
     html_url = fields.String()
-    labels = fields.List(fields.Nested('IssuesItemLabelsItem', ))
+    labels = fields.List(fields.Nested('IssuesItemLabelsItem'))
     milestone = fields.Nested('IssuesItemMilestone')
     number = fields.Integer()
     pull_request = fields.Nested('IssuesItemPull_request')
@@ -1512,7 +1520,7 @@ class MergesSuccessful(Schema):
     committer = fields.Nested('MergesSuccessfulCommitter')
     merged = fields.Boolean()
     message = fields.String()
-    parents = fields.List(fields.Nested('MergesSuccessfulParentsItem', ))
+    parents = fields.List(fields.Nested('MergesSuccessfulParentsItem'))
     sha = fields.String()
     url = fields.String()
 
@@ -1587,8 +1595,8 @@ class MergesSuccessfulAuthor(Schema):
 
 
 class Meta(Schema):
-    git = fields.List(fields.String())
-    hooks = fields.List(fields.String())
+    git = fields.List(fields.String(description='An Array of IP addresses in CIDR format specifying the Git servers at GitHub.'))
+    hooks = fields.List(fields.String(description='An Array of IP addresses in CIDR format specifying the addresses that incoming service hooks will originate from.'))
 
 
 class Milestone(Schema):
@@ -1716,7 +1724,7 @@ class Organization(Schema):
 
 
 class OrganizationAsTeamMember(Schema):
-    errors = fields.List(fields.Nested('OrganizationAsTeamMemberErrorsItem', ))
+    errors = fields.List(fields.Nested('OrganizationAsTeamMemberErrorsItem'))
     message = fields.String()
 
 
@@ -2304,7 +2312,7 @@ class RefStatusItem(Schema):
     repository_url = fields.String()
     sha = fields.String()
     state = fields.String()
-    statuses = fields.List(fields.Nested('RefStatusItemStatusesItem', ))
+    statuses = fields.List(fields.Nested('RefStatusItemStatusesItem'))
 
 
 class RefStatusItemStatusesItem(Schema):
@@ -2336,7 +2344,7 @@ class RefsBody(Schema):
 
 
 class Release(Schema):
-    assets = fields.List(fields.Nested('ReleaseAssetsItem', ))
+    assets = fields.List(fields.Nested('ReleaseAssetsItem'))
     assets_url = fields.String()
     author = fields.Nested('ReleaseAuthor')
     body = fields.String()
@@ -2419,7 +2427,7 @@ class Release_create(Schema):
 
 
 class ReleasesItem(Schema):
-    assets = fields.List(fields.Nested('ReleasesItemAssetsItem', ))
+    assets = fields.List(fields.Nested('ReleasesItemAssetsItem'))
     assets_url = fields.String()
     author = fields.Nested('ReleasesItemAuthor')
     body = fields.String()
@@ -2681,7 +2689,7 @@ class RepoCommit(Schema):
     author = fields.Nested('RepoCommitAuthor')
     committer = fields.Nested('RepoCommitCommitter')
     message = fields.String()
-    parents = fields.List(fields.Nested('RepoCommitParentsItem', ))
+    parents = fields.List(fields.Nested('RepoCommitParentsItem'))
     sha = fields.String()
     tree = fields.Nested('RepoCommitTree')
     url = fields.String()
@@ -2712,7 +2720,7 @@ class RepoCommitAuthor(Schema):
 class RepoCommitBody(Schema):
     author = fields.Nested('RepoCommitBodyAuthor')
     message = fields.String(required=True)
-    parents = fields.List(fields.String(required=True))
+    parents = fields.List(fields.String(), required=True)
     tree = fields.String(required=True)
 
 
@@ -2791,7 +2799,7 @@ class RepositoriesItemOwner(Schema):
 
 
 class Search_code(Schema):
-    items = fields.List(fields.Nested('Search_codeItemsItem', ))
+    items = fields.List(fields.Nested('Search_codeItemsItem'))
     total_count = fields.Integer()
 
 
@@ -2872,7 +2880,7 @@ class Search_codeItemsItemRepositoryOwner(Schema):
 
 
 class Search_issues(Schema):
-    items = fields.List(fields.Nested('Search_issuesItemsItem', ))
+    items = fields.List(fields.Nested('Search_issuesItemsItem'))
     total_count = fields.Integer()
 
 
@@ -2886,7 +2894,7 @@ class Search_issuesItemsItem(Schema):
     events_url = fields.String()
     html_url = fields.String()
     id = fields.Integer()
-    labels = fields.List(fields.Nested('Search_issuesItemsItemLabelsItem', ))
+    labels = fields.List(fields.Nested('Search_issuesItemsItemLabelsItem'))
     labels_url = fields.String()
     milestone = fields.Field()
     number = fields.Integer()
@@ -2931,7 +2939,7 @@ class Search_issuesItemsItemLabelsItem(Schema):
 
 
 class Search_issues_by_keyword(Schema):
-    issues = fields.List(fields.Nested('Search_issues_by_keywordIssuesItem', ))
+    issues = fields.List(fields.Nested('Search_issues_by_keywordIssuesItem'))
 
 
 class Search_issues_by_keywordIssuesItem(Schema):
@@ -2951,7 +2959,7 @@ class Search_issues_by_keywordIssuesItem(Schema):
 
 
 class Search_repositories(Schema):
-    items = fields.List(fields.Nested('Search_repositoriesItemsItem', ))
+    items = fields.List(fields.Nested('Search_repositoriesItemsItem'))
     total_count = fields.Integer()
 
 
@@ -2993,7 +3001,7 @@ class Search_repositoriesItemsItemOwner(Schema):
 
 
 class Search_repositories_by_keyword(Schema):
-    repositories = fields.List(fields.Nested('Search_repositories_by_keywordRepositoriesItem', ))
+    repositories = fields.List(fields.Nested('Search_repositories_by_keywordRepositoriesItem'))
 
 
 class Search_repositories_by_keywordRepositoriesItem(Schema):
@@ -3045,7 +3053,7 @@ class Search_user_by_emailUser(Schema):
 
 
 class Search_users(Schema):
-    items = fields.List(fields.Nested('Search_usersItemsItem', ))
+    items = fields.List(fields.Nested('Search_usersItemsItem'))
     total_count = fields.Integer()
 
 
@@ -3066,7 +3074,7 @@ class Search_usersItemsItem(Schema):
 
 
 class Search_users_by_keyword(Schema):
-    users = fields.List(fields.Nested('Search_users_by_keywordUsersItem', ))
+    users = fields.List(fields.Nested('Search_users_by_keywordUsersItem'))
 
 
 class Search_users_by_keywordUsersItem(Schema):
@@ -3231,7 +3239,7 @@ class Teams_listItemOrganization(Schema):
 
 class Tree(Schema):
     sha = fields.String()
-    tree = fields.List(fields.Nested('TreeTreeItem', ))
+    tree = fields.List(fields.Nested('TreeTreeItem'))
     url = fields.String()
 
 
@@ -3247,7 +3255,7 @@ class TreeTreeItem(Schema):
 class Trees(Schema):
     base_tree = fields.String()
     sha = fields.String(description='SHA1 checksum ID of the object in the tree.')
-    tree = fields.List(fields.Nested('TreesTreeItem', ))
+    tree = fields.List(fields.Nested('TreesTreeItem'))
     url = fields.String()
 
 
@@ -3294,6 +3302,14 @@ class UserPlan(Schema):
     space = fields.Integer()
 
 
+class User_emails_finalItem(Schema):
+    pass
+
+
+class User_keysItem(Schema):
+    pass
+
+
 class User_keys_keyId(Schema):
     id = fields.Integer()
     key = fields.String()
@@ -3336,6 +3352,10 @@ class User_userId(Schema):
     public_repos = fields.Integer()
     type = fields.String()
     url = fields.String()
+
+
+class User_userId_starredItem(Schema):
+    pass
 
 
 class User_userId_subscribitionsItem(Schema):
@@ -3384,8 +3404,20 @@ class UsersItem(Schema):
     url = fields.String()
 
 
+class Users_userId_keysItem(Schema):
+    pass
+
+
+class Users_userId_orgsItem(Schema):
+    pass
+
+
 class EmojisInput(object):
     class Get(object):
+        """
+        Lists all the emojis available to use on GitHub.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3399,6 +3431,10 @@ class EmojisInput(object):
 
 class EventsInput(object):
     class Get(object):
+        """
+        List public events.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3412,6 +3448,12 @@ class EventsInput(object):
 
 class FeedsInput(object):
     class Get(object):
+        """
+        List Feeds.
+        GitHub provides several timeline resources in Atom format. The Feeds API
+         lists all the feeds available to the authenticating user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3425,6 +3467,11 @@ class FeedsInput(object):
 
 class GistsInput(object):
     class Get(object):
+        """
+        List the authenticated user's gists or if called anonymously, this will
+        return all public gists.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3438,6 +3485,10 @@ class GistsInput(object):
 
 
     class Post(object):
+        """
+        Create a gist.
+        """
+
         class Body(PostGist):
             pass
 
@@ -3454,6 +3505,10 @@ class GistsInput(object):
 
 class GistsPublicInput(object):
     class Get(object):
+        """
+        List all public gists.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3470,6 +3525,10 @@ class GistsPublicInput(object):
 
 class GistsStarredInput(object):
     class Get(object):
+        """
+        List the authenticated user's starred gists.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3486,6 +3545,10 @@ class GistsStarredInput(object):
 
 class GistsIdInput(object):
     class Delete(object):
+        """
+        Delete a gist.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3499,6 +3562,10 @@ class GistsIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single gist.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3512,6 +3579,10 @@ class GistsIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit a gist.
+        """
+
         class Body(PatchGist):
             pass
 
@@ -3531,6 +3602,10 @@ class GistsIdInput(object):
 
 class GistsIdCommentsInput(object):
     class Get(object):
+        """
+        List comments on a gist.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3544,6 +3619,10 @@ class GistsIdCommentsInput(object):
 
 
     class Post(object):
+        """
+        Create a commen
+        """
+
         class Body(CommentBody):
             pass
 
@@ -3563,6 +3642,10 @@ class GistsIdCommentsInput(object):
 
 class GistsIdCommentsCommentIdInput(object):
     class Delete(object):
+        """
+        Delete a comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3577,6 +3660,10 @@ class GistsIdCommentsCommentIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3591,6 +3678,10 @@ class GistsIdCommentsCommentIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit a comment.
+        """
+
         class Body(Comment):
             pass
 
@@ -3611,6 +3702,10 @@ class GistsIdCommentsCommentIdInput(object):
 
 class GistsIdForksInput(object):
     class Post(object):
+        """
+        Fork a gist.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3627,6 +3722,10 @@ class GistsIdForksInput(object):
 
 class GistsIdStarInput(object):
     class Delete(object):
+        """
+        Unstar a gist.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3640,6 +3739,10 @@ class GistsIdStarInput(object):
 
 
     class Get(object):
+        """
+        Check if a gist is starred.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3653,6 +3756,10 @@ class GistsIdStarInput(object):
 
 
     class Put(object):
+        """
+        Star a gist.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3669,6 +3776,11 @@ class GistsIdStarInput(object):
 
 class GitignoreTemplatesInput(object):
     class Get(object):
+        """
+        Listing available templates.
+        List all templates available to pass as an option when creating a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3682,6 +3794,10 @@ class GitignoreTemplatesInput(object):
 
 class GitignoreTemplatesLanguageInput(object):
     class Get(object):
+        """
+        Get a single template.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3698,6 +3814,11 @@ class GitignoreTemplatesLanguageInput(object):
 
 class IssuesInput(object):
     class Get(object):
+        """
+        List issues.
+        List all issues across all the authenticated user's visible repositories.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3719,6 +3840,10 @@ class IssuesInput(object):
 
 class LegacyIssuesSearchOwnerRepositoryStateKeywordInput(object):
     class Get(object):
+        """
+        Find issues by state and keyword.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3738,6 +3863,10 @@ class LegacyIssuesSearchOwnerRepositoryStateKeywordInput(object):
 
 class LegacyReposSearchKeywordInput(object):
     class Get(object):
+        """
+        Find repositories by keyword. Note, this legacy method does not follow the v3 pagination pattern. This method returns up to 100 results per page and pages can be fetched using the start_page parameter.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3760,6 +3889,10 @@ class LegacyReposSearchKeywordInput(object):
 
 class LegacyUserEmailEmailInput(object):
     class Get(object):
+        """
+        This API call is added for compatibility reasons only.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3776,6 +3909,10 @@ class LegacyUserEmailEmailInput(object):
 
 class LegacyUserSearchKeywordInput(object):
     class Get(object):
+        """
+        Find users by keyword.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3797,6 +3934,10 @@ class LegacyUserSearchKeywordInput(object):
 
 class MarkdownInput(object):
     class Post(object):
+        """
+        Render an arbitrary Markdown document
+        """
+
         class Body(Markdown):
             pass
 
@@ -3813,6 +3954,10 @@ class MarkdownInput(object):
 
 class MarkdownRawInput(object):
     class Post(object):
+        """
+        Render a Markdown document in raw mode
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3826,6 +3971,10 @@ class MarkdownRawInput(object):
 
 class MetaInput(object):
     class Get(object):
+        """
+        This gives some information about GitHub.com, the service.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3839,6 +3988,10 @@ class MetaInput(object):
 
 class NetworksOwnerRepoEventsInput(object):
     class Get(object):
+        """
+        List public events for a network of repositories.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3856,6 +4009,11 @@ class NetworksOwnerRepoEventsInput(object):
 
 class NotificationsInput(object):
     class Get(object):
+        """
+        List your notifications.
+        List all notifications for the current user, grouped by repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3871,6 +4029,11 @@ class NotificationsInput(object):
 
 
     class Put(object):
+        """
+        Mark as read.
+        Marking a notification as "read" removes it from the default view on GitHub.com.
+        """
+
         class Body(NotificationMarkRead):
             pass
 
@@ -3887,6 +4050,10 @@ class NotificationsInput(object):
 
 class NotificationsThreadsIdInput(object):
     class Get(object):
+        """
+        View a single thread.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3900,6 +4067,10 @@ class NotificationsThreadsIdInput(object):
 
 
     class Patch(object):
+        """
+        Mark a thread as read
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3916,6 +4087,10 @@ class NotificationsThreadsIdInput(object):
 
 class NotificationsThreadsIdSubscriptionInput(object):
     class Delete(object):
+        """
+        Delete a Thread Subscription.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3929,6 +4104,10 @@ class NotificationsThreadsIdSubscriptionInput(object):
 
 
     class Get(object):
+        """
+        Get a Thread Subscription.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3942,6 +4121,13 @@ class NotificationsThreadsIdSubscriptionInput(object):
 
 
     class Put(object):
+        """
+        Set a Thread Subscription.
+        This lets you subscribe to a thread, or ignore it. Subscribing to a thread
+        is unnecessary if the user is already subscribed to the repository. Ignoring
+        a thread will mute all future notifications (until you comment or get @mentioned).
+        """
+
         class Body(PutSubscription):
             pass
 
@@ -3961,6 +4147,10 @@ class NotificationsThreadsIdSubscriptionInput(object):
 
 class OrgsOrgInput(object):
     class Get(object):
+        """
+        Get an Organization.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -3974,6 +4164,10 @@ class OrgsOrgInput(object):
 
 
     class Patch(object):
+        """
+        Edit an Organization.
+        """
+
         class Body(PatchOrg):
             pass
 
@@ -3993,6 +4187,10 @@ class OrgsOrgInput(object):
 
 class OrgsOrgEventsInput(object):
     class Get(object):
+        """
+        List public events for an organization.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4009,6 +4207,11 @@ class OrgsOrgEventsInput(object):
 
 class OrgsOrgIssuesInput(object):
     class Get(object):
+        """
+        List issues.
+        List all issues for a given organization for the authenticated user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4033,6 +4236,15 @@ class OrgsOrgIssuesInput(object):
 
 class OrgsOrgMembersInput(object):
     class Get(object):
+        """
+        Members list.
+        List all users who are members of an organization. A member is a user tha
+        belongs to at least 1 team in the organization. If the authenticated user
+        is also an owner of this organization then both concealed and public members
+        will be returned. If the requester is not an owner of the organization the
+        query will be redirected to the public members list.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4049,6 +4261,12 @@ class OrgsOrgMembersInput(object):
 
 class OrgsOrgMembersUsernameInput(object):
     class Delete(object):
+        """
+        Remove a member.
+        Removing a user from this list will remove them from all teams and they
+        will no longer have any access to the organization's repositories.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4063,6 +4281,10 @@ class OrgsOrgMembersUsernameInput(object):
 
 
     class Get(object):
+        """
+        Check if a user is, publicly or privately, a member of the organization.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4080,6 +4302,12 @@ class OrgsOrgMembersUsernameInput(object):
 
 class OrgsOrgPublicMembersInput(object):
     class Get(object):
+        """
+        Public members list.
+        Members of an organization can choose to have their membership publicized
+        or not.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4096,6 +4324,10 @@ class OrgsOrgPublicMembersInput(object):
 
 class OrgsOrgPublicMembersUsernameInput(object):
     class Delete(object):
+        """
+        Conceal a user's membership.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4110,6 +4342,10 @@ class OrgsOrgPublicMembersUsernameInput(object):
 
 
     class Get(object):
+        """
+        Check public membership.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4124,6 +4360,10 @@ class OrgsOrgPublicMembersUsernameInput(object):
 
 
     class Put(object):
+        """
+        Publicize a user's membership.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4141,6 +4381,10 @@ class OrgsOrgPublicMembersUsernameInput(object):
 
 class OrgsOrgReposInput(object):
     class Get(object):
+        """
+        List repositories for the specified org.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4157,6 +4401,11 @@ class OrgsOrgReposInput(object):
 
 
     class Post(object):
+        """
+        Create a new repository for the authenticated user. OAuth users must supply
+        repo scope.
+        """
+
         class Body(PostRepo):
             pass
 
@@ -4176,6 +4425,10 @@ class OrgsOrgReposInput(object):
 
 class OrgsOrgTeamsInput(object):
     class Get(object):
+        """
+        List teams.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4189,6 +4442,11 @@ class OrgsOrgTeamsInput(object):
 
 
     class Post(object):
+        """
+        Create team.
+        In order to create a team, the authenticated user must be an owner of organization.
+        """
+
         class Body(OrgTeamsPost):
             pass
 
@@ -4208,6 +4466,11 @@ class OrgsOrgTeamsInput(object):
 
 class RateLimitInput(object):
     class Get(object):
+        """
+        Get your current rate limit status
+        Note: Accessing this endpoint does not count against your rate limit.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4221,6 +4484,12 @@ class RateLimitInput(object):
 
 class ReposOwnerRepoInput(object):
     class Delete(object):
+        """
+        Delete a Repository.
+        Deleting a repository requires admin access. If OAuth is used, the delete_repo
+        scope is required.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4235,6 +4504,10 @@ class ReposOwnerRepoInput(object):
 
 
     class Get(object):
+        """
+        Get repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4249,6 +4522,10 @@ class ReposOwnerRepoInput(object):
 
 
     class Patch(object):
+        """
+        Edit repository.
+        """
+
         class Body(RepoEdit):
             pass
 
@@ -4269,6 +4546,12 @@ class ReposOwnerRepoInput(object):
 
 class ReposOwnerRepoAssigneesInput(object):
     class Get(object):
+        """
+        List assignees.
+        This call lists all the available assignees (owner + collaborators) to which
+        issues may be assigned.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4286,6 +4569,11 @@ class ReposOwnerRepoAssigneesInput(object):
 
 class ReposOwnerRepoAssigneesAssigneeInput(object):
     class Get(object):
+        """
+        Check assignee.
+        You may also check to see if a particular user is an assignee for a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4304,6 +4592,10 @@ class ReposOwnerRepoAssigneesAssigneeInput(object):
 
 class ReposOwnerRepoBranchesInput(object):
     class Get(object):
+        """
+        Get list of branches
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4321,6 +4613,10 @@ class ReposOwnerRepoBranchesInput(object):
 
 class ReposOwnerRepoBranchesBranchInput(object):
     class Get(object):
+        """
+        Get Branch
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4339,6 +4635,14 @@ class ReposOwnerRepoBranchesBranchInput(object):
 
 class ReposOwnerRepoCollaboratorsInput(object):
     class Get(object):
+        """
+        List.
+        When authenticating as an organization owner of an organization-owned
+        repository, all organization owners are included in the list of
+        collaborators. Otherwise, only users with access to the repository are
+        returned in the collaborators list.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4356,6 +4660,10 @@ class ReposOwnerRepoCollaboratorsInput(object):
 
 class ReposOwnerRepoCollaboratorsUserInput(object):
     class Delete(object):
+        """
+        Remove collaborator.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4371,6 +4679,10 @@ class ReposOwnerRepoCollaboratorsUserInput(object):
 
 
     class Get(object):
+        """
+        Check if user is a collaborator
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4386,6 +4698,10 @@ class ReposOwnerRepoCollaboratorsUserInput(object):
 
 
     class Put(object):
+        """
+        Add collaborator.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4404,6 +4720,11 @@ class ReposOwnerRepoCollaboratorsUserInput(object):
 
 class ReposOwnerRepoCommentsInput(object):
     class Get(object):
+        """
+        List commit comments for a repository.
+        Comments are ordered by ascending ID.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4421,6 +4742,10 @@ class ReposOwnerRepoCommentsInput(object):
 
 class ReposOwnerRepoCommentsCommentIdInput(object):
     class Delete(object):
+        """
+        Delete a commit comment
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4436,6 +4761,10 @@ class ReposOwnerRepoCommentsCommentIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single commit comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4451,6 +4780,10 @@ class ReposOwnerRepoCommentsCommentIdInput(object):
 
 
     class Patch(object):
+        """
+        Update a commit comment.
+        """
+
         class Body(CommentBody):
             pass
 
@@ -4472,6 +4805,10 @@ class ReposOwnerRepoCommentsCommentIdInput(object):
 
 class ReposOwnerRepoCommitsInput(object):
     class Get(object):
+        """
+        List commits on a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4496,6 +4833,13 @@ class ReposOwnerRepoCommitsInput(object):
 
 class ReposOwnerRepoCommitsRefStatusInput(object):
     class Get(object):
+        """
+        Get the combined Status for a specific Ref
+        The Combined status endpoint is currently available for developers to preview. During the preview period, the API may change without advance notice. Please see the blog post for full details.
+        To access this endpoint during the preview period, you must provide a custom media type in the Accept header:
+        application/vnd.github.she-hulk-preview+json
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4514,6 +4858,10 @@ class ReposOwnerRepoCommitsRefStatusInput(object):
 
 class ReposOwnerRepoCommitsShaCodeInput(object):
     class Get(object):
+        """
+        Get a single commit.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4532,6 +4880,10 @@ class ReposOwnerRepoCommitsShaCodeInput(object):
 
 class ReposOwnerRepoCommitsShaCodeCommentsInput(object):
     class Get(object):
+        """
+        List comments for a single commitList comments for a single commit.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4547,6 +4899,10 @@ class ReposOwnerRepoCommitsShaCodeCommentsInput(object):
 
 
     class Post(object):
+        """
+        Create a commit comment.
+        """
+
         class Body(CommitBody):
             pass
 
@@ -4568,6 +4924,10 @@ class ReposOwnerRepoCommitsShaCodeCommentsInput(object):
 
 class ReposOwnerRepoCompareBaseIdheadIdInput(object):
     class Get(object):
+        """
+        Compare two commits
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4587,6 +4947,11 @@ class ReposOwnerRepoCompareBaseIdheadIdInput(object):
 
 class ReposOwnerRepoContentsPathInput(object):
     class Delete(object):
+        """
+        Delete a file.
+        This method deletes a file in a repository.
+        """
+
         class Body(DeleteFileBody):
             pass
 
@@ -4605,6 +4970,15 @@ class ReposOwnerRepoContentsPathInput(object):
 
 
     class Get(object):
+        """
+        Get contents.
+        This method returns the contents of a file or directory in a repository.
+        Files and symlinks support a custom media type for getting the raw content.
+        Directories and submodules do not support custom media types.
+        Note: This API supports files up to 1 megabyte in size.
+        Here can be many outcomes. For details see "http://developer.github.com/v3/repos/contents/"
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4624,6 +4998,10 @@ class ReposOwnerRepoContentsPathInput(object):
 
 
     class Put(object):
+        """
+        Create a file.
+        """
+
         class Body(CreateFileBody):
             pass
 
@@ -4645,6 +5023,10 @@ class ReposOwnerRepoContentsPathInput(object):
 
 class ReposOwnerRepoContributorsInput(object):
     class Get(object):
+        """
+        Get list of contributors.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4665,6 +5047,10 @@ class ReposOwnerRepoContributorsInput(object):
 
 class ReposOwnerRepoDeploymentsInput(object):
     class Get(object):
+        """
+        Users with pull access can view deployments for a repository
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4679,6 +5065,10 @@ class ReposOwnerRepoDeploymentsInput(object):
 
 
     class Post(object):
+        """
+        Users with push access can create a deployment for a given ref
+        """
+
         class Body(Deployment):
             pass
 
@@ -4699,6 +5089,10 @@ class ReposOwnerRepoDeploymentsInput(object):
 
 class ReposOwnerRepoDeploymentsIdStatusesInput(object):
     class Get(object):
+        """
+        Users with pull access can view deployment statuses for a deployment
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4714,6 +5108,11 @@ class ReposOwnerRepoDeploymentsIdStatusesInput(object):
 
 
     class Post(object):
+        """
+        Create a Deployment Status
+        Users with push access can create deployment statuses for a given deployment:
+        """
+
         class Body(Deployment_statuses_create):
             pass
 
@@ -4735,6 +5134,10 @@ class ReposOwnerRepoDeploymentsIdStatusesInput(object):
 
 class ReposOwnerRepoDownloadsInput(object):
     class Get(object):
+        """
+        Deprecated. List downloads for a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4752,6 +5155,10 @@ class ReposOwnerRepoDownloadsInput(object):
 
 class ReposOwnerRepoDownloadsDownloadIdInput(object):
     class Delete(object):
+        """
+        Deprecated. Delete a download.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4767,6 +5174,10 @@ class ReposOwnerRepoDownloadsDownloadIdInput(object):
 
 
     class Get(object):
+        """
+        Deprecated. Get a single download.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4785,6 +5196,10 @@ class ReposOwnerRepoDownloadsDownloadIdInput(object):
 
 class ReposOwnerRepoEventsInput(object):
     class Get(object):
+        """
+        Get list of repository events.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4802,6 +5217,10 @@ class ReposOwnerRepoEventsInput(object):
 
 class ReposOwnerRepoForksInput(object):
     class Get(object):
+        """
+        List forks.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4819,6 +5238,13 @@ class ReposOwnerRepoForksInput(object):
 
 
     class Post(object):
+        """
+        Create a fork.
+        Forking a Repository happens asynchronously. Therefore, you may have to wai
+        a short period before accessing the git objects. If this takes longer than 5
+        minutes, be sure to contact Support.
+        """
+
         class Body(ForkBody):
             pass
 
@@ -4839,6 +5265,10 @@ class ReposOwnerRepoForksInput(object):
 
 class ReposOwnerRepoGitBlobsInput(object):
     class Post(object):
+        """
+        Create a Blob.
+        """
+
         class Body(Blob):
             pass
 
@@ -4859,6 +5289,14 @@ class ReposOwnerRepoGitBlobsInput(object):
 
 class ReposOwnerRepoGitBlobsShaCodeInput(object):
     class Get(object):
+        """
+        Get a Blob.
+        Since blobs can be any arbitrary binary data, the input and responses for
+        the blob API takes an encoding parameter that can be either utf-8 or
+        base64. If your data cannot be losslessly sent as a UTF-8 string, you can
+        base64 encode it.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4877,6 +5315,10 @@ class ReposOwnerRepoGitBlobsShaCodeInput(object):
 
 class ReposOwnerRepoGitCommitsInput(object):
     class Post(object):
+        """
+        Create a Commit.
+        """
+
         class Body(RepoCommitBody):
             pass
 
@@ -4897,6 +5339,10 @@ class ReposOwnerRepoGitCommitsInput(object):
 
 class ReposOwnerRepoGitCommitsShaCodeInput(object):
     class Get(object):
+        """
+        Get a Commit.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4915,6 +5361,10 @@ class ReposOwnerRepoGitCommitsShaCodeInput(object):
 
 class ReposOwnerRepoGitRefsInput(object):
     class Get(object):
+        """
+        Get all References
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4929,6 +5379,10 @@ class ReposOwnerRepoGitRefsInput(object):
 
 
     class Post(object):
+        """
+        Create a Reference
+        """
+
         class Body(RefsBody):
             pass
 
@@ -4949,6 +5403,12 @@ class ReposOwnerRepoGitRefsInput(object):
 
 class ReposOwnerRepoGitRefsRefInput(object):
     class Delete(object):
+        """
+        Delete a Reference
+        Example: Deleting a branch: DELETE /repos/octocat/Hello-World/git/refs/heads/feature-a 
+        Example: Deleting a tag:        DELETE /repos/octocat/Hello-World/git/refs/tags/v1.0
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4964,6 +5424,10 @@ class ReposOwnerRepoGitRefsRefInput(object):
 
 
     class Get(object):
+        """
+        Get a Reference
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -4979,6 +5443,10 @@ class ReposOwnerRepoGitRefsRefInput(object):
 
 
     class Patch(object):
+        """
+        Update a Reference
+        """
+
         class Body(GitRefPatch):
             pass
 
@@ -5000,6 +5468,15 @@ class ReposOwnerRepoGitRefsRefInput(object):
 
 class ReposOwnerRepoGitTagsInput(object):
     class Post(object):
+        """
+        Create a Tag Object.
+        Note that creating a tag object does not create the reference that makes a
+        tag in Git. If you want to create an annotated tag in Git, you have to do
+        this call to create the tag object, and then create the refs/tags/[tag]
+        reference. If you want to create a lightweight tag, you only have to create
+        the tag reference - this call would be unnecessary.
+        """
+
         class Body(Tag):
             pass
 
@@ -5020,6 +5497,10 @@ class ReposOwnerRepoGitTagsInput(object):
 
 class ReposOwnerRepoGitTagsShaCodeInput(object):
     class Get(object):
+        """
+        Get a Tag.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5038,6 +5519,13 @@ class ReposOwnerRepoGitTagsShaCodeInput(object):
 
 class ReposOwnerRepoGitTreesInput(object):
     class Post(object):
+        """
+        Create a Tree.
+        The tree creation API will take nested entries as well. If both a tree and
+        a nested path modifying that tree are specified, it will overwrite the
+        contents of that tree with the new path contents and write a new tree out.
+        """
+
         class Body(Tree):
             pass
 
@@ -5058,6 +5546,10 @@ class ReposOwnerRepoGitTreesInput(object):
 
 class ReposOwnerRepoGitTreesShaCodeInput(object):
     class Get(object):
+        """
+        Get a Tree.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5079,6 +5571,10 @@ class ReposOwnerRepoGitTreesShaCodeInput(object):
 
 class ReposOwnerRepoHooksInput(object):
     class Get(object):
+        """
+        Get list of hooks.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5093,6 +5589,10 @@ class ReposOwnerRepoHooksInput(object):
 
 
     class Post(object):
+        """
+        Create a hook.
+        """
+
         class Body(HookBody):
             pass
 
@@ -5113,6 +5613,10 @@ class ReposOwnerRepoHooksInput(object):
 
 class ReposOwnerRepoHooksHookIdInput(object):
     class Delete(object):
+        """
+        Delete a hook.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5128,6 +5632,10 @@ class ReposOwnerRepoHooksHookIdInput(object):
 
 
     class Get(object):
+        """
+        Get single hook.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5143,6 +5651,10 @@ class ReposOwnerRepoHooksHookIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit a hook.
+        """
+
         class Body(HookBody):
             pass
 
@@ -5164,6 +5676,15 @@ class ReposOwnerRepoHooksHookIdInput(object):
 
 class ReposOwnerRepoHooksHookIdTestsInput(object):
     class Post(object):
+        """
+        Test a push hook.
+        This will trigger the hook with the latest push to the current repository
+        if the hook is subscribed to push events. If the hook is not subscribed
+        to push events, the server will respond with 204 but no test POST will
+        be generated.
+        Note: Previously /repos/:owner/:repo/hooks/:id/tes
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5182,6 +5703,10 @@ class ReposOwnerRepoHooksHookIdTestsInput(object):
 
 class ReposOwnerRepoIssuesInput(object):
     class Get(object):
+        """
+        List issues for a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5204,6 +5729,11 @@ class ReposOwnerRepoIssuesInput(object):
 
 
     class Post(object):
+        """
+        Create an issue.
+        Any user with pull access to a repository can create an issue.
+        """
+
         class Body(Issue):
             pass
 
@@ -5224,6 +5754,10 @@ class ReposOwnerRepoIssuesInput(object):
 
 class ReposOwnerRepoIssuesCommentsInput(object):
     class Get(object):
+        """
+        List comments in a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5246,6 +5780,10 @@ class ReposOwnerRepoIssuesCommentsInput(object):
 
 class ReposOwnerRepoIssuesCommentsCommentIdInput(object):
     class Delete(object):
+        """
+        Delete a comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5261,6 +5799,10 @@ class ReposOwnerRepoIssuesCommentsCommentIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5276,6 +5818,10 @@ class ReposOwnerRepoIssuesCommentsCommentIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit a comment.
+        """
+
         class Body(CommentBody):
             pass
 
@@ -5297,6 +5843,10 @@ class ReposOwnerRepoIssuesCommentsCommentIdInput(object):
 
 class ReposOwnerRepoIssuesEventsInput(object):
     class Get(object):
+        """
+        List issue events for a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5314,6 +5864,10 @@ class ReposOwnerRepoIssuesEventsInput(object):
 
 class ReposOwnerRepoIssuesEventsEventIdInput(object):
     class Get(object):
+        """
+        Get a single event.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5332,6 +5886,10 @@ class ReposOwnerRepoIssuesEventsEventIdInput(object):
 
 class ReposOwnerRepoIssuesNumberInput(object):
     class Get(object):
+        """
+        Get a single issue
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5347,6 +5905,11 @@ class ReposOwnerRepoIssuesNumberInput(object):
 
 
     class Patch(object):
+        """
+        Edit an issue.
+        Issue owners and users with push access can edit an issue.
+        """
+
         class Body(Issue):
             pass
 
@@ -5368,6 +5931,10 @@ class ReposOwnerRepoIssuesNumberInput(object):
 
 class ReposOwnerRepoIssuesNumberCommentsInput(object):
     class Get(object):
+        """
+        List comments on an issue.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5383,6 +5950,10 @@ class ReposOwnerRepoIssuesNumberCommentsInput(object):
 
 
     class Post(object):
+        """
+        Create a comment.
+        """
+
         class Body(CommentBody):
             pass
 
@@ -5404,6 +5975,10 @@ class ReposOwnerRepoIssuesNumberCommentsInput(object):
 
 class ReposOwnerRepoIssuesNumberEventsInput(object):
     class Get(object):
+        """
+        List events for an issue.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5422,6 +5997,10 @@ class ReposOwnerRepoIssuesNumberEventsInput(object):
 
 class ReposOwnerRepoIssuesNumberLabelsInput(object):
     class Delete(object):
+        """
+        Remove all labels from an issue.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5437,6 +6016,10 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
 
     class Get(object):
+        """
+        List labels on an issue.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5452,6 +6035,10 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
 
     class Post(object):
+        """
+        Add labels to an issue.
+        """
+
         class Body(PrimitiveValueSchema):
             v = fields.String()
 
@@ -5470,6 +6057,11 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
 
     class Put(object):
+        """
+        Replace all labels for an issue.
+        Sending an empty array ([]) will remove all Labels from the Issue.
+        """
+
         class Body(PrimitiveValueSchema):
             v = fields.String()
 
@@ -5491,6 +6083,10 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
 class ReposOwnerRepoIssuesNumberLabelsNameInput(object):
     class Delete(object):
+        """
+        Remove a label from an issue.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5510,6 +6106,10 @@ class ReposOwnerRepoIssuesNumberLabelsNameInput(object):
 
 class ReposOwnerRepoKeysInput(object):
     class Get(object):
+        """
+        Get list of keys.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5524,6 +6124,10 @@ class ReposOwnerRepoKeysInput(object):
 
 
     class Post(object):
+        """
+        Create a key.
+        """
+
         class Body(User_keys_post):
             pass
 
@@ -5544,6 +6148,10 @@ class ReposOwnerRepoKeysInput(object):
 
 class ReposOwnerRepoKeysKeyIdInput(object):
     class Delete(object):
+        """
+        Delete a key.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5559,6 +6167,10 @@ class ReposOwnerRepoKeysKeyIdInput(object):
 
 
     class Get(object):
+        """
+        Get a key
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5577,6 +6189,10 @@ class ReposOwnerRepoKeysKeyIdInput(object):
 
 class ReposOwnerRepoLabelsInput(object):
     class Get(object):
+        """
+        List all labels for this repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5591,6 +6207,10 @@ class ReposOwnerRepoLabelsInput(object):
 
 
     class Post(object):
+        """
+        Create a label.
+        """
+
         class Body(PrimitiveValueSchema):
             v = fields.String()
 
@@ -5611,6 +6231,10 @@ class ReposOwnerRepoLabelsInput(object):
 
 class ReposOwnerRepoLabelsNameInput(object):
     class Delete(object):
+        """
+        Delete a label.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5626,6 +6250,10 @@ class ReposOwnerRepoLabelsNameInput(object):
 
 
     class Get(object):
+        """
+        Get a single label.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5641,6 +6269,10 @@ class ReposOwnerRepoLabelsNameInput(object):
 
 
     class Patch(object):
+        """
+        Update a label.
+        """
+
         class Body(PrimitiveValueSchema):
             v = fields.String()
 
@@ -5662,6 +6294,12 @@ class ReposOwnerRepoLabelsNameInput(object):
 
 class ReposOwnerRepoLanguagesInput(object):
     class Get(object):
+        """
+        List languages.
+        List languages for the specified repository. The value on the right of a
+        language is the number of bytes of code written in that language.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5679,6 +6317,10 @@ class ReposOwnerRepoLanguagesInput(object):
 
 class ReposOwnerRepoMergesInput(object):
     class Post(object):
+        """
+        Perform a merge.
+        """
+
         class Body(MergesBody):
             pass
 
@@ -5699,6 +6341,10 @@ class ReposOwnerRepoMergesInput(object):
 
 class ReposOwnerRepoMilestonesInput(object):
     class Get(object):
+        """
+        List milestones for a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5718,6 +6364,10 @@ class ReposOwnerRepoMilestonesInput(object):
 
 
     class Post(object):
+        """
+        Create a milestone.
+        """
+
         class Body(MilestoneUpdate):
             pass
 
@@ -5738,6 +6388,10 @@ class ReposOwnerRepoMilestonesInput(object):
 
 class ReposOwnerRepoMilestonesNumberInput(object):
     class Delete(object):
+        """
+        Delete a milestone.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5753,6 +6407,10 @@ class ReposOwnerRepoMilestonesNumberInput(object):
 
 
     class Get(object):
+        """
+        Get a single milestone.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5768,6 +6426,10 @@ class ReposOwnerRepoMilestonesNumberInput(object):
 
 
     class Patch(object):
+        """
+        Update a milestone.
+        """
+
         class Body(MilestoneUpdate):
             pass
 
@@ -5789,6 +6451,10 @@ class ReposOwnerRepoMilestonesNumberInput(object):
 
 class ReposOwnerRepoMilestonesNumberLabelsInput(object):
     class Get(object):
+        """
+        Get labels for every issue in a milestone.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5807,6 +6473,11 @@ class ReposOwnerRepoMilestonesNumberLabelsInput(object):
 
 class ReposOwnerRepoNotificationsInput(object):
     class Get(object):
+        """
+        List your notifications in a repository
+        List all notifications for the current user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5826,6 +6497,12 @@ class ReposOwnerRepoNotificationsInput(object):
 
 
     class Put(object):
+        """
+        Mark notifications as read in a repository.
+        Marking all notifications in a repository as "read" removes them from the
+        default view on GitHub.com.
+        """
+
         class Body(NotificationMarkRead):
             pass
 
@@ -5846,6 +6523,10 @@ class ReposOwnerRepoNotificationsInput(object):
 
 class ReposOwnerRepoPullsInput(object):
     class Get(object):
+        """
+        List pull requests.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5865,6 +6546,10 @@ class ReposOwnerRepoPullsInput(object):
 
 
     class Post(object):
+        """
+        Create a pull request.
+        """
+
         class Body(PullsPost):
             pass
 
@@ -5885,6 +6570,11 @@ class ReposOwnerRepoPullsInput(object):
 
 class ReposOwnerRepoPullsCommentsInput(object):
     class Get(object):
+        """
+        List comments in a repository.
+        By default, Review Comments are ordered by ascending ID.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5907,6 +6597,10 @@ class ReposOwnerRepoPullsCommentsInput(object):
 
 class ReposOwnerRepoPullsCommentsCommentIdInput(object):
     class Delete(object):
+        """
+        Delete a comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5922,6 +6616,10 @@ class ReposOwnerRepoPullsCommentsCommentIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single comment.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5937,6 +6635,10 @@ class ReposOwnerRepoPullsCommentsCommentIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit a comment.
+        """
+
         class Body(CommentBody):
             pass
 
@@ -5958,6 +6660,10 @@ class ReposOwnerRepoPullsCommentsCommentIdInput(object):
 
 class ReposOwnerRepoPullsNumberInput(object):
     class Get(object):
+        """
+        Get a single pull request.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -5973,6 +6679,10 @@ class ReposOwnerRepoPullsNumberInput(object):
 
 
     class Patch(object):
+        """
+        Update a pull request.
+        """
+
         class Body(PullUpdate):
             pass
 
@@ -5994,6 +6704,10 @@ class ReposOwnerRepoPullsNumberInput(object):
 
 class ReposOwnerRepoPullsNumberCommentsInput(object):
     class Get(object):
+        """
+        List comments on a pull request.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6009,6 +6723,20 @@ class ReposOwnerRepoPullsNumberCommentsInput(object):
 
 
     class Post(object):
+        """
+        Create a comment.
+          #TODO Alternative input ( http://developer.github.com/v3/pulls/comments/ )
+          description: |
+            Alternative Input.
+            Instead of passing commit_id, path, and position you can reply to an
+            existing Pull Request Comment like this:
+
+                body
+                   Required string
+                in_reply_to
+                   Required number - Comment id to reply to.
+        """
+
         class Body(PullsCommentPost):
             pass
 
@@ -6030,6 +6758,10 @@ class ReposOwnerRepoPullsNumberCommentsInput(object):
 
 class ReposOwnerRepoPullsNumberCommitsInput(object):
     class Get(object):
+        """
+        List commits on a pull request.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6048,6 +6780,10 @@ class ReposOwnerRepoPullsNumberCommitsInput(object):
 
 class ReposOwnerRepoPullsNumberFilesInput(object):
     class Get(object):
+        """
+        List pull requests files.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6066,6 +6802,10 @@ class ReposOwnerRepoPullsNumberFilesInput(object):
 
 class ReposOwnerRepoPullsNumberMergeInput(object):
     class Get(object):
+        """
+        Get if a pull request has been merged.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6081,6 +6821,10 @@ class ReposOwnerRepoPullsNumberMergeInput(object):
 
 
     class Put(object):
+        """
+        Merge a pull request (Merge Button's)
+        """
+
         class Body(MergePullBody):
             pass
 
@@ -6102,6 +6846,11 @@ class ReposOwnerRepoPullsNumberMergeInput(object):
 
 class ReposOwnerRepoReadmeInput(object):
     class Get(object):
+        """
+        Get the README.
+        This method returns the preferred README for a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6122,6 +6871,10 @@ class ReposOwnerRepoReadmeInput(object):
 
 class ReposOwnerRepoReleasesInput(object):
     class Get(object):
+        """
+        Users with push access to the repository will receive all releases (i.e., published releases and draft releases). Users with pull access will receive published releases only
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6136,6 +6889,11 @@ class ReposOwnerRepoReleasesInput(object):
 
 
     class Post(object):
+        """
+        Create a release
+        Users with push access to the repository can create a release.
+        """
+
         class Body(Release_create):
             pass
 
@@ -6156,6 +6914,10 @@ class ReposOwnerRepoReleasesInput(object):
 
 class ReposOwnerRepoReleasesAssetsIdInput(object):
     class Delete(object):
+        """
+        Delete a release asset
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6171,6 +6933,10 @@ class ReposOwnerRepoReleasesAssetsIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single release asset
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6186,6 +6952,11 @@ class ReposOwnerRepoReleasesAssetsIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit a release asset
+        Users with push access to the repository can edit a release asset.
+        """
+
         class Body(AssetPatch):
             pass
 
@@ -6207,6 +6978,10 @@ class ReposOwnerRepoReleasesAssetsIdInput(object):
 
 class ReposOwnerRepoReleasesIdInput(object):
     class Delete(object):
+        """
+        Users with push access to the repository can delete a release.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6222,6 +6997,10 @@ class ReposOwnerRepoReleasesIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single release
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6237,6 +7016,10 @@ class ReposOwnerRepoReleasesIdInput(object):
 
 
     class Patch(object):
+        """
+        Users with push access to the repository can edit a release
+        """
+
         class Body(Release_create):
             pass
 
@@ -6258,6 +7041,10 @@ class ReposOwnerRepoReleasesIdInput(object):
 
 class ReposOwnerRepoReleasesIdAssetsInput(object):
     class Get(object):
+        """
+        List assets for a release
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6276,6 +7063,10 @@ class ReposOwnerRepoReleasesIdAssetsInput(object):
 
 class ReposOwnerRepoStargazersInput(object):
     class Get(object):
+        """
+        List Stargazers.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6293,6 +7084,12 @@ class ReposOwnerRepoStargazersInput(object):
 
 class ReposOwnerRepoStatsCodeFrequencyInput(object):
     class Get(object):
+        """
+        Get the number of additions and deletions per week.
+        Returns a weekly aggregate of the number of additions and deletions pushed
+        to a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6310,6 +7107,12 @@ class ReposOwnerRepoStatsCodeFrequencyInput(object):
 
 class ReposOwnerRepoStatsCommitActivityInput(object):
     class Get(object):
+        """
+        Get the last year of commit activity data.
+        Returns the last year of commit activity grouped by week. The days array
+        is a group of commits per day, starting on Sunday.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6327,6 +7130,10 @@ class ReposOwnerRepoStatsCommitActivityInput(object):
 
 class ReposOwnerRepoStatsContributorsInput(object):
     class Get(object):
+        """
+        Get contributors list with additions, deletions, and commit counts.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6344,6 +7151,10 @@ class ReposOwnerRepoStatsContributorsInput(object):
 
 class ReposOwnerRepoStatsParticipationInput(object):
     class Get(object):
+        """
+        Get the weekly commit count for the repo owner and everyone else.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6361,6 +7172,18 @@ class ReposOwnerRepoStatsParticipationInput(object):
 
 class ReposOwnerRepoStatsPunchCardInput(object):
     class Get(object):
+        """
+        Get the number of commits per hour in each day.
+        Each array contains the day number, hour number, and number of commits
+        0-6 Sunday - Saturday
+        0-23 Hour of day
+        Number of commits
+
+        For example, [2, 14, 25] indicates that there were 25 total commits, during
+        the 2.00pm hour on Tuesdays. All times are based on the time zone of
+        individual commits.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6378,6 +7201,10 @@ class ReposOwnerRepoStatsPunchCardInput(object):
 
 class ReposOwnerRepoStatusesRefInput(object):
     class Get(object):
+        """
+        List Statuses for a specific Ref.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6393,6 +7220,10 @@ class ReposOwnerRepoStatusesRefInput(object):
 
 
     class Post(object):
+        """
+        Create a Status.
+        """
+
         class Body(HeadBranch):
             pass
 
@@ -6414,6 +7245,10 @@ class ReposOwnerRepoStatusesRefInput(object):
 
 class ReposOwnerRepoSubscribersInput(object):
     class Get(object):
+        """
+        List watchers.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6431,6 +7266,10 @@ class ReposOwnerRepoSubscribersInput(object):
 
 class ReposOwnerRepoSubscriptionInput(object):
     class Delete(object):
+        """
+        Delete a Repository Subscription.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6445,6 +7284,10 @@ class ReposOwnerRepoSubscriptionInput(object):
 
 
     class Get(object):
+        """
+        Get a Repository Subscription.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6459,6 +7302,10 @@ class ReposOwnerRepoSubscriptionInput(object):
 
 
     class Put(object):
+        """
+        Set a Repository Subscription
+        """
+
         class Body(SubscribitionBody):
             pass
 
@@ -6479,6 +7326,10 @@ class ReposOwnerRepoSubscriptionInput(object):
 
 class ReposOwnerRepoTagsInput(object):
     class Get(object):
+        """
+        Get list of tags.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6496,6 +7347,10 @@ class ReposOwnerRepoTagsInput(object):
 
 class ReposOwnerRepoTeamsInput(object):
     class Get(object):
+        """
+        Get list of teams
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6513,6 +7368,10 @@ class ReposOwnerRepoTeamsInput(object):
 
 class ReposOwnerRepoWatchersInput(object):
     class Get(object):
+        """
+        List Stargazers. New implementation.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6530,6 +7389,15 @@ class ReposOwnerRepoWatchersInput(object):
 
 class ReposOwnerRepoArchiveFormatPathInput(object):
     class Get(object):
+        """
+        Get archive link.
+        This method will return a 302 to a URL to download a tarball or zipball
+        archive for a repository. Please make sure your HTTP framework is
+        configured to follow redirects or you will need to use the Location header
+        to make a second GET request.
+        Note: For private repositories, these links are temporary and expire quickly.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6549,6 +7417,14 @@ class ReposOwnerRepoArchiveFormatPathInput(object):
 
 class RepositoriesInput(object):
     class Get(object):
+        """
+        List all public repositories.
+        This provides a dump of every public repository, in the order that they
+        were created.
+        Note: Pagination is powered exclusively by the since parameter. is the
+        Link header to get the URL for the next page of repositories.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6565,6 +7441,10 @@ class RepositoriesInput(object):
 
 class SearchCodeInput(object):
     class Get(object):
+        """
+        Search code.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6583,6 +7463,10 @@ class SearchCodeInput(object):
 
 class SearchIssuesInput(object):
     class Get(object):
+        """
+        Find issues by state and keyword. (This method returns up to 100 results per page.)
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6601,6 +7485,10 @@ class SearchIssuesInput(object):
 
 class SearchRepositoriesInput(object):
     class Get(object):
+        """
+        Search repositories.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6619,6 +7507,10 @@ class SearchRepositoriesInput(object):
 
 class SearchUsersInput(object):
     class Get(object):
+        """
+        Search users.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6637,6 +7529,12 @@ class SearchUsersInput(object):
 
 class TeamsTeamIdInput(object):
     class Delete(object):
+        """
+        Delete team.
+        In order to delete a team, the authenticated user must be an owner of the
+        org that the team is associated with.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6650,6 +7548,10 @@ class TeamsTeamIdInput(object):
 
 
     class Get(object):
+        """
+        Get team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6663,6 +7565,12 @@ class TeamsTeamIdInput(object):
 
 
     class Patch(object):
+        """
+        Edit team.
+        In order to edit a team, the authenticated user must be an owner of the org
+        that the team is associated with.
+        """
+
         class Body(EditTeam):
             pass
 
@@ -6682,6 +7590,12 @@ class TeamsTeamIdInput(object):
 
 class TeamsTeamIdMembersInput(object):
     class Get(object):
+        """
+        List team members.
+        In order to list members in a team, the authenticated user must be a member
+        of the team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6698,6 +7612,16 @@ class TeamsTeamIdMembersInput(object):
 
 class TeamsTeamIdMembersUsernameInput(object):
     class Delete(object):
+        """
+        The "Remove team member" API is deprecated and is scheduled for removal in the next major version of the API. We recommend using the Remove team membership API instead. It allows you to remove both active and pending memberships.
+
+        Remove team member.
+        In order to remove a user from a team, the authenticated user must have 'admin'
+        permissions to the team or be an owner of the org that the team is associated
+        with.
+        NOTE This does not delete the user, it just remove them from the team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6712,6 +7636,14 @@ class TeamsTeamIdMembersUsernameInput(object):
 
 
     class Get(object):
+        """
+        The "Get team member" API is deprecated and is scheduled for removal in the next major version of the API. We recommend using the Get team membership API instead. It allows you to get both active and pending memberships.
+
+        Get team member.
+        In order to get if a user is a member of a team, the authenticated user mus
+        be a member of the team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6726,6 +7658,15 @@ class TeamsTeamIdMembersUsernameInput(object):
 
 
     class Put(object):
+        """
+        The API (described below) is deprecated and is scheduled for removal in the next major version of the API. We recommend using the Add team membership API instead. It allows you to invite new organization members to your teams.
+
+        Add team member.
+        In order to add a user to a team, the authenticated user must have 'admin'
+        permissions to the team or be an owner of the org that the team is associated
+        with.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6743,6 +7684,11 @@ class TeamsTeamIdMembersUsernameInput(object):
 
 class TeamsTeamIdMembershipsUsernameInput(object):
     class Delete(object):
+        """
+        Remove team membership.
+        In order to remove a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with. NOTE: This does not delete the user, it just removes their membership from the team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6757,6 +7703,11 @@ class TeamsTeamIdMembershipsUsernameInput(object):
 
 
     class Get(object):
+        """
+        Get team membership.
+        In order to get a user's membership with a team, the authenticated user must be a member of the team or an owner of the team's organization.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6771,6 +7722,15 @@ class TeamsTeamIdMembershipsUsernameInput(object):
 
 
     class Put(object):
+        """
+        Add team membership.
+        In order to add a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with.
+
+        If the user is already a part of the team's organization (meaning they're on at least one other team in the organization), this endpoint will add the user to the team.
+
+        If the user is completely unaffiliated with the team's organization (meaning they're on none of the organization's teams), this endpoint will send an invitation to the user via email. This newly-created membership will be in the 'pending' state until the user accepts the invitation, at which point the membership will transition to the 'active' state and the user will be added as a member of the team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6788,6 +7748,10 @@ class TeamsTeamIdMembershipsUsernameInput(object):
 
 class TeamsTeamIdReposInput(object):
     class Get(object):
+        """
+        List team repos
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6804,6 +7768,10 @@ class TeamsTeamIdReposInput(object):
 
 class TeamsTeamIdReposOrgRepoInput(object):
     class Put(object):
+        """
+        In order to add a repository to a team, the authenticated user must be an owner of the org that the team is associated with. Also, the repository must be owned by the organization, or a direct fork of a repository owned by the organization.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6822,6 +7790,10 @@ class TeamsTeamIdReposOrgRepoInput(object):
 
 class TeamsTeamIdReposOwnerRepoInput(object):
     class Delete(object):
+        """
+        In order to remove a repository from a team, the authenticated user must be an owner of the org that the team is associated with. NOTE: This does not delete the repository, it just removes it from the team.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6837,6 +7809,10 @@ class TeamsTeamIdReposOwnerRepoInput(object):
 
 
     class Get(object):
+        """
+        Check if a team manages a repository
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6855,6 +7831,10 @@ class TeamsTeamIdReposOwnerRepoInput(object):
 
 class UserInput(object):
     class Get(object):
+        """
+        Get the authenticated user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6865,6 +7845,10 @@ class UserInput(object):
 
 
     class Patch(object):
+        """
+        Update the authenticated user.
+        """
+
         class Body(User_update):
             pass
 
@@ -6881,6 +7865,11 @@ class UserInput(object):
 
 class UserEmailsInput(object):
     class Delete(object):
+        """
+        Delete email address(es).
+        You can include a single email address or an array of addresses.
+        """
+
         class Body(PrimitiveValueSchema):
             v = fields.String()
 
@@ -6894,6 +7883,15 @@ class UserEmailsInput(object):
 
 
     class Get(object):
+        """
+        List email addresses for a user.
+        In the final version of the API, this method will return an array of hashes
+        with extended information for each email address indicating if the address
+        has been verified and if it's primary email address for GitHub.
+        Until API v3 is finalized, use the application/vnd.github.v3 media type to
+        get other response format.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6904,6 +7902,11 @@ class UserEmailsInput(object):
 
 
     class Post(object):
+        """
+        Add email address(es).
+        You can post a single email address or an array of addresses.
+        """
+
         class Body(PrimitiveValueSchema):
             v = fields.String()
 
@@ -6920,6 +7923,10 @@ class UserEmailsInput(object):
 
 class UserFollowersInput(object):
     class Get(object):
+        """
+        List the authenticated user's followers
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6933,6 +7940,10 @@ class UserFollowersInput(object):
 
 class UserFollowingInput(object):
     class Get(object):
+        """
+        List who the authenticated user is following.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6946,6 +7957,12 @@ class UserFollowingInput(object):
 
 class UserFollowingUsernameInput(object):
     class Delete(object):
+        """
+        Unfollow a user.
+        Unfollowing a user requires the user to be logged in and authenticated with
+        basic auth or OAuth with the user:follow scope.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6959,6 +7976,10 @@ class UserFollowingUsernameInput(object):
 
 
     class Get(object):
+        """
+        Check if you are following a user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6972,6 +7993,12 @@ class UserFollowingUsernameInput(object):
 
 
     class Put(object):
+        """
+        Follow a user.
+        Following a user requires the user to be logged in and authenticated with
+        basic auth or OAuth with the user:follow scope.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -6988,6 +8015,12 @@ class UserFollowingUsernameInput(object):
 
 class UserIssuesInput(object):
     class Get(object):
+        """
+        List issues.
+        List all issues across owned and member repositories for the authenticated
+        user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7009,6 +8042,12 @@ class UserIssuesInput(object):
 
 class UserKeysInput(object):
     class Get(object):
+        """
+        List your public keys.
+        Lists the current user's keys. Management of public keys via the API requires
+        that you are authenticated through basic auth, or OAuth with the 'user', 'write:public_key' scopes.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7019,6 +8058,10 @@ class UserKeysInput(object):
 
 
     class Post(object):
+        """
+        Create a public key.
+        """
+
         class Body(User_keys_post):
             pass
 
@@ -7035,6 +8078,10 @@ class UserKeysInput(object):
 
 class UserKeysKeyIdInput(object):
     class Delete(object):
+        """
+        Delete a public key. Removes a public key. Requires that you are authenticated via Basic Auth or via OAuth with at least admin:public_key scope.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7048,6 +8095,10 @@ class UserKeysKeyIdInput(object):
 
 
     class Get(object):
+        """
+        Get a single public key.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7064,6 +8115,10 @@ class UserKeysKeyIdInput(object):
 
 class UserOrgsInput(object):
     class Get(object):
+        """
+        List public and private organizations for the authenticated user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7077,6 +8132,12 @@ class UserOrgsInput(object):
 
 class UserReposInput(object):
     class Get(object):
+        """
+        List repositories for the authenticated user. Note that this does not include
+        repositories owned by organizations which the user can access. You can lis
+        user organizations and list organization repositories separately.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7090,6 +8151,11 @@ class UserReposInput(object):
 
 
     class Post(object):
+        """
+        Create a new repository for the authenticated user. OAuth users must supply
+        repo scope.
+        """
+
         class Body(PostRepo):
             pass
 
@@ -7106,6 +8172,10 @@ class UserReposInput(object):
 
 class UserStarredInput(object):
     class Get(object):
+        """
+        List repositories being starred by the authenticated user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7123,6 +8193,10 @@ class UserStarredInput(object):
 
 class UserStarredOwnerRepoInput(object):
     class Delete(object):
+        """
+        Unstar a repository
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7137,6 +8211,10 @@ class UserStarredOwnerRepoInput(object):
 
 
     class Get(object):
+        """
+        Check if you are starring a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7151,6 +8229,10 @@ class UserStarredOwnerRepoInput(object):
 
 
     class Put(object):
+        """
+        Star a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7168,6 +8250,10 @@ class UserStarredOwnerRepoInput(object):
 
 class UserSubscriptionsInput(object):
     class Get(object):
+        """
+        List repositories being watched by the authenticated user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7181,6 +8267,10 @@ class UserSubscriptionsInput(object):
 
 class UserSubscriptionsOwnerRepoInput(object):
     class Delete(object):
+        """
+        Stop watching a repository
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7195,6 +8285,10 @@ class UserSubscriptionsOwnerRepoInput(object):
 
 
     class Get(object):
+        """
+        Check if you are watching a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7209,6 +8303,10 @@ class UserSubscriptionsOwnerRepoInput(object):
 
 
     class Put(object):
+        """
+        Watch a repository.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7226,6 +8324,10 @@ class UserSubscriptionsOwnerRepoInput(object):
 
 class UserTeamsInput(object):
     class Get(object):
+        """
+        List all of the teams across all of the organizations to which the authenticated user belongs. This method requires user or repo scope when authenticating via OAuth.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7239,6 +8341,13 @@ class UserTeamsInput(object):
 
 class UsersInput(object):
     class Get(object):
+        """
+        Get all users.
+        This provides a dump of every user, in the order that they signed up for GitHub.
+        Note: Pagination is powered exclusively by the since parameter. Use the Link
+        header to get the URL for the next page of users.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7255,6 +8364,10 @@ class UsersInput(object):
 
 class UsersUsernameInput(object):
     class Get(object):
+        """
+        Get a single user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7271,6 +8384,10 @@ class UsersUsernameInput(object):
 
 class UsersUsernameEventsInput(object):
     class Get(object):
+        """
+        If you are authenticated as the given user, you will see your private events. Otherwise, you'll only see public events.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7287,6 +8404,10 @@ class UsersUsernameEventsInput(object):
 
 class UsersUsernameEventsOrgsOrgInput(object):
     class Get(object):
+        """
+        This is the user's organization dashboard. You must be authenticated as the user to view this.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7304,6 +8425,10 @@ class UsersUsernameEventsOrgsOrgInput(object):
 
 class UsersUsernameFollowersInput(object):
     class Get(object):
+        """
+        List a user's followers
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7320,6 +8445,10 @@ class UsersUsernameFollowersInput(object):
 
 class UsersUsernameFollowingTargetUserInput(object):
     class Get(object):
+        """
+        Check if one user follows another.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7337,6 +8466,10 @@ class UsersUsernameFollowingTargetUserInput(object):
 
 class UsersUsernameGistsInput(object):
     class Get(object):
+        """
+        List a users gists.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7356,6 +8489,11 @@ class UsersUsernameGistsInput(object):
 
 class UsersUsernameKeysInput(object):
     class Get(object):
+        """
+        List public keys for a user.
+        Lists the verified public keys for a user. This is accessible by anyone.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7372,6 +8510,10 @@ class UsersUsernameKeysInput(object):
 
 class UsersUsernameOrgsInput(object):
     class Get(object):
+        """
+        List all public organizations for a user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7388,6 +8530,10 @@ class UsersUsernameOrgsInput(object):
 
 class UsersUsernameReceivedEventsInput(object):
     class Get(object):
+        """
+        These are events that you'll only see public events.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7404,6 +8550,10 @@ class UsersUsernameReceivedEventsInput(object):
 
 class UsersUsernameReceivedEventsPublicInput(object):
     class Get(object):
+        """
+        List public events that a user has received
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7420,6 +8570,10 @@ class UsersUsernameReceivedEventsPublicInput(object):
 
 class UsersUsernameReposInput(object):
     class Get(object):
+        """
+        List public repositories for the specified user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7439,6 +8593,10 @@ class UsersUsernameReposInput(object):
 
 class UsersUsernameStarredInput(object):
     class Get(object):
+        """
+        List repositories being starred by a user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7455,6 +8613,10 @@ class UsersUsernameStarredInput(object):
 
 class UsersUsernameSubscriptionsInput(object):
     class Get(object):
+        """
+        List repositories being watched by a user.
+        """
+
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
@@ -7561,8 +8723,12 @@ class GistsIdCommentsCommentIdOutput(object):
 
 
 class GitignoreTemplatesOutput(object):
-    class Get200(PrimitiveValueSchema):
-        v = fields.Field()
+    class Get200(GitignoreItem):
+        """OK"""
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
 
 
 
@@ -8655,8 +9821,12 @@ class UserIssuesOutput(object):
 
 
 class UserKeysOutput(object):
-    class Get200(PrimitiveValueSchema):
-        v = fields.Field()
+    class Get200(GitignoreItem):
+        """OK"""
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
 
     class Post201(User_keys_keyId):
         """Created"""
@@ -8672,8 +9842,12 @@ class UserKeysKeyIdOutput(object):
 
 
 class UserOrgsOutput(object):
-    class Get200(PrimitiveValueSchema):
-        v = fields.Field()
+    class Get200(GitignoreItem):
+        """OK"""
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
 
 
 
@@ -8695,8 +9869,12 @@ class UserReposOutput(object):
 
 
 class UserStarredOutput(object):
-    class Get200(PrimitiveValueSchema):
-        v = fields.Field()
+    class Get200(GitignoreItem):
+        """OK"""
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
 
 
 
@@ -8761,14 +9939,22 @@ class UsersUsernameGistsOutput(object):
 
 
 class UsersUsernameKeysOutput(object):
-    class Get200(PrimitiveValueSchema):
-        v = fields.Field()
+    class Get200(GitignoreItem):
+        """OK"""
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
 
 
 
 class UsersUsernameOrgsOutput(object):
-    class Get200(PrimitiveValueSchema):
-        v = fields.Field()
+    class Get200(GitignoreItem):
+        """OK"""
+        def __init__(self, *args, **kwargs):
+            kwargs['many'] = True
+            super().__init__(*args, **kwargs)
+
 
 
 

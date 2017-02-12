@@ -14,7 +14,7 @@ class Product(Schema):
 
 
 class ProductList(Schema):
-    products = fields.List(fields.Field('Product', ))
+    products = fields.List(fields.Field('Product'), description='Contains the list of products')
 
 
 class PriceEstimate(Schema):
@@ -43,7 +43,7 @@ class Activities(Schema):
     offset = fields.Integer(description='Position in pagination.')
     limit = fields.Integer(description='Number of items to retrieve (100 max).')
     count = fields.Integer(description='Total number of items available.')
-    history = fields.List(fields.Field('Activity', ))
+    history = fields.List(fields.Field('Activity'))
 
 
 class Error(Schema):
@@ -54,7 +54,9 @@ class Error(Schema):
 
 class ProductsInput(object):
     class Get(object):
-        """Product Types"""
+        """
+        Product Types
+        """
 
         class Query(Schema):
             latitude = fields.Number(description='Latitude component of location.')
@@ -65,7 +67,9 @@ class ProductsInput(object):
 
 class EstimatesPriceInput(object):
     class Get(object):
-        """Price Estimates"""
+        """
+        Price Estimates
+        """
 
         class Query(Schema):
             start_latitude = fields.Number(description='Latitude component of start location.')
@@ -78,7 +82,9 @@ class EstimatesPriceInput(object):
 
 class EstimatesTimeInput(object):
     class Get(object):
-        """Time Estimates"""
+        """
+        Time Estimates
+        """
 
         class Query(Schema):
             start_latitude = fields.Number(description='Latitude component of start location.')
@@ -91,7 +97,9 @@ class EstimatesTimeInput(object):
 
 class HistoryInput(object):
     class Get(object):
-        """User Activity"""
+        """
+        User Activity
+        """
 
         class Query(Schema):
             offset = fields.Integer(description='Offset the list of returned results by this amount. Default is zero.')

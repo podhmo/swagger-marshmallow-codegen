@@ -30,7 +30,7 @@ class Default(Schema):
     date = Date(missing=lambda: datetime.date(2000, 1, 1))
     datetime = DateTime(missing=lambda: datetime.datetime(2000, 1, 1, 1, 1, 1))
     object = fields.Nested('DefaultObject', missing=lambda: OrderedDict([('name', 'foo'), ('age', 20)]))
-    array = fields.List(fields.Integer(missing=lambda: [1, 2, 3]))
+    array = fields.List(fields.Integer(), missing=lambda: [1, 2, 3])
 
 
 class DefaultObject(Schema):
@@ -60,7 +60,7 @@ class Regex_validation(Schema):
 
 
 class Array_validation(Schema):
-    nums = fields.List(fields.Integer(validate=[ItemsRange(min=1, max=10), Unique()]))
+    nums = fields.List(fields.Integer(), validate=[ItemsRange(min=1, max=10), Unique()])
 
 
 class Enum_validation(Schema):
