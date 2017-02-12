@@ -215,14 +215,11 @@ class PathsSchemaWriter(object):
             found = False
             lazy_clsname = self.get_lazy_clsname(path)
             with sc.m.class_(LazyFormat("{}Input", lazy_clsname)):
+                toplevel_parameters = self.accessor.parameters(methods)
+                if self.OVERRIDE_NAME_MARKER in methods:
+                    lazy_clsname.pop()
+                    lazy_clsname.append(methods[self.OVERRIDE_NAME_MARKER])
                 for method, definition in self.accessor.methods(methods):
-                    if method == self.__class__.OVERRIDE_NAME_MARKER:
-                        lazy_clsname.pop()
-                        lazy_clsname.append(definition)
-                        continue
-                    elif method.startswith("x-"):
-                        continue
-
                     ssc = sc.new_child()
                     with ssc.m.class_(titleize(method)):
                         if "summary" in definition or "description" in definition:
@@ -236,7 +233,7 @@ class PathsSchemaWriter(object):
                             ssc.m.stmt('"""')
                             ssc.m.stmt("")
 
-                        path_info = self.build_path_info(d, definition)
+                        path_info = self.build_path_info(d, toplevel_parameters, self.accessor.parameters(definition))
                         for section, properties in sorted(path_info.items()):
                             if section is None:
                                 continue
@@ -252,12 +249,13 @@ class PathsSchemaWriter(object):
             if not found:
                 sc.m.clear()
 
-    def build_path_info(self, fulldata, d):
+    def build_path_info(self, fulldata, *paramaters_set):
         info = defaultdict(OrderedDict)
-        for p in self.accessor.parameters(d):
-            if self.resolver.has_ref(p):
-                _, p = self.resolver.resolve_ref_definition(fulldata, p)
-            info[p.get("in")][p.get("name")] = p
+        for parameters in paramaters_set:
+            for p in parameters:
+                if self.resolver.has_ref(p):
+                    _, p = self.resolver.resolve_ref_definition(fulldata, p)
+                info[p.get("in")][p.get("name")] = p
         return info
 
 
@@ -285,14 +283,10 @@ class ResponsesSchemaWriter(object):
             sc = c.new_child()
             found = False
             with sc.m.class_(LazyFormat("{}Output", lazy_clsname)):
+                if self.OVERRIDE_NAME_MARKER in methods:
+                    lazy_clsname.pop()
+                    lazy_clsname.append(methods[self.OVERRIDE_NAME_MARKER])
                 for method, definition in self.accessor.methods(methods):
-                    if method == self.__class__.OVERRIDE_NAME_MARKER:
-                        lazy_clsname.pop()
-                        lazy_clsname.append(definition)
-                        continue
-                    elif method.startswith("x-"):
-                        continue
-
                     for status, definition in self.accessor.responses(definition):
                         if self.resolver.has_ref(definition):
                             _, definition = self.resolver.resolve_ref_definition(d, definition)

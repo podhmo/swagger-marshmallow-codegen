@@ -14,9 +14,10 @@ class Accessor(object):
     def paths(self, d):
         return (d.get("paths") or {}).items()
 
-    def methods(self, d):
+    def methods(self, d, candidates=set(("get", "post", "put", "head", "delete", "options", "patch"))):
         for method, definition in d.items():
-            yield method, definition
+            if method in candidates:
+                yield method, definition
 
     def parameters(self, d):
         return d.get("parameters") or []
