@@ -80,6 +80,7 @@ class CodegenTests(DiffTestCase):
             ("./src/00paths.yaml", "./dst/00paths.py"),
             ("./src/01paths.yaml", "./dst/01paths.py"),
             ("./src/02paths.yaml", "./dst/02paths.py"),
+            ("./src/03paths.yaml", "./dst/03paths.py"),
             ("./src/00empty.yaml", "./dst/00empty.py"),
             ("./src/01empty.yaml", "./dst/01empty.py"),
             ("./src/00list_with_options.yaml", "./dst/00list_with_options.py"),
