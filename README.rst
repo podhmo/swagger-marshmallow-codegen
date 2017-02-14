@@ -240,6 +240,14 @@ definition.py
       deposit = fields.Integer(validate=[MultipleOf(n=10000)])
       color = fields.String(required=True, validate=[OneOf(choices=['R', 'G', 'B'], labels=[])])
 
+
+customization:
+----------------------------------------
+
+todo: write down
+
+https://github.com/podhmo/swagger-marshmallow-codegen/issues/1
+
 todo:
 ----------------------------------------
 
