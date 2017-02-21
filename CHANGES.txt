@@ -1,3 +1,7 @@
+0.3.4
+
+- list fields dispatch is also customizable
+
 0.3.3
 
 - support python's resrved word field name #12

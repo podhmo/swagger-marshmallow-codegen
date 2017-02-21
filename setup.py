@@ -32,7 +32,7 @@ testing_extras = tests_require + [
 ]
 
 setup(name='swagger-marshmallow-codegen',
-      version='0.3.3',
+      version='0.3.4',
       description='generating marshmallow\'s schema from swagger definition file',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
