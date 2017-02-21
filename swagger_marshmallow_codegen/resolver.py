@@ -49,10 +49,8 @@ class Resolver(object):
     def resolve_schema_name(self, name):
         return titleize(name)
 
-    def resolve_type_and_format(self, name, field, ignore_array=True):
+    def resolve_type_and_format(self, name, field):
         try:
-            if self.has_many(field):
-                return self.resolve_type_and_format(name, field["items"])
             typ = field["type"]
             format = field.get("format")
             return Pair(type=typ, format=format)

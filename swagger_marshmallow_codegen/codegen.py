@@ -98,6 +98,10 @@ class SchemaWriter(object):
         self.accessor.update_option_on_property(c, field, opts)
         opts.pop("many", None)
 
+        caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
+        if caller_name is None:
+            raise CodegenError("matched field class is not found. name=%r, schema=%r", name, schema_name)
+
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name
@@ -107,9 +111,9 @@ class SchemaWriter(object):
 
         def wrap(value, opts=opts):
             if opts:
-                return LazyFormat("fields.List({}, {})", value, LazyKeywordsRepr(opts))
+                return LazyFormat("{}({}, {})", caller_name, value, LazyKeywordsRepr(opts))
             else:
-                return LazyFormat("fields.List({})", value)
+                return LazyFormat("{}({})", caller_name, value)
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, normalized_name, field, {}, wrap=wrap)
 
