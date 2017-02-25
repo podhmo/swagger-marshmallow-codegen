@@ -147,6 +147,11 @@ class SchemaWriter(object):
                             m.stmt("super().__init__(*args, **kwargs)")
                     init_writer = init  # xxx : overwrite
             else:
+                if not self.resolver.has_schema(d, ref_definition):
+                    c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
+                    with c.m.class_(clsname, "PrimitiveValueSchema"):
+                        self.write_field_one(c, d, clsname, {}, "v", ref_definition, OrderedDict())
+                    return
                 self.write_schema(c, d, ref_name, ref_definition)
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
