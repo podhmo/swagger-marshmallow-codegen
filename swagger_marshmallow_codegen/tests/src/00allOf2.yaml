@@ -1,0 +1,16 @@
+definitions:
+  person0:
+    description: original (no. 1)
+    properties:
+      name:
+        type: string
+  mix:
+    required: ["name"]
+    description: no. 2
+    properties:
+      age:
+        type: integer
+  person:
+    allOf:
+      - $ref: "#/definitions/person0"
+      - $ref: "#/definitions/mix"

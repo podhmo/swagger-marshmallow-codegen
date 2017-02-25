@@ -1,0 +1,14 @@
+definitions:
+  person0:
+    description: original (no. 1)
+    properties:
+      name:
+        type: string
+  person:
+    allOf:
+      - $ref: "#/definitions/person0"
+    description: no. 4
+    required: ["name"]
+    properties:
+      age:
+        type: integer

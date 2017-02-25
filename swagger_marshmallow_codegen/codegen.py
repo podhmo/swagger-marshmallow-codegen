@@ -5,7 +5,7 @@ import logging
 from functools import partial
 from prestring import PreString
 from prestring.python import Module, LazyFormat, LazyKeywords
-from dictknife import deepequal
+from dictknife import deepequal, deepmerge
 from collections import defaultdict
 from collections import OrderedDict
 from .langhelpers import LazyCallString, titleize
@@ -150,7 +150,8 @@ class SchemaWriter(object):
                 self.write_schema(c, d, ref_name, ref_definition)
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
-            ref_list, definition = self.resolver.resolve_allof_definition(d, definition)
+            ref_list, ref_definition = self.resolver.resolve_allof_definition(d, definition)
+            definition = deepmerge(ref_definition, definition)
             if ref_list:
                 base_classes = []
                 for ref_name, ref_definition in ref_list:
@@ -159,8 +160,7 @@ class SchemaWriter(object):
                     else:
                         self.write_schema(c, d, ref_name, ref_definition)
                         base_classes.append(ref_name)
-
-        with c.m.class_(clsname, *base_classes):
+        with c.m.class_(clsname, bases=base_classes):
             if "description" in definition:
                 c.m.stmt('"""{}"""'.format(definition["description"]))
 
