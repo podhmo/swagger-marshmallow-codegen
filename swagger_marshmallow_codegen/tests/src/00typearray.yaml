@@ -1,0 +1,22 @@
+definitions:
+  foo:
+    properties:
+      value0:
+        type:
+          - string
+      value1:
+        type:
+          - string
+          - null
+      value2:
+        type:
+          - null
+          - string
+      value3:
+        type:
+          - string
+          - integer
+      value4:
+        type:
+          - integer
+          - string

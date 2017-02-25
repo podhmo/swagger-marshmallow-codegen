@@ -52,6 +52,11 @@ class Resolver(object):
     def resolve_type_and_format(self, name, field):
         try:
             typ = field["type"]
+            if isinstance(typ, (list, tuple)):
+                for typ in typ:
+                    if typ is None:
+                        continue
+                    break
             format = field.get("format")
             return Pair(type=typ, format=format)
         except KeyError as e:
