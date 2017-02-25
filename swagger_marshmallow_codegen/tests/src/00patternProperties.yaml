@@ -1,0 +1,10 @@
+definitions:
+  scoreSheet:
+    type: object
+    properties:
+      name:
+        type: string
+    patternProperties:
+      ".+Score":
+        type: integer
+    additionalProperties: false

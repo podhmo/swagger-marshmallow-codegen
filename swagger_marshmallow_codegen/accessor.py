@@ -34,6 +34,9 @@ class Accessor(object):
     def properties(self, d):
         return d.get("properties") or {}
 
+    def pattern_properties(self, d):
+        return d.get("patternProperties") or {}
+
     def update_options_pre_properties(self, d, opts):
         for name in d.get("required") or []:
             opts[name]["required"] = True
