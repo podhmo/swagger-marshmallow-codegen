@@ -115,7 +115,7 @@ class SchemaWriter(object):
             else:
                 return LazyFormat("{}({})", caller_name, value)
         field = field["items"]
-        return self.write_field_one(c, d, schema_name, definition, normalized_name, field, {}, wrap=wrap)
+        return self.write_field_one(c, d, schema_name, definition, normalized_name, field, OrderedDict(), wrap=wrap)
 
     def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, init_writer=None):
         if not force and clsname in self.arrived:
