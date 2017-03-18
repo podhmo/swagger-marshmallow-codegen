@@ -9,9 +9,10 @@ class MyHandler(Handler):
 
 def lifting_definition(data, replace=True):
     w = SubDefinitionLifting(replace=replace)
-    for name in list(data["definitions"].keys()):
-        prop = data["definitions"].pop(name)
+    definitions = data.get("definitions") or {}
+    for name in list(definitions.keys()):
+        prop = definitions.pop(name)
         extracted = w.extract(prop, MyHandler([name]))
         extracted[name] = prop
-        data["definitions"].update(reversed(extracted.items()))
+        definitions.update(reversed(extracted.items()))
     return data
