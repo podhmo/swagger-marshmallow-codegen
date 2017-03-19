@@ -33,9 +33,9 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
 
         class Path(Schema):
-            owner = fields.String(description='Name of repository owner.')
-            repo = fields.String(description='Name of repository.')
-            number = fields.Integer(description='Number of issue.')
+            owner = fields.String(required=True, description='Name of repository owner.')
+            repo = fields.String(required=True, description='Name of repository.')
+            number = fields.Integer(required=True, description='Number of issue.')
 
 
     class Get(object):
@@ -52,9 +52,9 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
 
         class Path(Schema):
-            owner = fields.String(description='Name of repository owner.')
-            repo = fields.String(description='Name of repository.')
-            number = fields.Integer(description='Number of issue.')
+            owner = fields.String(required=True, description='Name of repository owner.')
+            repo = fields.String(required=True, description='Name of repository.')
+            number = fields.Integer(required=True, description='Number of issue.')
 
 
     class Post(object):
@@ -74,9 +74,9 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
 
         class Path(Schema):
-            owner = fields.String(description='Name of repository owner.')
-            repo = fields.String(description='Name of repository.')
-            number = fields.Integer(description='Number of issue.')
+            owner = fields.String(required=True, description='Name of repository owner.')
+            repo = fields.String(required=True, description='Name of repository.')
+            number = fields.Integer(required=True, description='Number of issue.')
 
 
     class Put(object):
@@ -97,9 +97,9 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
 
         class Path(Schema):
-            owner = fields.String(description='Name of repository owner.')
-            repo = fields.String(description='Name of repository.')
-            number = fields.Integer(description='Number of issue.')
+            owner = fields.String(required=True, description='Name of repository owner.')
+            repo = fields.String(required=True, description='Name of repository.')
+            number = fields.Integer(required=True, description='Number of issue.')
 
 
 

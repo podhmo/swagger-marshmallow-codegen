@@ -39,7 +39,7 @@ class PetsPetIdInput(object):
         """
 
         class Path(Schema):
-            pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
+            pet_id = fields.String(required=True, description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
 
     class Put(object):
@@ -51,7 +51,7 @@ class PetsPetIdInput(object):
             pass
 
         class Path(Schema):
-            pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
+            pet_id = fields.String(required=True, description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
 
     class Delete(object):
@@ -60,7 +60,7 @@ class PetsPetIdInput(object):
         """
 
         class Path(Schema):
-            pet_id = fields.String(description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
+            pet_id = fields.String(required=True, description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
 
 
