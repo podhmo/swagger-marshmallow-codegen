@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import keyword
 import logging
+from collections import namedtuple
 from functools import partial
 from prestring import PreString
 from prestring.python import Module, LazyFormat, LazyKeywords
@@ -249,7 +250,7 @@ class PathsSchemaWriter(object):
                             ssc.m.stmt("")
 
                         path_info = self.build_path_info(d, toplevel_parameters, self.accessor.parameters(definition))
-                        for section, properties in sorted(path_info.items()):
+                        for section, properties in sorted(path_info.info.items()):
                             if section is None:
                                 continue
                             clsname = titleize(section)
@@ -257,21 +258,29 @@ class PathsSchemaWriter(object):
                                 definition = next(iter(properties.values()))["schema"]
                                 self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
                             else:
-                                self.schema_writer.write_schema(ssc, d, clsname, {"properties": properties}, force=True)
+                                definition = {"properties": properties, "required": path_info.required[section]}
+                                self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
                     if not path_info:
                         ssc.m.clear()
                     found = found or bool(path_info)
             if not found:
                 sc.m.clear()
 
+    PathInfo = namedtuple("PathInfo", "info, required")
+
     def build_path_info(self, fulldata, *paramaters_set):
         info = defaultdict(OrderedDict)
+        required = defaultdict(list)
         for parameters in paramaters_set:
             for p in parameters:
                 if self.resolver.has_ref(p):
                     _, p = self.resolver.resolve_ref_definition(fulldata, p)
-                info[p.get("in")][p.get("name")] = p
-        return info
+                name = p.get("name")
+                section = p.get("in")
+                info[section][name] = p
+                if p.get("required"):
+                    required[section].append(name)
+        return self.PathInfo(info=info, required=required)
 
 
 class ResponsesSchemaWriter(object):
