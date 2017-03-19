@@ -24,6 +24,11 @@ def untitleize(name):
     return "{}{}".format(name[0].lower(), name[1:])
 
 
+def clsname_from_path(path, ignore_rx=re.compile("[^0-9a-zA-Z_]+"), separate_rx=re.compile("[/_]")):
+    path_separated = separate_rx.split(path.lstrip("/"))  # xxx:
+    return "".join(titleize(ignore_rx.sub("", name)) for name in path_separated)
+
+
 class LazyCallString(object):
     def __init__(self, call, *args, **kwargs):
         self.call = call
