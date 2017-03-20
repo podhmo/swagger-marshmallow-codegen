@@ -30,6 +30,7 @@ TYPE_MAP = {
     Pair(type="array", format=None): "marshmallow.fields:List",
     Pair(type="object", format=None): "marshmallow.fields:Nested",
     Pair(type="any", format=None): "marshmallow.fields:Field",
+    Pair(type="file", format=None): "marshmallow.fields:Field",
 }
 
 
