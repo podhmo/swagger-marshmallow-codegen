@@ -165,6 +165,12 @@ class SchemaWriter(object):
                     else:
                         self.write_schema(c, d, ref_name, ref_definition)
                         base_classes.append(ref_name)
+
+        # supporting additional properties
+        if "additionalProperties" in definition and base_classes[0] == self.schema_class:
+            c.from_("swagger_marshmallow_codegen.schema", "AdditionalPropertiesSchema")
+            base_classes[0] = "AdditionalPropertiesSchema"
+
         with c.m.class_(clsname, bases=base_classes):
             if "description" in definition:
                 c.m.stmt('"""{}"""'.format(definition["description"]))
@@ -188,6 +194,20 @@ class SchemaWriter(object):
                         self.write_field_many(c, d, clsname, definition, name, field, opts[name])
                     else:
                         self.write_field_one(c, d, clsname, definition, name, field, opts[name])
+
+            # supporting additional properties
+            subdef = definition.get("additionalProperties")
+            if subdef and hasattr(subdef, "keys"):
+                c.m.sep()
+                subdef = definition["additionalProperties"]
+                with c.m.class_("Meta"):
+                    if self.resolver.has_ref(subdef):
+                        ref_name, _ = self.resolver.resolve_ref_definition(d, subdef)
+                        if ref_name is None:
+                            raise CodegenError("$ref %r is not found", subdef["$ref"])
+                        self.write_field_one(c, d, ref_name, {}, "additional_field", subdef, OrderedDict())
+                    else:
+                        self.write_field_one(c, d, "", subdef, "additional_field", subdef, OrderedDict())
 
 
 class DefinitionsSchemaWriter(object):

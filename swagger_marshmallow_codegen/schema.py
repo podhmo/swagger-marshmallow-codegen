@@ -70,17 +70,12 @@ class AdditionalPropertiesSchema(Schema):
     OPTIONS_CLASS = AdditionalPropertiesOpts
 
     @pre_load
-    def pre_load(self, data):
-        diff = set(data.keys()).difference(self.fields.keys())
-        for name in diff:
-            self.fields[name] = self.opts.additional_field()
-        return data
-
     @pre_dump
-    def pre_dump(self, data):
+    def wrap_dynamic_additionals(self, data):
         diff = set(data.keys()).difference(self.fields.keys())
         for name in diff:
-            self.fields[name] = self.opts.additional_field()
+            f = self.opts.additional_field
+            self.fields[name] = f() if callable(f) else f
         return data
 
     def dumps(self, obj, many=None, update_fields=False, *args, **kwargs):
