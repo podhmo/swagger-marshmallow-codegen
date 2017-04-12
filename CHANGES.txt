@@ -1,3 +1,7 @@
+0.3.7
+
+- support additionalProperties with object
+
 0.3.6
 
 - fix required option in parameters section are ignored
