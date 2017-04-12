@@ -28,3 +28,14 @@ class Box3(AdditionalPropertiesSchema):
 
     class Meta(object):
         additional_field = fields.String()
+
+
+
+class Box4(Schema):
+    box = fields.Nested('Box4Box')
+
+
+class Box4Box(AdditionalPropertiesSchema):
+
+    class Meta(object):
+        additional_field = fields.String()

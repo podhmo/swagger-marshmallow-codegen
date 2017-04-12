@@ -185,8 +185,9 @@ class SchemaWriter(object):
             self.accessor.update_options_pre_properties(definition, opts)
 
             properties = self.accessor.properties(definition)
+            need_pass_statement = False
             if not properties and not init_writer:
-                c.m.stmt("pass")
+                need_pass_statement = True
             else:
                 for name, field in properties.items():
                     name = str(name)
@@ -198,6 +199,7 @@ class SchemaWriter(object):
             # supporting additional properties
             subdef = definition.get("additionalProperties")
             if subdef and hasattr(subdef, "keys"):
+                need_pass_statement = False
                 c.m.sep()
                 subdef = definition["additionalProperties"]
                 with c.m.class_("Meta"):
@@ -208,6 +210,9 @@ class SchemaWriter(object):
                         self.write_field_one(c, d, ref_name, {}, "additional_field", subdef, OrderedDict())
                     else:
                         self.write_field_one(c, d, "", subdef, "additional_field", subdef, OrderedDict())
+
+            if need_pass_statement:
+                c.m.stmt("pass")
 
 
 class DefinitionsSchemaWriter(object):
