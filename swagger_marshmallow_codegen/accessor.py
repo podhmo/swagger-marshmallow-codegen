@@ -55,10 +55,14 @@ class Accessor(object):
             logger.debug("    resolve: dump_only=True")
             opts["dump_only"] = True
         typ = field.get("type")
+
         if isinstance(typ, (list, tuple)):
             for typ in typ:
                 if typ is None:
                     opts["allow_none"] = True
+        if field.get("x-nullable") or field.get("nullable"):
+            opts["allow_none"] = True
+
         validators = self.resolver.resolve_validators_on_property(c, field)
         if validators:
             opts["validate"] = validators

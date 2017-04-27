@@ -90,6 +90,7 @@ class CodegenTests(DiffTestCase):
             ("./src/00reserved.yaml", "./dst/00reserved.py"),
             ("./src/00typearray.yaml", "./dst/00typearray.py"),
             ("./src/00additional.yaml", "./dst/00additional.py"),
+            ("./src/00nullable.yaml", "./dst/00nullable.py"),
             # ("./src/00patternProperties.yaml", "./dst/00patternProperties.py"),  not supported yet
         ]
         for src_file, dst_file in candidates:
