@@ -150,6 +150,12 @@ class SchemaWriter(object):
                 if not self.resolver.has_schema(d, ref_definition):
                     c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
                     with c.m.class_(clsname, "PrimitiveValueSchema"):
+                        if meta_writer is not None:
+                            meta_writer(c.m)
+
+                        if init_writer is not None:
+                            init_writer(c.m)
+
                         self.write_field_one(c, d, clsname, {}, "v", ref_definition, OrderedDict())
                     return
                 self.write_schema(c, d, ref_name, ref_definition)
