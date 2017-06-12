@@ -73,7 +73,7 @@ class SchemaWriter(object):
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name
-        if keyword.iskeyword(normalized_name):
+        if keyword.iskeyword(normalized_name) or normalized_name == "fields":
             opts["dump_to"] = opts["load_from"] = normalized_name
             normalized_name = normalized_name + "_"
 
@@ -105,7 +105,7 @@ class SchemaWriter(object):
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
             opts["dump_to"] = opts["load_from"] = name
-        if keyword.iskeyword(normalized_name):
+        if keyword.iskeyword(normalized_name) or normalized_name == "fields":
             opts["dump_to"] = opts["load_from"] = normalized_name
             normalized_name = normalized_name + "_"
 
