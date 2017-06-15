@@ -300,7 +300,10 @@ class PathsSchemaWriter(object):
                             else:
                                 definition = {"properties": properties, "required": path_info.required[section]}
                                 self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
-                    if not path_info or not path_info.info:
+                        if path_info and not path_info.info:
+                            ssc.m.stmt("pass")
+
+                    if not path_info:
                         ssc.m.clear()
                     found = found or bool(path_info)
             if not found:
