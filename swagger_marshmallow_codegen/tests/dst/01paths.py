@@ -64,7 +64,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
         class Body(PrimitiveValueSchema):
             class schema_class(Schema):
-                value = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
+                value = fields.List(fields.String(validate=[Regexp(regex=re.compile('.+@.+'))]))
 
 
         class Header(Schema):
@@ -89,7 +89,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
         class Body(PrimitiveValueSchema):
             class schema_class(Schema):
-                value = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
+                value = fields.List(fields.String(validate=[Regexp(regex=re.compile('.+@.+'))]))
 
 
         class Header(Schema):

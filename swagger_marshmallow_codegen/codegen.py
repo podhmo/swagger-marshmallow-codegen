@@ -136,7 +136,7 @@ class SchemaWriter(object):
                 if not self.resolver.has_schema(d, items):
                     c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
                     with c.m.class_(clsname, "PrimitiveValueSchema"):
-                        self.write_schema(c, d, "schema_class", {"properties": {"value": items}}, force=True)
+                        self.write_schema(c, d, "schema_class", {"properties": {"value": ref_definition}}, force=True)
                     return
                 else:
                     self.write_schema(c, d, ref_name, items)
