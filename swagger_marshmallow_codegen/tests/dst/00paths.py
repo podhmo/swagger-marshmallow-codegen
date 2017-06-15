@@ -68,7 +68,6 @@ class PetsPetIdInput(object):
 class PetsOutput(object):
     class Get200(Pet):
         """Return pets"""
-
         def __init__(self, *args, **kwargs):
             kwargs['many'] = True
             super().__init__(*args, **kwargs)

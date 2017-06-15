@@ -1,0 +1,17 @@
+paths:
+  /ints:
+    get:
+      responses:
+        200:
+          description: ok
+          schema:
+            items:
+              type: integer
+    post:
+      parameters:
+        - description: ints.
+          in: body
+          name: body
+          schema:
+            items:
+              type: integer

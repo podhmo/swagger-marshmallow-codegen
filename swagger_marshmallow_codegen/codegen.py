@@ -117,12 +117,21 @@ class SchemaWriter(object):
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, normalized_name, field, OrderedDict(), wrap=wrap)
 
+    def write_primitive_schema(self, c, d, clsname, definition, many=False):
+        c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
+        with c.m.class_(clsname, "PrimitiveValueSchema"):
+            with c.m.class_("schema_class", self.schema_class):
+                if many or self.resolver.has_many(definition):
+                    definition["type"] = "array"
+                    self.write_field_many(c, d, clsname, {}, "value", definition, {})
+                else:
+                    self.write_field_one(c, d, clsname, {}, "value", definition, {})
+
     def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, many=False):
         if not force and clsname in self.arrived:
             return
         self.arrived.add(clsname)
         base_classes = [self.schema_class]
-
         if self.resolver.has_ref(definition):
             ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
             if ref_name is None:
@@ -134,19 +143,13 @@ class SchemaWriter(object):
                 if self.resolver.has_ref(items):
                     _, items = self.resolver.resolve_ref_definition(d, ref_definition["items"])
                 if not self.resolver.has_schema(d, items):
-                    c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
-                    with c.m.class_(clsname, "PrimitiveValueSchema"):
-                        self.write_schema(c, d, "schema_class", {"properties": {"value": ref_definition}}, force=True)
-                    return
+                    return self.write_primitive_schema(c, d, clsname, ref_definition, many=many)
                 else:
                     self.write_schema(c, d, ref_name, items)
                     base_classes = [ref_name]
             else:
                 if not self.resolver.has_schema(d, ref_definition):
-                    c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
-                    with c.m.class_(clsname, "PrimitiveValueSchema"):
-                        self.write_schema(c, d, "schema_class", {"properties": {"value": ref_definition}}, force=True)
-                    return
+                    return self.write_primitive_schema(c, d, clsname, ref_definition, many=many)
                 self.write_schema(c, d, ref_name, ref_definition)
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
@@ -166,6 +169,21 @@ class SchemaWriter(object):
             c.from_("swagger_marshmallow_codegen.schema", "AdditionalPropertiesSchema")
             base_classes[0] = "AdditionalPropertiesSchema"
 
+        if "properties" not in definition and ("object" != definition.get("type", "object") and "items" not in definition):
+            return self.write_primitive_schema(c, d, clsname, definition, many=many)
+
+        if "items" in definition:
+            many = True
+            if not self.resolver.has_ref(definition["items"]):
+                return self.write_primitive_schema(c, d, clsname, definition, many=many)
+            else:
+                ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition["items"])
+                if ref_name is None:
+                    return self.write_primitive_schema(c, d, clsname, definition, many=many)
+                else:
+                    self.write_schema(c, d, ref_name, ref_definition)
+                    base_classes = [ref_name]
+
         with c.m.class_(clsname, bases=base_classes):
             if "description" in definition:
                 c.m.stmt('"""{}"""'.format(definition["description"]))
@@ -173,7 +191,7 @@ class SchemaWriter(object):
             if meta_writer is not None:
                 meta_writer(c.m)
 
-            if many:
+            if many or self.resolver.has_many(definition):
                 with c.m.def_("__init__", "self", "*args", "**kwargs"):
                     c.m.stmt("kwargs['many'] = True")
                     c.m.stmt("super().__init__(*args, **kwargs)")
@@ -282,7 +300,7 @@ class PathsSchemaWriter(object):
                             else:
                                 definition = {"properties": properties, "required": path_info.required[section]}
                                 self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
-                    if not path_info:
+                    if not path_info or not path_info.info:
                         ssc.m.clear()
                     found = found or bool(path_info)
             if not found:
@@ -337,21 +355,12 @@ class ResponsesSchemaWriter(object):
                             found = True
                             clsname = titleize(method) + status
                             schema_definition = definition["schema"]
-                            # xxx:
-                            if "items" in schema_definition:
 
-                                def meta(m):
-                                    if "description" in definition:
-                                        m.stmt('"""{}"""\n'.format(definition["description"]))
+                            def meta(m):
+                                if "description" in definition:
+                                    m.stmt('"""{}"""'.format(definition["description"]))
 
-                                self.schema_writer.write_schema(sc, d, clsname, schema_definition["items"], force=True, meta_writer=meta, many=True)
-                            else:
-
-                                def meta(m):
-                                    if "description" in definition:
-                                        m.stmt('"""{}"""'.format(definition["description"]))
-
-                                self.schema_writer.write_schema(sc, d, clsname, schema_definition, force=True, meta_writer=meta)
+                            self.schema_writer.write_schema(sc, d, clsname, schema_definition, force=True, meta_writer=meta)
             if not found:
                 sc.m.clear()
 
