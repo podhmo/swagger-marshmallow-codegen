@@ -63,7 +63,9 @@ class IssuedLabelsInput(object):
         """
 
         class Body(PrimitiveValueSchema):
-            v = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
+            class schema_class(Schema):
+                value = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
+
 
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
@@ -86,7 +88,9 @@ class IssuedLabelsInput(object):
         """
 
         class Body(PrimitiveValueSchema):
-            v = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
+            class schema_class(Schema):
+                value = fields.String(validate=[Regexp(regex=re.compile('.+@.+'))])
+
 
         class Header(Schema):
             X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
