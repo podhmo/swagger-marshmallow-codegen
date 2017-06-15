@@ -8,6 +8,9 @@ from swagger_marshmallow_codegen.schema import (
 
 
 class IntsInput(object):
+    class Get(object):
+        pass
+
     class Post(object):
         class Body(PrimitiveValueSchema):
             class schema_class(Schema):
