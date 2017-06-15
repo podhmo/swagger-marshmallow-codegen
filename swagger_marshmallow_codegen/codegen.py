@@ -10,7 +10,6 @@ from collections import defaultdict
 from collections import OrderedDict
 from .langhelpers import LazyCallString, titleize, clsname_from_path
 
-
 logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
 
@@ -114,10 +113,11 @@ class SchemaWriter(object):
                 return LazyFormat("{}({}, {})", caller_name, value, LazyKeywordsRepr(opts))
             else:
                 return LazyFormat("{}({})", caller_name, value)
+
         field = field["items"]
         return self.write_field_one(c, d, schema_name, definition, normalized_name, field, OrderedDict(), wrap=wrap)
 
-    def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, init_writer=None):
+    def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, many=False):
         if not force and clsname in self.arrived:
             return
         self.arrived.add(clsname)
@@ -129,6 +129,7 @@ class SchemaWriter(object):
                 raise CodegenError("$ref %r is not found", definition["$ref"])
             elif "items" in ref_definition:
                 # work around
+                many = True
                 items = ref_definition["items"]
                 if self.resolver.has_ref(items):
                     _, items = self.resolver.resolve_ref_definition(d, ref_definition["items"])
@@ -140,12 +141,6 @@ class SchemaWriter(object):
                 else:
                     self.write_schema(c, d, ref_name, items)
                     base_classes = [ref_name]
-
-                    def init(m):
-                        with m.def_("__init__", "self", "*args", "**kwargs"):
-                            m.stmt("kwargs['many'] = True")
-                            m.stmt("super().__init__(*args, **kwargs)")
-                    init_writer = init  # xxx : overwrite
             else:
                 if not self.resolver.has_schema(d, ref_definition):
                     c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
@@ -178,15 +173,17 @@ class SchemaWriter(object):
             if meta_writer is not None:
                 meta_writer(c.m)
 
-            if init_writer is not None:
-                init_writer(c.m)
+            if many:
+                with c.m.def_("__init__", "self", "*args", "**kwargs"):
+                    c.m.stmt("kwargs['many'] = True")
+                    c.m.stmt("super().__init__(*args, **kwargs)")
 
             opts = defaultdict(OrderedDict)
             self.accessor.update_options_pre_properties(definition, opts)
 
             properties = self.accessor.properties(definition)
             need_pass_statement = False
-            if not properties and not init_writer:
+            if not properties and not many:
                 need_pass_statement = True
             else:
                 for name, field in properties.items():
@@ -342,19 +339,18 @@ class ResponsesSchemaWriter(object):
                             schema_definition = definition["schema"]
                             # xxx:
                             if "items" in schema_definition:
+
                                 def meta(m):
                                     if "description" in definition:
                                         m.stmt('"""{}"""\n'.format(definition["description"]))
 
-                                def init(m):
-                                    with m.def_("__init__", "self", "*args", "**kwargs"):
-                                        m.stmt("kwargs['many'] = True")
-                                        m.stmt("super().__init__(*args, **kwargs)")
-                                self.schema_writer.write_schema(sc, d, clsname, schema_definition["items"], force=True, meta_writer=meta, init_writer=init)
+                                self.schema_writer.write_schema(sc, d, clsname, schema_definition["items"], force=True, meta_writer=meta, many=True)
                             else:
+
                                 def meta(m):
                                     if "description" in definition:
                                         m.stmt('"""{}"""'.format(definition["description"]))
+
                                 self.schema_writer.write_schema(sc, d, clsname, schema_definition, force=True, meta_writer=meta)
             if not found:
                 sc.m.clear()
