@@ -9,7 +9,7 @@ class Date(fields.Date):
         return super()._deserialize(value, attr, data)
 
 
-class DateTime(fields.Date):
+class DateTime(fields.DateTime):
     def _deserialize(self, value, attr, data):
         if isinstance(value, datetime.datetime):
             return value
