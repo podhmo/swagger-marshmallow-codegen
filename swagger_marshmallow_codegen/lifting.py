@@ -1,5 +1,5 @@
 from .langhelpers import titleize
-from dictknife.jsonknife.lifting import Handler, SubDefinitionLifting
+from dictknife.jsonknife.lifting import Handler, Flattener
 
 
 class MyHandler(Handler):
@@ -8,7 +8,7 @@ class MyHandler(Handler):
 
 
 def lifting_definition(data, replace=True):
-    w = SubDefinitionLifting(replace=replace)
+    w = Flattener(replace=replace)
     definitions = data.get("definitions") or {}
     for name in list(definitions.keys()):
         prop = definitions.pop(name)
