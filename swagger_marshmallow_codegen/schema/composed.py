@@ -7,7 +7,7 @@ StrategyContext = namedtuple("StrategyContext", "data, schemas, results, errors,
 
 
 class OneOfSchema(Schema):
-    schema_clsses = []
+    schema_clsses = None
 
     def __init__(self, *args, **kwargs):
         strict = kwargs.pop("strict", None)
@@ -46,7 +46,7 @@ class OneOfSchema(Schema):
 
 
 class AnyOfSchema(Schema):
-    schema_clsses = []
+    schema_clsses = None
 
     def __init__(self, *args, **kwargs):
         strict = kwargs.pop("strict", None)
