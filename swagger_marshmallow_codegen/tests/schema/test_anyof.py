@@ -3,13 +3,13 @@ from testmarker import mark
 from collections import namedtuple
 
 
-@mark.oneof
+@mark.anyof
 class LoadTests(unittest.TestCase):
     def _getTargetClass(self):
-        from swagger_marshmallow_codegen.schema import OneOfSchema
         from .schema import Person, Group
+        from swagger_marshmallow_codegen.schema import AnyOfSchema
 
-        class S(OneOfSchema):
+        class S(AnyOfSchema):
             schema_classes = (Person, Group)
 
         return S
@@ -49,7 +49,7 @@ class LoadTests(unittest.TestCase):
                 data=dict(age="10", name="A", members=[]),
                 expected=UnmarshalResult(
                     data=dict(age=10, name="A", members=[]),
-                    errors=dict(_schema=["satisfied both of ['Person', 'Group'], not only one"])
+                    errors={},
                 ),
             ),
         ]
@@ -95,9 +95,7 @@ class LoadTests(unittest.TestCase):
                 data=[dict(age="10", name="A", members=[])],
                 expected=UnmarshalResult(
                     data=[dict(age=10, name="A", members=[])],
-                    errors={
-                        0: dict(_schema=["satisfied both of ['Person', 'Group'], not only one"])
-                    }
+                    errors={},
                 ),
             ),
             C(
@@ -151,7 +149,7 @@ class LoadTests(unittest.TestCase):
                 data=dict(target=dict(age="10", name="A", members=[])),
                 expected=UnmarshalResult(
                     data=dict(target=dict(age=10, name="A", members=[])),
-                    errors=dict(target=dict(_schema=["satisfied both of ['Person', 'Group'], not only one"]))
+                    errors={},
                 ),
             ),
         ]
@@ -247,13 +245,13 @@ class LoadTests(unittest.TestCase):
                 self.assertEqual(got, c.expected)
 
 
-@mark.oneof
+@mark.anyof
 class DumpTests(unittest.TestCase):
     def _getTargetClass(self):
-        from swagger_marshmallow_codegen.schema import OneOfSchema
+        from swagger_marshmallow_codegen.schema import AnyOfSchema
         from .schema import Person, Group
 
-        class S(OneOfSchema):
+        class S(AnyOfSchema):
             schema_classes = (Person, Group)
 
         return S
@@ -291,10 +289,7 @@ class DumpTests(unittest.TestCase):
             C(
                 msg="both",
                 data=dict(age="10", name="A", members=[]),
-                expected=MarshalResult(
-                    data=dict(age=10, name="A", members=[]),
-                    errors=dict(_schema=["satisfied both of ['Person', 'Group'], not only one"])
-                ),
+                expected=MarshalResult(data=dict(age=10, name="A", members=[]), errors={}),
             ),
         ]
         for c in candidates:

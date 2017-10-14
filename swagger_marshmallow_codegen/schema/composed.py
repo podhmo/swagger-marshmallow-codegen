@@ -45,6 +45,36 @@ class OneOfSchema(Schema):
             }
 
 
+class AnyOfSchema(Schema):
+    schema_clsses = []
+
+    def __init__(self, *args, **kwargs):
+        strict = kwargs.pop("strict", None)
+        many = kwargs.pop("many", None)
+        self.schemas = [
+            cls(*args, strict=False, many=False, **kwargs) for cls in self.schema_classes
+        ]
+        super().__init__(strict=strict, many=many)
+
+        self._marshal = ComposedMarshaller(self.schemas, self.final_check)
+        self._unmarshal = ComposedUnmarshaller(self.schemas, self.final_check)
+
+    def final_check(self, sctx):
+        compacted = sctx.compacted
+        if len(compacted) >= 1:
+            for other in compacted[1:]:
+                compacted[0].update(other)
+            return compacted[0], {}
+        else:
+            results = sctx.results
+            for other in results[1:]:
+                results[0].update(other)
+            return sctx.data if not results else results[0], {
+                "_schema":
+                ["not matched, any of {}".format([s.__class__.__name__ for s in self.schemas])]
+            }
+
+
 def run_many(data, fn, **kwargs):
     results = []
     errors = {}
