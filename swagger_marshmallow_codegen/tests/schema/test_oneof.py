@@ -10,8 +10,7 @@ class LoadTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(OneOfSchema):
-            class Meta:
-                schema_classes = (Person, Group)
+            schema_classes = (Person, Group)
 
         return S
 
@@ -257,8 +256,7 @@ class LoadTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(OneOfSchema):
-            class Meta:
-                schema_classes = (Person, Group)
+            schema_classes = (Person, Group)
 
             memo = fields.String(required=False)
             substitute = fields.Nested(Person, required=True)
@@ -319,8 +317,7 @@ class DumpTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(OneOfSchema):
-            class Meta:
-                schema_classes = (Person, Group)
+            schema_classes = (Person, Group)
 
         return S
 
@@ -360,6 +357,39 @@ class DumpTests(unittest.TestCase):
                 expected=MarshalResult(
                     data=dict(age=10, name="A", members=[]),
                     errors=dict(_schema=["satisfied both of ['Person', 'Group'], not only one"])
+                ),
+            ),
+        ]
+        for c in candidates:
+            with self.subTest(msg=c.msg):
+                s = S()
+                got = s.dump(c.data)
+                self.assertEqual(got.errors, c.expected.errors)
+                self.assertEqual(got.data, c.expected.data)
+
+    def test_with_discriminator(self):
+        from marshmallow import MarshalResult
+
+        class S(self._getTargetClass()):
+            class Meta:
+                discriminator = {"fieldname": "type"}
+
+        C = namedtuple("C", "data, expected, msg")
+        candidates = [
+            C(
+                msg="both",
+                data=dict(age="10", name="A", members=[], type="Person"),
+                expected=MarshalResult(
+                    data=dict(age=10, name="A"),
+                    errors={},
+                ),
+            ),
+            C(
+                msg="both",
+                data=dict(age="10", name="A", members=[], type="Group"),
+                expected=MarshalResult(
+                    data=dict(members=[], name="A"),
+                    errors={},
                 ),
             ),
         ]

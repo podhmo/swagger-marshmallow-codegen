@@ -9,24 +9,31 @@ StrategyContext = namedtuple("StrategyContext", "data, schemas, results, errors,
 class ComposedOpts(SchemaOpts):
     def __init__(self, meta, **kwargs):
         super().__init__(meta, **kwargs)
+
         self.schema_classes = getattr(meta, "schema_classes", ())
         if not isinstance(self.schema_classes, (tuple, list)):
             raise ValueError("`schema_classes` must be a list or tuple.")
 
+        self.discriminator = getattr(meta, "discriminator", None)
+        if self.discriminator is not None:
+            if "fieldname" not in self.discriminator:
+                raise ValueError("`discriminator` must need `fieldname` value")
+
 
 class OneOfSchema(Schema):
     OPTIONS_CLASS = ComposedOpts
+    schema_classes = None
 
     def __init__(self, *args, **kwargs):
         strict = kwargs.pop("strict", None)
         many = kwargs.pop("many", None)
-        self.schemas = [
-            cls(*args, strict=False, many=False, **kwargs) for cls in self.opts.schema_classes
-        ]
+        schema_classes = self.opts.schema_classes or self.__class__.schema_classes
+        self.schemas = [cls(*args, strict=False, many=False, **kwargs) for cls in schema_classes]
         super().__init__(strict=strict, many=many)
 
-        self._marshal = ComposedMarshaller(self._marshal, self.schemas, self.final_check)
-        self._unmarshal = ComposedUnmarshaller(self._unmarshal, self.schemas, self.final_check)
+        finder = SchemaFinder(self.schemas, self.opts.discriminator)
+        self._marshal = ComposedMarshaller(self._marshal, finder, self.final_check)
+        self._unmarshal = ComposedUnmarshaller(self._unmarshal, finder, self.final_check)
 
     def final_check(self, sctx):
         compacted = sctx.compacted
@@ -55,17 +62,18 @@ class OneOfSchema(Schema):
 
 class AnyOfSchema(Schema):
     OPTIONS_CLASS = ComposedOpts
+    schema_classes = None
 
     def __init__(self, *args, **kwargs):
         strict = kwargs.pop("strict", None)
         many = kwargs.pop("many", None)
-        self.schemas = [
-            cls(*args, strict=False, many=False, **kwargs) for cls in self.opts.schema_classes
-        ]
+        schema_classes = self.opts.schema_classes or self.__class__.schema_classes
+        self.schemas = [cls(*args, strict=False, many=False, **kwargs) for cls in schema_classes]
         super().__init__(strict=strict, many=many)
 
-        self._marshal = ComposedMarshaller(self._marshal, self.schemas, self.final_check)
-        self._unmarshal = ComposedUnmarshaller(self._unmarshal, self.schemas, self.final_check)
+        finder = SchemaFinder(self.schemas, self.opts.discriminator)
+        self._marshal = ComposedMarshaller(self._marshal, finder, self.final_check)
+        self._unmarshal = ComposedUnmarshaller(self._unmarshal, finder, self.final_check)
 
     def final_check(self, sctx):
         compacted = sctx.compacted
@@ -94,15 +102,25 @@ def run_many(data, fn, **kwargs):
     return results, errors
 
 
-class ComposedMarshaller(marshalling.Marshaller):
-    def __init__(self, marshaller, schemas, final_check):
-        super().__init__()
-        self._marshaller = marshaller
+class SchemaFinder:
+    def __init__(self, schemas, discriminator):
         self.schemas = schemas
-        self.final_check = final_check
+        if discriminator is None:
+            self.discriminator_name = None
+            self.discriminator_mapping = None
+        else:
+            self.discriminator_name = discriminator["fieldname"]
+            if "mapping" not in discriminator:
+                self.discriminator_mapping = {s.__class__.__name__: s for s in schemas}
+            else:
+                mapping = {s.__class__: s for s in schemas}
+                self.discriminator_mapping = {
+                    name: mapping[cls]
+                    for name, cls in discriminator["mapping"].items()
+                }
 
     @reify
-    def mapping(self):
+    def signature_mapping(self):
         d = {}
         for s in self.schemas:
             sig = tuple(sorted([name for name, f in s.fields.items() if f.required]))
@@ -110,11 +128,27 @@ class ComposedMarshaller(marshalling.Marshaller):
         return d
 
     def find_matched_schemas(self, data):
+        if self.discriminator_name is not None:
+            return (self.discriminator_mapping[data[self.discriminator_name]], )
+
         r = []
-        for signature, s in self.mapping.items():
+        for signature, s in self.signature_mapping.items():
             if all(k in data for k in signature):
                 r.append(s)
         return r
+
+    def find_schemas(self, data):
+        if self.discriminator_name is not None:
+            return (self.discriminator_mapping[data[self.discriminator_name]], )
+        return self.schemas
+
+
+class ComposedMarshaller(marshalling.Marshaller):
+    def __init__(self, marshaller, finder, final_check):
+        super().__init__()
+        self._marshaller = marshaller
+        self.finder = finder
+        self.final_check = final_check
 
     def marshall(self, obj, fields_dict, *, many, accessor, dict_class, index_errors, index=None):
         self.reset_errors()
@@ -153,7 +187,7 @@ class ComposedMarshaller(marshalling.Marshaller):
         results = []
         errors = []
         compacted = []
-        schemas = self.find_matched_schemas(data)
+        schemas = self.finder.find_matched_schemas(data)
         for s in schemas:
             r, err = s.dump(data, update_fields=False)
             if not err:
@@ -167,10 +201,10 @@ class ComposedMarshaller(marshalling.Marshaller):
 
 
 class ComposedUnmarshaller(marshalling.Unmarshaller):
-    def __init__(self, unmarshaller, schemas, final_check):
+    def __init__(self, unmarshaller, finder, final_check):
         super().__init__()
         self._unmarshaller = unmarshaller
-        self.schemas = schemas
+        self.finder = finder
         self.final_check = final_check
 
     def unmarshall(self, data, fields, *, many, partial, dict_class, index_errors):
@@ -207,7 +241,7 @@ class ComposedUnmarshaller(marshalling.Unmarshaller):
         results = []
         errors = []
         compacted = []
-        schemas = self.schemas
+        schemas = self.finder.find_schemas(data)
         for s in schemas:
             r, err = s.load(data, partial=partial)
             if not err:
