@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from marshmallow import Schema, ValidationError, SchemaOpts
 from marshmallow import marshalling
 from prestring.utils import reify
@@ -121,7 +121,7 @@ class SchemaFinder:
 
     @reify
     def signature_mapping(self):
-        d = {}
+        d = OrderedDict()
         for s in self.schemas:
             sig = tuple(sorted([name for name, f in s.fields.items() if f.required]))
             d[sig] = s
