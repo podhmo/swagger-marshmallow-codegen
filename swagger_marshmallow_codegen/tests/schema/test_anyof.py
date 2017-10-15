@@ -10,7 +10,8 @@ class LoadTests(unittest.TestCase):
         from swagger_marshmallow_codegen.schema import AnyOfSchema
 
         class S(AnyOfSchema):
-            schema_classes = (Person, Group)
+            class Meta:
+                schema_classes = (Person, Group)
 
         return S
 
@@ -252,7 +253,8 @@ class DumpTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(AnyOfSchema):
-            schema_classes = (Person, Group)
+            class Meta:
+                schema_classes = (Person, Group)
 
         return S
 

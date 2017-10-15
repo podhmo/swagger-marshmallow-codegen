@@ -1,19 +1,27 @@
 from collections import namedtuple
-from marshmallow import Schema, ValidationError
+from marshmallow import Schema, ValidationError, SchemaOpts
 from marshmallow import marshalling
 from prestring.utils import reify
 
 StrategyContext = namedtuple("StrategyContext", "data, schemas, results, errors, compacted")
 
 
+class ComposedOpts(SchemaOpts):
+    def __init__(self, meta, **kwargs):
+        super().__init__(meta, **kwargs)
+        self.schema_classes = getattr(meta, "schema_classes", ())
+        if not isinstance(self.schema_classes, (tuple, list)):
+            raise ValueError("`schema_classes` must be a list or tuple.")
+
+
 class OneOfSchema(Schema):
-    schema_clsses = None
+    OPTIONS_CLASS = ComposedOpts
 
     def __init__(self, *args, **kwargs):
         strict = kwargs.pop("strict", None)
         many = kwargs.pop("many", None)
         self.schemas = [
-            cls(*args, strict=False, many=False, **kwargs) for cls in self.schema_classes
+            cls(*args, strict=False, many=False, **kwargs) for cls in self.opts.schema_classes
         ]
         super().__init__(strict=strict, many=many)
 
@@ -46,13 +54,13 @@ class OneOfSchema(Schema):
 
 
 class AnyOfSchema(Schema):
-    schema_clsses = None
+    OPTIONS_CLASS = ComposedOpts
 
     def __init__(self, *args, **kwargs):
         strict = kwargs.pop("strict", None)
         many = kwargs.pop("many", None)
         self.schemas = [
-            cls(*args, strict=False, many=False, **kwargs) for cls in self.schema_classes
+            cls(*args, strict=False, many=False, **kwargs) for cls in self.opts.schema_classes
         ]
         super().__init__(strict=strict, many=many)
 

@@ -10,7 +10,8 @@ class LoadTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(OneOfSchema):
-            schema_classes = (Person, Group)
+            class Meta:
+                schema_classes = (Person, Group)
 
         return S
 
@@ -256,7 +257,9 @@ class LoadTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(OneOfSchema):
-            schema_classes = (Person, Group)
+            class Meta:
+                schema_classes = (Person, Group)
+
             memo = fields.String(required=False)
             substitute = fields.Nested(Person, required=True)
 
@@ -316,7 +319,8 @@ class DumpTests(unittest.TestCase):
         from .schema import Person, Group
 
         class S(OneOfSchema):
-            schema_classes = (Person, Group)
+            class Meta:
+                schema_classes = (Person, Group)
 
         return S
 
