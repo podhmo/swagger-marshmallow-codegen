@@ -17,8 +17,8 @@ class OneOfSchema(Schema):
         ]
         super().__init__(strict=strict, many=many)
 
-        self._marshal = ComposedMarshaller(self.schemas, self.final_check)
-        self._unmarshal = ComposedUnmarshaller(self.schemas, self.final_check)
+        self._marshal = ComposedMarshaller(self._marshal, self.schemas, self.final_check)
+        self._unmarshal = ComposedUnmarshaller(self._unmarshal, self.schemas, self.final_check)
 
     def final_check(self, sctx):
         compacted = sctx.compacted
@@ -56,8 +56,8 @@ class AnyOfSchema(Schema):
         ]
         super().__init__(strict=strict, many=many)
 
-        self._marshal = ComposedMarshaller(self.schemas, self.final_check)
-        self._unmarshal = ComposedUnmarshaller(self.schemas, self.final_check)
+        self._marshal = ComposedMarshaller(self._marshal, self.schemas, self.final_check)
+        self._unmarshal = ComposedUnmarshaller(self._unmarshal, self.schemas, self.final_check)
 
     def final_check(self, sctx):
         compacted = sctx.compacted
@@ -87,8 +87,9 @@ def run_many(data, fn, **kwargs):
 
 
 class ComposedMarshaller(marshalling.Marshaller):
-    def __init__(self, schemas, final_check):
+    def __init__(self, marshaller, schemas, final_check):
         super().__init__()
+        self._marshaller = marshaller
         self.schemas = schemas
         self.final_check = final_check
 
@@ -109,10 +110,30 @@ class ComposedMarshaller(marshalling.Marshaller):
 
     def marshall(self, obj, fields_dict, *, many, accessor, dict_class, index_errors, index=None):
         self.reset_errors()
+        self_errors = None
+        try:
+            result = self._marshaller(
+                obj,
+                fields_dict,
+                many=many,
+                accessor=accessor,
+                dict_class=dict_class,
+                index_errors=index_errors,
+                index=index,
+            )
+        except ValidationError as err:
+            self_errors = self._marshal.errors
+            result = err.data
+
         if many:
             d, errors = run_many(obj, self._marshall_one)
+            for i in range(len(result)):
+                d[i].update(result[i])
         else:
             d, errors = self._marshall_one(obj)
+            d.update(result)
+        if self_errors is not None:
+            errors.update(self_errors)
         self.errors = errors
         if errors:
             raise ValidationError(errors, data=d)
@@ -138,17 +159,37 @@ class ComposedMarshaller(marshalling.Marshaller):
 
 
 class ComposedUnmarshaller(marshalling.Unmarshaller):
-    def __init__(self, schemas, final_check):
+    def __init__(self, unmarshaller, schemas, final_check):
         super().__init__()
+        self._unmarshaller = unmarshaller
         self.schemas = schemas
         self.final_check = final_check
 
     def unmarshall(self, data, fields, *, many, partial, dict_class, index_errors):
         self.reset_errors()
+        self_errors = None
+        try:
+            result = self._unmarshaller(
+                data,
+                fields,
+                many=many,
+                partial=partial,
+                dict_class=dict_class,
+                index_errors=index_errors,
+            )
+        except ValidationError as err:
+            self_errors = self._unmarshaller.errors
+            result = err.data
+
         if many:
             d, errors = run_many(data, self._unmarshall_one, partial=partial)
+            for i in range(len(result)):
+                d[i].update(result[i])
         else:
             d, errors = self._unmarshall_one(data, partial=partial)
+            d.update(result)
+        if self_errors is not None:
+            errors.update(self_errors)
         self.errors = errors
         return d
 

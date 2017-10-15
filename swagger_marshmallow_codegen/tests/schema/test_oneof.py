@@ -151,7 +151,11 @@ class LoadTests(unittest.TestCase):
                 data=dict(target=dict(age="10", name="A", members=[])),
                 expected=UnmarshalResult(
                     data=dict(target=dict(age=10, name="A", members=[])),
-                    errors=dict(target=dict(_schema=["satisfied both of ['Person', 'Group'], not only one"]))
+                    errors=dict(
+                        target=dict(
+                            _schema=["satisfied both of ['Person', 'Group'], not only one"]
+                        )
+                    )
                 ),
             ),
         ]
@@ -230,13 +234,13 @@ class LoadTests(unittest.TestCase):
             ),
             C(
                 schema=S1,
-                msg="default marshmallow",
+                msg="oneof schema",
                 opts={"many": True},
                 expected=UnmarshalResult(data=[], errors={})
             ),
             C(
-                schema=S1,
-                msg="default marshmallow",
+                schema=S2,
+                msg="nested",
                 opts={"many": True},
                 expected=UnmarshalResult(data=[], errors={})
             )
@@ -244,6 +248,64 @@ class LoadTests(unittest.TestCase):
         for c in candidates:
             with self.subTest(msg=c.msg):
                 got = c.schema(**c.opts).load({})
+                self.assertEqual(got, c.expected)
+
+    def test_extra_field(self):
+        from marshmallow import fields, UnmarshalResult
+        from swagger_marshmallow_codegen.schema import OneOfSchema
+        from .schema import Person, Group
+
+        class S(OneOfSchema):
+            schema_classes = (Person, Group)
+            memo = fields.String(required=False)
+            substitute = fields.Nested(Person, required=True)
+
+        C = namedtuple("C", "msg, opts, data, expected")
+
+        candidates = [
+            C(
+                msg="person ok",
+                opts={"many": False},
+                data=dict(name="foo", age="20", substitute=dict(name="bar", age="40"), xxx="xxx"),
+                expected=UnmarshalResult(
+                    data=dict(name="foo", age=20, substitute=dict(name="bar", age=40)), errors={}
+                )
+            ),
+            C(
+                msg="person ng",
+                opts={"many": False},
+                data=dict(name="foo", substitute=dict(name="bar", age="40"), xxx="xxx"),
+                expected=UnmarshalResult(
+                    data=dict(name="foo", substitute=dict(name="bar", age=40)),
+                    errors={'_schema': ["not matched, any of ['Person', 'Group']"]}
+                )
+            ),
+            C(
+                msg="extra ng",
+                opts={"many": False},
+                data=dict(name="foo", age="20", xxx="xxx"),
+                expected=UnmarshalResult(
+                    data=dict(name="foo", age=20),
+                    errors={
+                        'substitute': {
+                            'name': ['Missing data for required field.'],
+                            'age': ['Missing data for required field.']
+                        }
+                    }
+                )
+            ),
+            C(
+                msg="people ok",
+                opts={"many": True},
+                data=[dict(name="foo", age="20", substitute=dict(name="bar", age="40"), xxx="xxx")],
+                expected=UnmarshalResult(
+                    data=[dict(name="foo", age=20, substitute=dict(name="bar", age=40))], errors={}
+                )
+            ),
+        ]
+        for c in candidates:
+            with self.subTest(msg=c.msg):
+                got = S(**c.opts).load(c.data)
                 self.assertEqual(got, c.expected)
 
 
