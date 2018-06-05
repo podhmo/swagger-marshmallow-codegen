@@ -10,7 +10,7 @@ if __name__ == "__main__":
                 dict(product_id="x2", description="second", display_name="2nd", capacity="5 people", image="http://example.jp/img/notfound.jpg"),
             ]
         }
-        data, err = ProductList().load(d)
+        data = ProductList().load(d)
         print("ok", data)
     except Exception as e:
         print("ng", e)
