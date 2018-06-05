@@ -187,7 +187,7 @@ d = json.loads("""{
 
 if __name__ == "__main__":
     try:
-        data, err = Repo(strict=True).load(d)
+        data = Repo().load(d)
         print("ok", json.dumps(data, indent=2))
     except Exception as e:
         print("ng", e)
@@ -195,8 +195,8 @@ if __name__ == "__main__":
 
     try:
         d = {"8ball": "hmm"}
-        data, err = Emojis(strict=True).load(d)
-        print("ok", data, Emojis().dump(data).data)
+        data = Emojis().load(d)
+        print("ok", data, Emojis().dump(data))
     except Exception as e:
         print("ng", e)
         sys.exit(-1)
