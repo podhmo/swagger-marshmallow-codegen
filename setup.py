@@ -13,7 +13,7 @@ except IOError:
 install_requires = [
     'dictknife[load] >= 0.3.1',
     "prestring",
-    "marshmallow<3.0",
+    "marshmallow",
     "magicalimport",
 ]
 
