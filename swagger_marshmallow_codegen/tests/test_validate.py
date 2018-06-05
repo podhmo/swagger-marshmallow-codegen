@@ -20,7 +20,9 @@ class RangeTests(unittest.TestCase):
             C(maximum=100, exclusive_maximum=True, value=101, ok=False),
         ]
         for c in candidates:
-            with self.subTest(maximum=c.maximum, exclusive_maximum=c.exclusive_maximum, value=c.value):
+            with self.subTest(
+                maximum=c.maximum, exclusive_maximum=c.exclusive_maximum, value=c.value
+            ):
                 target = self._makeOne(max=c.maximum, exclusive_max=c.exclusive_maximum)
                 try:
                     target(c.value)
@@ -41,7 +43,9 @@ class RangeTests(unittest.TestCase):
             C(minimum=100, exclusive_minimum=True, value=101, ok=True),
         ]
         for c in candidates:
-            with self.subTest(minimum=c.minimum, exclusive_minimum=c.exclusive_minimum, value=c.value):
+            with self.subTest(
+                minimum=c.minimum, exclusive_minimum=c.exclusive_minimum, value=c.value
+            ):
                 target = self._makeOne(min=c.minimum, exclusive_min=c.exclusive_minimum)
                 try:
                     target(c.value)

@@ -1,31 +1,24 @@
 from marshmallow import Schema, SchemaOpts, fields
 from marshmallow import pre_load, pre_dump
-from marshmallow import UnmarshalResult, MarshalResult
 
 
 class PrimitiveValueSchema:
     schema_class = None
     key = "value"
-    missing = None
+    missing_value = None
 
     def __init__(self, *args, **kwargs):
         self.schema = self.__class__.schema_class(*args, **kwargs)
 
     def load(self, value):  # don't support many
         data = {self.key: value}
-        r, errors = self.schema.load(data)
-        return UnmarshalResult(
-            data=r.get(self.key) or self.missing,
-            errors=errors.get(self.key) or errors,
-        )
+        r = self.schema.load(data)
+        return r.get(self.key) or self.missing_value
 
     def dump(self, value):  # don't support many
         data = {self.key: value}
-        r, errors = self.schema.dump(data, update_fields=False)
-        return MarshalResult(
-            data=r.get(self.key) or self.missing,
-            errors=errors.get(self.key) or errors,
-        )
+        r = self.schema.dump(data, update_fields=False)
+        return r.get(self.key) or self.missing_value
 
 
 class AdditionalPropertiesOpts(SchemaOpts):
