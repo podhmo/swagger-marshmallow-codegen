@@ -50,7 +50,7 @@ class Activities(Schema):
 class Error(Schema):
     code = fields.Integer()
     message = fields.String()
-    fields_ = fields.String(dump_to='fields', load_from='fields')
+    fields_ = fields.String(data_key='fields')
 
 
 class ProductsInput:
