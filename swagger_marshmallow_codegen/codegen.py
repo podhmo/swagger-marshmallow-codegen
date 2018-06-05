@@ -72,9 +72,9 @@ class SchemaWriter(object):
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
-            opts["dump_to"] = opts["load_from"] = name
+            opts["data_key"] = name
         if keyword.iskeyword(normalized_name) or normalized_name == "fields":
-            opts["dump_to"] = opts["load_from"] = normalized_name
+            opts["data_key"] = normalized_name
             normalized_name = normalized_name + "_"
 
         kwargs = LazyKeywordsRepr(opts)
@@ -104,9 +104,9 @@ class SchemaWriter(object):
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
-            opts["dump_to"] = opts["load_from"] = name
+            opts["data_key"] = name
         if keyword.iskeyword(normalized_name) or normalized_name == "fields":
-            opts["dump_to"] = opts["load_from"] = normalized_name
+            opts["data_key"] = normalized_name
             normalized_name = normalized_name + "_"
 
         def wrap(value, opts=opts):
