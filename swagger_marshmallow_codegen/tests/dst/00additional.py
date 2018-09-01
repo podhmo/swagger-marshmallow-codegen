@@ -1,16 +1,16 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from swagger_marshmallow_codegen.schema import (
-    AdditionalPropertiesSchema
+    AdditionalPropertiesSchema,
 )
 
 
 class Box(AdditionalPropertiesSchema):
     name = fields.String()
 
-    class Meta(object):
+    class Meta:
         additional_field = fields.Integer()
 
 
@@ -18,7 +18,7 @@ class Box(AdditionalPropertiesSchema):
 class Box2(AdditionalPropertiesSchema):
     name = fields.String()
 
-    class Meta(object):
+    class Meta:
         additional_field = fields.Nested('Box')
 
 
@@ -26,7 +26,7 @@ class Box2(AdditionalPropertiesSchema):
 class Box3(AdditionalPropertiesSchema):
     name = fields.String()
 
-    class Meta(object):
+    class Meta:
         additional_field = fields.String()
 
 
@@ -37,5 +37,5 @@ class Box4(Schema):
 
 class Box4Box(AdditionalPropertiesSchema):
 
-    class Meta(object):
+    class Meta:
         additional_field = fields.String()

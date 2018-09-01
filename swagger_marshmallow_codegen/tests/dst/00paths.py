@@ -1,10 +1,10 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from marshmallow.validate import (
     Length,
-    Regexp
+    Regexp,
 )
 from swagger_marshmallow_codegen.fields import DateTime
 import re
@@ -19,8 +19,8 @@ class Pet(Schema):
     created = DateTime(description='Creation time', dump_only=True)
 
 
-class PetsInput(object):
-    class Get(object):
+class PetsInput:
+    class Get:
         """
         Get all pets
         """
@@ -32,8 +32,8 @@ class PetsInput(object):
 
 
 
-class PetsPetIdInput(object):
-    class Get(object):
+class PetsPetIdInput:
+    class Get:
         """
         Get a single pet
         """
@@ -42,7 +42,7 @@ class PetsPetIdInput(object):
             pet_id = fields.String(required=True, description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
 
-    class Put(object):
+    class Put:
         """
         Create or update a pet
         """
@@ -54,7 +54,7 @@ class PetsPetIdInput(object):
             pet_id = fields.String(required=True, description="Pet's Unique identifier", validate=[Regexp(regex=re.compile('^[a-zA-Z0-9-]+$'))])
 
 
-    class Delete(object):
+    class Delete:
         """
         Remove a pet
         """
@@ -65,7 +65,7 @@ class PetsPetIdInput(object):
 
 
 
-class PetsOutput(object):
+class PetsOutput:
     class Get200(Pet):
         """Return pets"""
         def __init__(self, *args, **kwargs):
@@ -75,7 +75,7 @@ class PetsOutput(object):
 
 
 
-class PetsPetIdOutput(object):
+class PetsPetIdOutput:
     class Get200(Pet):
         """Return pet"""
         pass
