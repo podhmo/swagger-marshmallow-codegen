@@ -9,6 +9,7 @@ from swagger_marshmallow_codegen.fields import (
     Date,
     DateTime,
 )
+from collections import OrderedDict
 from marshmallow.validate import (
     Length,
     OneOf,
@@ -29,7 +30,7 @@ class Default(Schema):
     boolean = fields.Boolean(missing=lambda: True)
     date = Date(missing=lambda: datetime.date(2000, 1, 1))
     datetime = DateTime(missing=lambda: datetime.datetime(2000, 1, 1, 1, 1, 1))
-    object = fields.Nested('DefaultObject', missing=lambda: {'name': 'foo', 'age': 20})
+    object = fields.Nested('DefaultObject', missing=lambda: OrderedDict([('name', 'foo'), ('age', 20)]))
     array = fields.List(fields.Integer(), missing=lambda: [1, 2, 3])
 
 
