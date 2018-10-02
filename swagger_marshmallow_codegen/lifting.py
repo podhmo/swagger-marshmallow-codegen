@@ -14,5 +14,5 @@ def lifting_definition(data, replace=True):
         prop = definitions.pop(name)
         extracted = w.extract(prop, MyHandler([name]))
         extracted[name] = prop
-        definitions.update(reversed(extracted.items()))
+        definitions.update(reversed(list(extracted.items())))
     return data
