@@ -1,17 +1,17 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from swagger_marshmallow_codegen.schema import (
-    PrimitiveValueSchema
+    PrimitiveValueSchema,
 )
 
 
-class IntsInput(object):
-    class Get(object):
+class IntsInput:
+    class Get:
         pass
 
-    class Post(object):
+    class Post:
         class Body(PrimitiveValueSchema):
             class schema_class(Schema):
                 value = fields.List(fields.Integer())
@@ -20,7 +20,7 @@ class IntsInput(object):
 
 
 
-class IntsOutput(object):
+class IntsOutput:
     class Get200(PrimitiveValueSchema):
         class schema_class(Schema):
             value = fields.List(fields.Integer())

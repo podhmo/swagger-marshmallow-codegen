@@ -1,9 +1,9 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from swagger_marshmallow_codegen.validate import (
-    Range
+    Range,
 )
 
 

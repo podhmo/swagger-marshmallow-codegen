@@ -4,7 +4,8 @@ import logging
 from collections import namedtuple
 from functools import partial
 from prestring import PreString
-from prestring.python import Module, LazyFormat, LazyKeywords
+from prestring.python import Module
+from prestring.utils import LazyFormat, LazyKeywords, LazyKeywordsRepr
 from dictknife import deepequal, deepmerge
 from collections import defaultdict
 from collections import OrderedDict
@@ -409,11 +410,6 @@ class Codegen(object):
         self.write_import_(c)
         self.write_body(c, d, targets)
         return c.m
-
-
-class LazyKeywordsRepr(LazyKeywords):
-    def _string(self):
-        return ", ".join(["{}={}".format(str(k), repr(v)) for k, v in self.kwargs.items()])
 
 
 def lazy_json_dump(s):

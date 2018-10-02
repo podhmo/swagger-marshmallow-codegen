@@ -1,11 +1,11 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 import re
 from marshmallow.validate import (
     Length,
-    Regexp
+    Regexp,
 )
 
 

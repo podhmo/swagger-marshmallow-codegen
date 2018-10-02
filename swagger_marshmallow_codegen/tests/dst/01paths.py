@@ -1,13 +1,13 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from marshmallow.validate import (
     Length,
-    Regexp
+    Regexp,
 )
 from swagger_marshmallow_codegen.schema import (
-    PrimitiveValueSchema
+    PrimitiveValueSchema,
 )
 import re
 
@@ -18,8 +18,8 @@ class Label(Schema):
     url = fields.String()
 
 
-class ReposOwnerRepoIssuesNumberLabelsInput(object):
-    class Delete(object):
+class ReposOwnerRepoIssuesNumberLabelsInput:
+    class Delete:
         """
         Remove all labels from an issue.
         """
@@ -38,7 +38,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             number = fields.Integer(required=True, description='Number of issue.')
 
 
-    class Get(object):
+    class Get:
         """
         List labels on an issue.
         """
@@ -57,7 +57,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             number = fields.Integer(required=True, description='Number of issue.')
 
 
-    class Post(object):
+    class Post:
         """
         Add labels to an issue.
         """
@@ -81,7 +81,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
             number = fields.Integer(required=True, description='Number of issue.')
 
 
-    class Put(object):
+    class Put:
         """
         Replace all labels for an issue.
         Sending an empty array ([]) will remove all Labels from the Issue.
@@ -108,7 +108,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput(object):
 
 
 
-class ReposOwnerRepoIssuesNumberLabelsOutput(object):
+class ReposOwnerRepoIssuesNumberLabelsOutput:
     class Get200(Label):
         """OK"""
         def __init__(self, *args, **kwargs):

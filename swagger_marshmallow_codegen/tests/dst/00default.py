@@ -1,6 +1,6 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 import datetime
 from swagger_marshmallow_codegen.fields import DateTime
