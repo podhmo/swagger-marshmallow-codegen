@@ -7,4 +7,6 @@ python:
   - "nightly"
 install:
   - pip install -e .[testing]
-script: python setup.py test
+script:
+  - python setup.py test
+  - make ci
