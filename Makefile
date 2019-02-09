@@ -9,5 +9,5 @@ ci:
 
 WHERE ?= .
 _find-candidates:
-	@find ${WHERE} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | grep -v github
+	@find ${WHERE} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | sort -h
 
