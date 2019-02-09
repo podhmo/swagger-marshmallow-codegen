@@ -1,2 +1,2 @@
 default:
-	SRC=definition.yaml DST=definition.py make -f ../gen.mk -C .
+	SRC=definition.yaml DST=definition.py $(MAKE) -f ../gen.mk -C .
