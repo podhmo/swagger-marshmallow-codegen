@@ -381,12 +381,17 @@ class Codegen:
     schema_writer_factory = SchemaWriter
 
     @classmethod
-    def override(cls, *, schema_class_path, schema_writer_factory):
-        return partial(cls, schema_class_path=schema_class_path)
+    def override(cls, *, schema_class_path=None, schema_writer_factory=None):
+        return partial(
+            cls,
+            schema_class_path=schema_class_path,
+            schema_writer_factory=schema_writer_factory,
+        )
 
-    def __init__(self, accessor, schema_class_path=None):
+    def __init__(self, accessor, *, schema_class_path=None, schema_writer_factory=None):
         self.accessor = accessor
         self.schema_class_path = schema_class_path or self.__class__.schema_class_path
+        self.schema_writer_factory = schema_writer_factory or self.__class__.schema_writer_factory
         self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
     @property

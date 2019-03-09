@@ -3,9 +3,10 @@ import logging
 from . import loading
 from .accessor import Accessor
 from .resolver import Resolver
-from .codegen import Codegen
+from .codegen import Codegen, SchemaWriter
 from .dispatcher import FormatDispatcher
 from .lifting import lifting_definition
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,6 +41,17 @@ class Driver:
         return self.codegen_factory(accessor)
 
 
+class LegacyDriver(Driver):
+    def codegen_factory(self, accessor):
+        factory = Codegen.override(
+            schema_class_path="swagger_marshmallow_codegen.schema.legacy:LegacySchema",
+            schema_writer_factory=SchemaWriter.override(
+                extra_schema_module="swagger_marshmallow_codegen.schema.legacy"
+            ),
+        )
+        return factory(accessor)
+
+
 class Flatten:
     def __init__(self, options):
         self.options = options
@@ -63,6 +75,7 @@ class ProfileDriver(Driver):
     def run(self, inp, outp):
         import cProfile
         import pstats
+
         profile = cProfile.Profile()
         profile.enable()
         data = self.load(inp)
