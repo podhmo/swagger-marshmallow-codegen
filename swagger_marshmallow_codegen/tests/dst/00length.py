@@ -1,9 +1,9 @@
 from marshmallow import (
     Schema,
-    fields,
+    fields
 )
 from marshmallow.validate import (
-    Length,
+    Length
 )
 
 
