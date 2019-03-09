@@ -1,0 +1,19 @@
+paths:
+  /ids:
+    get:
+     responses:
+        200:
+          schema:
+            type: array
+            items:
+              type: integer
+  /ids/{id}:
+    get:
+      paramters:
+      - in: path
+        name: id
+        required: true
+      responses:
+        200:
+          schema:
+            type: integer
