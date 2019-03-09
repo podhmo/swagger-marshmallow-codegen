@@ -2,9 +2,8 @@ from collections import namedtuple
 
 import marshmallow
 
-from .extra import make_additional_properties_schema_class
-from .extra import PrimitiveValueSchema  # noqa
-from .extra import AdditionalPropertiesOpts  # noqa
+from . import extra
+
 
 #: Return type of :meth:`Schema.dump` including serialized data and errors
 MarshalResult = namedtuple("MarshalResult", ["data", "errors"])
@@ -74,9 +73,39 @@ class LegacySchema(marshmallow.Schema):
             return UnmarshalResult(data=d, errors=e)
 
 
-LegacyAdditionalPropertiesSchema = make_additional_properties_schema_class(
+class LegacyPrimitiveValueSchema(extra.PrimitiveValueSchema):
+    strict = None
+
+    def __init__(self, strict=None, **kwargs):
+        if strict is None:
+            strict = self.__class__.strict
+        self.strict = strict
+        super().__init__(**kwargs)
+
+    def _fix_return_value(self, r):
+        data = r.data
+        if data and self.key in data:
+            data = data[self.key]
+        errors = r.errors
+        if errors:
+            errors = self._fix_exception(errors)
+        return r.__class__(data=data, errors=errors)
+
+    def load(self, value):  # don't support many
+        r = super()._do_load(value)
+        return self._fix_return_value(r)
+
+    def dump(self, value):  # don't support many
+        r = super()._do_dump(value)
+        return self._fix_return_value(r)
+
+
+AdditionalPropertiesOpts = extra.AdditionalPropertiesOpts
+
+LegacyAdditionalPropertiesSchema = extra.make_additional_properties_schema_class(
     marshmallow.Schema
 )
 
 Schema = LegacySchema
 AdditionalPropertiesSchema = LegacyAdditionalPropertiesSchema
+PrimitiveValueSchema = LegacyPrimitiveValueSchema
