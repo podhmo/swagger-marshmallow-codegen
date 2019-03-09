@@ -21,12 +21,13 @@ class PrimitiveValueSchema:
         return r.get(self.key) or self.missing_value
 
 
-def make_additional_properties_schema_class(Schema, SchemaOpts):
-    class AdditionalPropertiesOpts(SchemaOpts):
-        def __init__(self, meta, **kwargs):
-            super().__init__(meta, **kwargs)
-            self.additional_field = getattr(meta, "additional_field", fields.Field)
+class AdditionalPropertiesOpts(SchemaOpts):
+    def __init__(self, meta, **kwargs):
+        super().__init__(meta, **kwargs)
+        self.additional_field = getattr(meta, "additional_field", fields.Field)
 
+
+def make_additional_properties_schema_class(Schema):
     class AdditionalPropertiesSchema(Schema):
         """
         support addtionalProperties
@@ -56,4 +57,4 @@ def make_additional_properties_schema_class(Schema, SchemaOpts):
     return AdditionalPropertiesSchema
 
 
-AdditionalPropertiesSchema = make_additional_properties_schema_class(Schema, SchemaOpts)
+AdditionalPropertiesSchema = make_additional_properties_schema_class(Schema)

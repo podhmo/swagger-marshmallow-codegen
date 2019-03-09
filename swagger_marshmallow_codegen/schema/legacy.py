@@ -1,8 +1,10 @@
 from collections import namedtuple
+
 import marshmallow
 
 from .extra import make_additional_properties_schema_class
-
+from .extra import PrimitiveValueSchema  # noqa
+from .extra import AdditionalPropertiesOpts  # noqa
 
 #: Return type of :meth:`Schema.dump` including serialized data and errors
 MarshalResult = namedtuple("MarshalResult", ["data", "errors"])
@@ -73,7 +75,7 @@ class LegacySchema(marshmallow.Schema):
 
 
 LegacyAdditionalPropertiesSchema = make_additional_properties_schema_class(
-    marshmallow.Schema, marshmallow.SchemaOpts
+    marshmallow.Schema
 )
 
 Schema = LegacySchema

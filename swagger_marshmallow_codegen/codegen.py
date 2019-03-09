@@ -5,7 +5,7 @@ from collections import namedtuple
 from functools import partial
 from prestring import PreString
 from prestring.python import Module
-from prestring.utils import LazyFormat, LazyKeywords, LazyKeywordsRepr
+from prestring.utils import LazyFormat, LazyKeywordsRepr
 from dictknife import deepequal, deepmerge
 from collections import defaultdict
 from collections import OrderedDict
@@ -37,10 +37,17 @@ class CodegenError(Exception):
 
 
 class SchemaWriter:
-    def __init__(self, accessor, schema_class):
+    extra_schema_module = "swagger_marshmallow_codegen.schema"
+
+    def __init__(self, accessor, schema_class, *, extra_schema_module=None):
         self.accessor = accessor
         self.schema_class = schema_class
         self.arrived = set()
+        self.extra_schema_module = extra_schema_module or self.__class__.extra_schema_module
+
+    @classmethod
+    def override(cls, extra_schema_module):
+        return partial(cls, extra_schema_module=extra_schema_module)
 
     @property
     def resolver(self):
@@ -119,7 +126,7 @@ class SchemaWriter:
         return self.write_field_one(c, d, schema_name, definition, normalized_name, field, OrderedDict(), wrap=wrap)
 
     def write_primitive_schema(self, c, d, clsname, definition, many=False):
-        c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
+        c.im.from_(self.extra_schema_module, "PrimitiveValueSchema")
         with c.m.class_(clsname, "PrimitiveValueSchema"):
             with c.m.class_("schema_class", self.schema_class):
                 if many or self.resolver.has_many(definition):
@@ -167,7 +174,7 @@ class SchemaWriter:
 
         # supporting additional properties
         if "additionalProperties" in definition and base_classes[0] == self.schema_class:
-            c.from_("swagger_marshmallow_codegen.schema", "AdditionalPropertiesSchema")
+            c.from_(self.extra_schema_module, "AdditionalPropertiesSchema")
             base_classes[0] = "AdditionalPropertiesSchema"
 
         if "properties" not in definition and ("object" != definition.get("type", "object") and "items" not in definition):
@@ -371,9 +378,10 @@ class ResponsesSchemaWriter:
 
 class Codegen:
     schema_class_path = "marshmallow:Schema"
+    schema_writer_factory = SchemaWriter
 
     @classmethod
-    def override(cls, schema_class_path):
+    def override(cls, *, schema_class_path, schema_writer_factory):
         return partial(cls, schema_class_path=schema_class_path)
 
     def __init__(self, accessor, schema_class_path=None):
@@ -395,7 +403,7 @@ class Codegen:
         c.from_("marshmallow", "fields")
 
     def write_body(self, c, d, targets):
-        sw = SchemaWriter(self.accessor, self.schema_class)
+        sw = self.schema_writer_factory(self.accessor, self.schema_class)
         if targets.get("schema", False):
             DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
         if targets.get("input", False):
