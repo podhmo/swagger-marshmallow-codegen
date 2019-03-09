@@ -13,9 +13,9 @@ class Pet(Schema):
 
 class Cat(Pet):
     """A representation of a cat"""
-    huntingSkill = fields.String(required=True, description='The measured skill for hunting', missing=lambda: 'lazy', validate=[OneOf(choices=['clueless', 'lazy', 'adventurous', 'aggressive'], labels=[])])
+    huntingSkill = fields.String(required=True, description='The measured skill for hunting', validate=[OneOf(choices=['clueless', 'lazy', 'adventurous', 'aggressive'], labels=[])])
 
 
 class Dog(Pet):
     """A representation of a dog"""
-    packSize = fields.Integer(required=True, description='the size of the pack the dog is from', missing=lambda: 0, validate=[Range(min=0, max=None, exclusive_min=False, exclusive_max=False)])
+    packSize = fields.Integer(required=True, description='the size of the pack the dog is from', validate=[Range(min=0, max=None, exclusive_min=False, exclusive_max=False)])
