@@ -48,7 +48,11 @@ class AdditionalPropertiesSchema(Schema):
         return data
 
     def dumps(self, obj, many=None, update_fields=False, *args, **kwargs):
-        return super().dumps(obj, many=many, update_fields=update_fields, *args, **kwargs)
+        return super().dumps(
+            obj, many=many, update_fields=update_fields, *args, **kwargs
+        )
 
     def dump(self, obj, many=None, update_fields=False, *args, **kwargs):
-        return super().dump(obj, many=many, update_fields=update_fields, *args, **kwargs)
+        return super().dump(
+            obj, many=many, update_fields=update_fields, *args, **kwargs
+        )
