@@ -17,7 +17,7 @@ class PrimitiveValueSchema:
 
     def dump(self, value):  # don't support many
         data = {self.key: value}
-        r = self.schema.dump(data, update_fields=False)
+        r = self.schema.dump(data)
         return r.get(self.key) or self.missing_value
 
 
@@ -47,12 +47,12 @@ class AdditionalPropertiesSchema(Schema):
             self.fields[name] = f() if callable(f) else f
         return data
 
-    def dumps(self, obj, many=None, update_fields=False, *args, **kwargs):
+    def dumps(self, obj, many=None, *args, **kwargs):
         return super().dumps(
-            obj, many=many, update_fields=update_fields, *args, **kwargs
+            obj, many=many, *args, **kwargs
         )
 
-    def dump(self, obj, many=None, update_fields=False, *args, **kwargs):
+    def dump(self, obj, many=None, *args, **kwargs):
         return super().dump(
-            obj, many=many, update_fields=update_fields, *args, **kwargs
+            obj, many=many, *args, **kwargs
         )
