@@ -3833,11 +3833,11 @@ class IssuesInput:
             X_GitHub_Request_Id = fields.Integer(data_key='X-GitHub-Request-Id')
 
         class Query(Schema):
-            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", missing=lambda: 'all', validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
-            state = fields.String(required=True, missing=lambda: 'open', validate=[OneOf(choices=['open', 'closed'], labels=[])])
+            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
+            state = fields.String(required=True, validate=[OneOf(choices=['open', 'closed'], labels=[])])
             labels = fields.String(required=True, description='String list of comma separated Label names. Example - bug,ui,@high.')
-            sort = fields.String(required=True, missing=lambda: 'created', validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
-            direction = fields.String(required=True, missing=lambda: 'desc', validate=[OneOf(choices=['asc', 'desc'], labels=[])])
+            sort = fields.String(required=True, validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
+            direction = fields.String(required=True, validate=[OneOf(choices=['asc', 'desc'], labels=[])])
             since = fields.String(description='Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.\nOnly issues updated at or after this time are returned.\n')
 
 
@@ -4229,11 +4229,11 @@ class OrgsOrgIssuesInput:
             org = fields.String(required=True, description='Name of organisation.')
 
         class Query(Schema):
-            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", missing=lambda: 'all', validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
-            state = fields.String(required=True, missing=lambda: 'open', validate=[OneOf(choices=['open', 'closed'], labels=[])])
+            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
+            state = fields.String(required=True, validate=[OneOf(choices=['open', 'closed'], labels=[])])
             labels = fields.String(required=True, description='String list of comma separated Label names. Example - bug,ui,@high.')
-            sort = fields.String(required=True, missing=lambda: 'created', validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
-            direction = fields.String(required=True, missing=lambda: 'desc', validate=[OneOf(choices=['asc', 'desc'], labels=[])])
+            sort = fields.String(required=True, validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
+            direction = fields.String(required=True, validate=[OneOf(choices=['asc', 'desc'], labels=[])])
             since = fields.String(description='Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.\nOnly issues updated at or after this time are returned.\n')
 
 
@@ -5725,11 +5725,11 @@ class ReposOwnerRepoIssuesInput:
             repo = fields.String(required=True, description='Name of repository.')
 
         class Query(Schema):
-            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", missing=lambda: 'all', validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
-            state = fields.String(required=True, missing=lambda: 'open', validate=[OneOf(choices=['open', 'closed'], labels=[])])
+            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
+            state = fields.String(required=True, validate=[OneOf(choices=['open', 'closed'], labels=[])])
             labels = fields.String(required=True, description='String list of comma separated Label names. Example - bug,ui,@high.')
-            sort = fields.String(required=True, missing=lambda: 'created', validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
-            direction = fields.String(required=True, missing=lambda: 'desc', validate=[OneOf(choices=['asc', 'desc'], labels=[])])
+            sort = fields.String(required=True, validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
+            direction = fields.String(required=True, validate=[OneOf(choices=['asc', 'desc'], labels=[])])
             since = fields.String(description='Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.\nOnly issues updated at or after this time are returned.\n')
 
 
@@ -8047,11 +8047,11 @@ class UserIssuesInput:
             X_GitHub_Request_Id = fields.Integer(data_key='X-GitHub-Request-Id')
 
         class Query(Schema):
-            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", missing=lambda: 'all', validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
-            state = fields.String(required=True, missing=lambda: 'open', validate=[OneOf(choices=['open', 'closed'], labels=[])])
+            filter = fields.String(required=True, description="Issues assigned to you / created by you / mentioning you / you're\nsubscribed to updates for / All issues the authenticated user can see\n", validate=[OneOf(choices=['assigned', 'created', 'mentioned', 'subscribed', 'all'], labels=[])])
+            state = fields.String(required=True, validate=[OneOf(choices=['open', 'closed'], labels=[])])
             labels = fields.String(required=True, description='String list of comma separated Label names. Example - bug,ui,@high.')
-            sort = fields.String(required=True, missing=lambda: 'created', validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
-            direction = fields.String(required=True, missing=lambda: 'desc', validate=[OneOf(choices=['asc', 'desc'], labels=[])])
+            sort = fields.String(required=True, validate=[OneOf(choices=['created', 'updated', 'comments'], labels=[])])
+            direction = fields.String(required=True, validate=[OneOf(choices=['asc', 'desc'], labels=[])])
             since = fields.String(description='Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.\nOnly issues updated at or after this time are returned.\n')
 
 
