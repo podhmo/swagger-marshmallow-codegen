@@ -29,7 +29,7 @@ def clsname_from_path(path, ignore_rx=re.compile("[^0-9a-zA-Z_]+"), separate_rx=
     return "".join(titleize(ignore_rx.sub("", name)) for name in path_separated)
 
 
-class LazyCallString(object):
+class LazyCallString:
     def __init__(self, call, *args, **kwargs):
         self.call = call
         self.args = args

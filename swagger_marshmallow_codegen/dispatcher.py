@@ -34,7 +34,7 @@ TYPE_MAP = {
 }
 
 
-class FormatDispatcher(object):
+class FormatDispatcher:
     type_map = TYPE_MAP
 
     @classmethod
@@ -91,7 +91,7 @@ class FormatDispatcher(object):
         return value
 
 
-class ReprWrap(object):
+class ReprWrap:
     def __init__(self, value):
         self.value = value
 

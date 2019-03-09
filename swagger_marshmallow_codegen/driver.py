@@ -9,7 +9,7 @@ from .lifting import lifting_definition
 logger = logging.getLogger(__name__)
 
 
-class Driver(object):
+class Driver:
     dispatcher_factory = FormatDispatcher
     resolver_factory = Resolver
     accessor_factory = Accessor
@@ -40,7 +40,7 @@ class Driver(object):
         return self.codegen_factory(accessor)
 
 
-class Flatten(object):
+class Flatten:
     def __init__(self, options):
         self.options = options
 

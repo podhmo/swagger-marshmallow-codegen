@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Accessor(object):
+class Accessor:
     def __init__(self, resolver):
         self.resolver = resolver
 

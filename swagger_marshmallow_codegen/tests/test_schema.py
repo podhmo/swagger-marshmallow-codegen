@@ -113,7 +113,7 @@ class AddtioinalSchemaTests(unittest.TestCase):
         class S(self._getTargetClass()):
             name = fields.String()
 
-            class Meta(object):
+            class Meta:
                 additional_field = fields.Integer()
 
         C = namedtuple("C", "value, expected, ok")
@@ -159,7 +159,7 @@ class AddtioinalSchemaTests(unittest.TestCase):
         class S(self._getTargetClass()):
             name = fields.String()
 
-            class Meta(object):
+            class Meta:
                 additional_field = fields.Integer()
 
         C = namedtuple("C", "value, expected, ok")

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
 
 
-class Context(object):
+class Context:
     def __init__(self, m=None, im=None):
         self.m = m or Module(import_unique=True)
         self.im = im or self.m.submodule()
@@ -36,7 +36,7 @@ class CodegenError(Exception):
     pass
 
 
-class SchemaWriter(object):
+class SchemaWriter:
     def __init__(self, accessor, schema_class):
         self.accessor = accessor
         self.schema_class = schema_class
@@ -231,7 +231,7 @@ class SchemaWriter(object):
                 c.m.stmt("pass")
 
 
-class DefinitionsSchemaWriter(object):
+class DefinitionsSchemaWriter:
     def __init__(self, accessor, schema_writer):
         self.accessor = accessor
         self.schema_writer = schema_writer
@@ -252,7 +252,7 @@ class DefinitionsSchemaWriter(object):
             self.schema_writer.write_schema(c, d, clsname, definition)
 
 
-class PathsSchemaWriter(object):
+class PathsSchemaWriter:
     OVERRIDE_NAME_MARKER = NAME_MARKER
 
     def __init__(self, accessor, schema_writer):
@@ -327,7 +327,7 @@ class PathsSchemaWriter(object):
         return self.PathInfo(info=info, required=required)
 
 
-class ResponsesSchemaWriter(object):
+class ResponsesSchemaWriter:
     OVERRIDE_NAME_MARKER = NAME_MARKER
 
     def __init__(self, accessor, schema_writer):
@@ -369,7 +369,7 @@ class ResponsesSchemaWriter(object):
                 sc.m.clear()
 
 
-class Codegen(object):
+class Codegen:
     schema_class_path = "marshmallow:Schema"
 
     @classmethod
