@@ -27,22 +27,14 @@ class MultipleOf(v.Validator):
 class ItemsRange(v.Range):
     """for maxItems and minItems"""
 
-    message_min = "Must be at least {min} items."
-    message_max = "Must be at most {max} items."
-    message_all = "Must be between {min} and {max} items."
+    message_min = "Must be {min_op} {{min}} items."
+    message_max = "Must be {max_op} {{max}} items."
+    message_all = "Must be {min_op} {{min}} and {max_op} {{max}} items."
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __call__(self, value):
-        if self.min is not None and len(value) < self.min:
-            message = self.message_min if self.max is None else self.message_all
-            raise v.ValidationError(self._format_error(value, message))
-
-        if self.max is not None and len(value) > self.max:
-            message = self.message_max if self.min is None else self.message_all
-            raise v.ValidationError(self._format_error(value, message))
-        return value
+    message_gte = "greater than or equal to"
+    message_gt = "greater than"
+    message_lte = "less than or equal to"
+    message_lt = "less than"
 
 
 class Unique(v.Validator):
