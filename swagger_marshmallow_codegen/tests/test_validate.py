@@ -5,6 +5,7 @@ from collections import namedtuple
 class RangeTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
         from swagger_marshmallow_codegen.validate import Range
+
         return Range(*args, **kwargs)
 
     def test_maximum(self):
@@ -23,7 +24,9 @@ class RangeTests(unittest.TestCase):
             with self.subTest(
                 maximum=c.maximum, exclusive_maximum=c.exclusive_maximum, value=c.value
             ):
-                target = self._makeOne(max=c.maximum, exclusive_max=c.exclusive_maximum)
+                target = self._makeOne(
+                    max=c.maximum, max_inclusive=not c.exclusive_maximum
+                )
                 try:
                     target(c.value)
                     self.assertTrue(c.ok)
@@ -46,7 +49,9 @@ class RangeTests(unittest.TestCase):
             with self.subTest(
                 minimum=c.minimum, exclusive_minimum=c.exclusive_minimum, value=c.value
             ):
-                target = self._makeOne(min=c.minimum, exclusive_min=c.exclusive_minimum)
+                target = self._makeOne(
+                    min=c.minimum, min_inclusive=not c.exclusive_minimum
+                )
                 try:
                     target(c.value)
                     self.assertTrue(c.ok)
@@ -57,6 +62,7 @@ class RangeTests(unittest.TestCase):
 class MultipleOfTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
         from swagger_marshmallow_codegen.validate import MultipleOf
+
         return MultipleOf(*args, **kwargs)
 
     def test_it(self):

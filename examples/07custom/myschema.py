@@ -24,10 +24,10 @@ class ObjectId(fields.String):
         except (ValueError, AttributeError):
             self.fail('invalid_object_id')
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         return self._validated(value)
 
-    def _serialize(self, value, attr, data):
+    def _serialize(self, value, attr, data, **kwargs):
         if not value:
             return value
         return str(value)

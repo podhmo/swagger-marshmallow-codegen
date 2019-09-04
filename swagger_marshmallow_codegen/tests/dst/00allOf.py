@@ -18,4 +18,4 @@ class Cat(Pet):
 
 class Dog(Pet):
     """A representation of a dog"""
-    packSize = fields.Integer(required=True, description='the size of the pack the dog is from', validate=[Range(min=0, max=None, exclusive_min=False, exclusive_max=False)])
+    packSize = fields.Integer(required=True, description='the size of the pack the dog is from', validate=[Range(min=0, max=None, min_inclusive=True, max_inclusive=True)])

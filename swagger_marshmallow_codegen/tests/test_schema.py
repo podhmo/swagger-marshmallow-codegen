@@ -6,15 +6,25 @@ from marshmallow import fields, Schema
 class PrimitiveValueSchemaTests(unittest.TestCase):
     def _getTargetClass(self):
         from swagger_marshmallow_codegen.schema import PrimitiveValueSchema
+
         return PrimitiveValueSchema
 
-    def assert_value(self, fut, c):
+    def assert_load_value(self, fut, c):
         if c.ok:
             actual = fut()
             self.assertEqual(actual, c.expected)
         else:
             from marshmallow import ValidationError
+
             with self.assertRaises(ValidationError):
+                fut()
+
+    def assert_dump_value(self, fut, c):
+        if c.ok:
+            actual = fut()
+            self.assertEqual(actual, c.expected)
+        else:
+            with self.assertRaises(ValueError):
                 fut()
 
     def test_load_atom(self):
@@ -29,7 +39,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                self.assert_value(lambda: S().load(c.value), c)
+                self.assert_load_value(lambda: S().load(c.value), c)
 
     def test_load_list(self):
         class S(self._getTargetClass()):
@@ -44,7 +54,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                self.assert_value(lambda: S().load(c.value), c)
+                self.assert_load_value(lambda: S().load(c.value), c)
 
     def test_dump_atom(self):
         class S(self._getTargetClass()):
@@ -59,7 +69,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                self.assert_value(lambda: S().dump(c.value), c)
+                self.assert_dump_value(lambda: S().dump(c.value), c)
 
     def test_dump_list(self):
         class S(self._getTargetClass()):
@@ -74,12 +84,13 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                self.assert_value(lambda: S().dump(c.value), c)
+                self.assert_dump_value(lambda: S().dump(c.value), c)
 
 
-class AddtioinalSchemaTests(unittest.TestCase):
+class AdditioinalSchemaTests(unittest.TestCase):
     def _getTargetClass(self):
         from swagger_marshmallow_codegen.schema import AdditionalPropertiesSchema
+
         return AdditionalPropertiesSchema
 
     def assert_value(self, fut, c):
@@ -88,6 +99,7 @@ class AddtioinalSchemaTests(unittest.TestCase):
             self.assertEqual(actual, c.expected)
         else:
             from marshmallow import ValidationError
+
             with self.assertRaises(ValidationError):
                 fut()
 
@@ -98,12 +110,10 @@ class AddtioinalSchemaTests(unittest.TestCase):
         C = namedtuple("C", "value, expected, ok")
         candidates = [
             C(
-                value={"name": "foo",
-                       "value": "100"},
-                expected={"name": "foo",
-                          "value": "100"},
-                ok=True
-            ),
+                value={"name": "foo", "value": "100"},
+                expected={"name": "foo", "value": "100"},
+                ok=True,
+            )
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
@@ -119,18 +129,14 @@ class AddtioinalSchemaTests(unittest.TestCase):
         C = namedtuple("C", "value, expected, ok")
         candidates = [
             C(
-                value={"name": "foo",
-                       "value": "100"},
-                expected={"name": "foo",
-                          "value": 100},
-                ok=True
+                value={"name": "foo", "value": "100"},
+                expected={"name": "foo", "value": 100},
+                ok=True,
             ),
             C(
-                value={"name": "foo",
-                       "value": "100"},
-                expected={"name": "foo",
-                          "value": 100},
-                ok=True
+                value={"name": "foo", "value": "100"},
+                expected={"name": "foo", "value": 100},
+                ok=True,
             ),
         ]
         for c in candidates:
@@ -144,12 +150,10 @@ class AddtioinalSchemaTests(unittest.TestCase):
         C = namedtuple("C", "value, expected, ok")
         candidates = [
             C(
-                value={"name": "foo",
-                       "value": "100"},
-                expected={"name": "foo",
-                          "value": "100"},
-                ok=True
-            ),
+                value={"name": "foo", "value": "100"},
+                expected={"name": "foo", "value": "100"},
+                ok=True,
+            )
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
@@ -165,18 +169,14 @@ class AddtioinalSchemaTests(unittest.TestCase):
         C = namedtuple("C", "value, expected, ok")
         candidates = [
             C(
-                value={"name": "foo",
-                       "value": "100"},
-                expected={"name": "foo",
-                          "value": 100},
-                ok=True
+                value={"name": "foo", "value": "100"},
+                expected={"name": "foo", "value": 100},
+                ok=True,
             ),
             C(
-                value={"name": "foo",
-                       "value": "100"},
-                expected={"name": "foo",
-                          "value": 100},
-                ok=True
+                value={"name": "foo", "value": "100"},
+                expected={"name": "foo", "value": 100},
+                ok=True,
             ),
         ]
         for c in candidates:
