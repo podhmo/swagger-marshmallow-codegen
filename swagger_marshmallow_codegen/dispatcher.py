@@ -21,9 +21,9 @@ TYPE_MAP = {
     Pair(type="string", format=None): "marshmallow.fields:String",
     Pair(type="boolean", format=None): "marshmallow.fields:Boolean",
     Pair(type="string", format="uuid"): "marshmallow.fields:UUID",
-    Pair(type="string", format="date-time"): "swagger_marshmallow_codegen.fields:DateTime",
-    Pair(type="string", format="date"): "swagger_marshmallow_codegen.fields:Date",
-    Pair(type="string", format="time"): "swagger_marshmallow_codegen.fields:Time",
+    Pair(type="string", format="date-time"): "marshmallow.fields:DateTime",
+    Pair(type="string", format="date"): "marshmallow.fields:Date",
+    Pair(type="string", format="time"): "marshmallow.fields:Time",
     Pair(type="string", format="email"): "marshmallow.fields:Email",
     Pair(type="string", format="url"): "marshmallow.fields:URL",
 
@@ -34,7 +34,7 @@ TYPE_MAP = {
 }
 
 
-class FormatDispatcher(object):
+class FormatDispatcher:
     type_map = TYPE_MAP
 
     @classmethod
@@ -91,7 +91,7 @@ class FormatDispatcher(object):
         return value
 
 
-class ReprWrap(object):
+class ReprWrap:
     def __init__(self, value):
         self.value = value
 

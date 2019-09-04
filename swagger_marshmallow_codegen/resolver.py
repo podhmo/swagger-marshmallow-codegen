@@ -9,7 +9,7 @@ from . import validate
 logger = logging.getLogger(__name__)
 
 
-class Resolver(object):
+class Resolver:
     def __init__(self, dispatcher):
         self.dispatcher = dispatcher
         self.accessor = dictknife.Accessor()  # todo: rename

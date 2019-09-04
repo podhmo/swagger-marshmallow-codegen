@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Accessor(object):
+class Accessor:
     def __init__(self, resolver):
         self.resolver = resolver
 
@@ -48,7 +48,7 @@ class Accessor(object):
         if self.resolver.has_many(field):
             logger.debug("    resolve: many=True")
             opts["many"] = True
-        if "default" in field:
+        if "default" in field and not opts.get("required", False):
             logger.debug("    resolve: default=%r", field["default"])
             opts["missing"] = self.dispatcher.handle_default(c, field["default"], field)  # xxx
         if field.get("readOnly", False):

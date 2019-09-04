@@ -5,7 +5,7 @@ from collections import namedtuple
 from functools import partial
 from prestring import PreString
 from prestring.python import Module
-from prestring.utils import LazyFormat, LazyKeywords, LazyKeywordsRepr
+from prestring.utils import LazyFormat, LazyKeywordsRepr
 from dictknife import deepequal, deepmerge
 from collections import defaultdict
 from collections import OrderedDict
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
 
 
-class Context(object):
+class Context:
     def __init__(self, m=None, im=None):
         self.m = m or Module(import_unique=True)
         self.im = im or self.m.submodule()
@@ -36,11 +36,18 @@ class CodegenError(Exception):
     pass
 
 
-class SchemaWriter(object):
-    def __init__(self, accessor, schema_class):
+class SchemaWriter:
+    extra_schema_module = "swagger_marshmallow_codegen.schema"
+
+    def __init__(self, accessor, schema_class, *, extra_schema_module=None):
         self.accessor = accessor
         self.schema_class = schema_class
         self.arrived = set()
+        self.extra_schema_module = extra_schema_module or self.__class__.extra_schema_module
+
+    @classmethod
+    def override(cls, extra_schema_module):
+        return partial(cls, extra_schema_module=extra_schema_module)
 
     @property
     def resolver(self):
@@ -72,9 +79,9 @@ class SchemaWriter(object):
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
-            opts["dump_to"] = opts["load_from"] = name
+            opts["data_key"] = name
         if keyword.iskeyword(normalized_name) or normalized_name == "fields":
-            opts["dump_to"] = opts["load_from"] = normalized_name
+            opts["data_key"] = normalized_name
             normalized_name = normalized_name + "_"
 
         kwargs = LazyKeywordsRepr(opts)
@@ -104,9 +111,9 @@ class SchemaWriter(object):
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
-            opts["dump_to"] = opts["load_from"] = name
+            opts["data_key"] = name
         if keyword.iskeyword(normalized_name) or normalized_name == "fields":
-            opts["dump_to"] = opts["load_from"] = normalized_name
+            opts["data_key"] = normalized_name
             normalized_name = normalized_name + "_"
 
         def wrap(value, opts=opts):
@@ -119,7 +126,7 @@ class SchemaWriter(object):
         return self.write_field_one(c, d, schema_name, definition, normalized_name, field, OrderedDict(), wrap=wrap)
 
     def write_primitive_schema(self, c, d, clsname, definition, many=False):
-        c.im.from_("swagger_marshmallow_codegen.schema", "PrimitiveValueSchema")
+        c.im.from_(self.extra_schema_module, "PrimitiveValueSchema")
         with c.m.class_(clsname, "PrimitiveValueSchema"):
             with c.m.class_("schema_class", self.schema_class):
                 if many or self.resolver.has_many(definition):
@@ -167,7 +174,7 @@ class SchemaWriter(object):
 
         # supporting additional properties
         if "additionalProperties" in definition and base_classes[0] == self.schema_class:
-            c.from_("swagger_marshmallow_codegen.schema", "AdditionalPropertiesSchema")
+            c.from_(self.extra_schema_module, "AdditionalPropertiesSchema")
             base_classes[0] = "AdditionalPropertiesSchema"
 
         if "properties" not in definition and ("object" != definition.get("type", "object") and "items" not in definition):
@@ -231,7 +238,7 @@ class SchemaWriter(object):
                 c.m.stmt("pass")
 
 
-class DefinitionsSchemaWriter(object):
+class DefinitionsSchemaWriter:
     def __init__(self, accessor, schema_writer):
         self.accessor = accessor
         self.schema_writer = schema_writer
@@ -252,7 +259,7 @@ class DefinitionsSchemaWriter(object):
             self.schema_writer.write_schema(c, d, clsname, definition)
 
 
-class PathsSchemaWriter(object):
+class PathsSchemaWriter:
     OVERRIDE_NAME_MARKER = NAME_MARKER
 
     def __init__(self, accessor, schema_writer):
@@ -327,7 +334,7 @@ class PathsSchemaWriter(object):
         return self.PathInfo(info=info, required=required)
 
 
-class ResponsesSchemaWriter(object):
+class ResponsesSchemaWriter:
     OVERRIDE_NAME_MARKER = NAME_MARKER
 
     def __init__(self, accessor, schema_writer):
@@ -369,16 +376,22 @@ class ResponsesSchemaWriter(object):
                 sc.m.clear()
 
 
-class Codegen(object):
+class Codegen:
     schema_class_path = "marshmallow:Schema"
+    schema_writer_factory = SchemaWriter
 
     @classmethod
-    def override(cls, schema_class_path):
-        return partial(cls, schema_class_path=schema_class_path)
+    def override(cls, *, schema_class_path=None, schema_writer_factory=None):
+        return partial(
+            cls,
+            schema_class_path=schema_class_path,
+            schema_writer_factory=schema_writer_factory,
+        )
 
-    def __init__(self, accessor, schema_class_path=None):
+    def __init__(self, accessor, *, schema_class_path=None, schema_writer_factory=None):
         self.accessor = accessor
         self.schema_class_path = schema_class_path or self.__class__.schema_class_path
+        self.schema_writer_factory = schema_writer_factory or self.__class__.schema_writer_factory
         self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
     @property
@@ -395,7 +408,7 @@ class Codegen(object):
         c.from_("marshmallow", "fields")
 
     def write_body(self, c, d, targets):
-        sw = SchemaWriter(self.accessor, self.schema_class)
+        sw = self.schema_writer_factory(self.accessor, self.schema_class)
         if targets.get("schema", False):
             DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
         if targets.get("input", False):

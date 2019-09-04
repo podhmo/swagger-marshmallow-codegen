@@ -25,12 +25,12 @@ class IssuedLabelsInput:
         """
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
-            X_RateLimit_Limit = fields.Integer(dump_to='X-RateLimit-Limit', load_from='X-RateLimit-Limit')
-            X_RateLimit_Remaining = fields.Integer(dump_to='X-RateLimit-Remaining', load_from='X-RateLimit-Remaining')
-            X_RateLimit_Reset = fields.Integer(dump_to='X-RateLimit-Reset', load_from='X-RateLimit-Reset')
-            X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
+            X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
+            X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
+            X_RateLimit_Reset = fields.Integer(data_key='X-RateLimit-Reset')
+            X_GitHub_Request_Id = fields.Integer(data_key='X-GitHub-Request-Id')
 
         class Path(Schema):
             owner = fields.String(required=True, description='Name of repository owner.')
@@ -44,12 +44,12 @@ class IssuedLabelsInput:
         """
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
-            X_RateLimit_Limit = fields.Integer(dump_to='X-RateLimit-Limit', load_from='X-RateLimit-Limit')
-            X_RateLimit_Remaining = fields.Integer(dump_to='X-RateLimit-Remaining', load_from='X-RateLimit-Remaining')
-            X_RateLimit_Reset = fields.Integer(dump_to='X-RateLimit-Reset', load_from='X-RateLimit-Reset')
-            X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
+            X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
+            X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
+            X_RateLimit_Reset = fields.Integer(data_key='X-RateLimit-Reset')
+            X_GitHub_Request_Id = fields.Integer(data_key='X-GitHub-Request-Id')
 
         class Path(Schema):
             owner = fields.String(required=True, description='Name of repository owner.')
@@ -68,12 +68,12 @@ class IssuedLabelsInput:
 
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
-            X_RateLimit_Limit = fields.Integer(dump_to='X-RateLimit-Limit', load_from='X-RateLimit-Limit')
-            X_RateLimit_Remaining = fields.Integer(dump_to='X-RateLimit-Remaining', load_from='X-RateLimit-Remaining')
-            X_RateLimit_Reset = fields.Integer(dump_to='X-RateLimit-Reset', load_from='X-RateLimit-Reset')
-            X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
+            X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
+            X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
+            X_RateLimit_Reset = fields.Integer(data_key='X-RateLimit-Reset')
+            X_GitHub_Request_Id = fields.Integer(data_key='X-GitHub-Request-Id')
 
         class Path(Schema):
             owner = fields.String(required=True, description='Name of repository owner.')
@@ -93,12 +93,12 @@ class IssuedLabelsInput:
 
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', dump_to='X-GitHub-Media-Type', load_from='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
             Accept = fields.String(description='Is used to set specified media type.')
-            X_RateLimit_Limit = fields.Integer(dump_to='X-RateLimit-Limit', load_from='X-RateLimit-Limit')
-            X_RateLimit_Remaining = fields.Integer(dump_to='X-RateLimit-Remaining', load_from='X-RateLimit-Remaining')
-            X_RateLimit_Reset = fields.Integer(dump_to='X-RateLimit-Reset', load_from='X-RateLimit-Reset')
-            X_GitHub_Request_Id = fields.Integer(dump_to='X-GitHub-Request-Id', load_from='X-GitHub-Request-Id')
+            X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
+            X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
+            X_RateLimit_Reset = fields.Integer(data_key='X-RateLimit-Reset')
+            X_GitHub_Request_Id = fields.Integer(data_key='X-GitHub-Request-Id')
 
         class Path(Schema):
             owner = fields.String(required=True, description='Name of repository owner.')

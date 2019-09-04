@@ -6,7 +6,6 @@ from marshmallow.validate import (
     Length,
     Regexp
 )
-from swagger_marshmallow_codegen.fields import DateTime
 import re
 from swagger_marshmallow_codegen.validate import Range
 
@@ -16,7 +15,7 @@ class Pet(Schema):
     name = fields.String(required=True, description="Pet's name", validate=[Length(min=1, max=100, equal=None)])
     animal_type = fields.String(required=True, description='Kind of animal', validate=[Length(min=1, max=None, equal=None)])
     tags = fields.Field(description='Custom tags')
-    created = DateTime(description='Creation time', dump_only=True)
+    created = fields.DateTime(description='Creation time', dump_only=True)
 
 
 class PetsInput:

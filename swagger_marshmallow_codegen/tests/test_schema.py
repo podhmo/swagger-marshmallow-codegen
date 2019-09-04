@@ -8,12 +8,14 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         from swagger_marshmallow_codegen.schema import PrimitiveValueSchema
         return PrimitiveValueSchema
 
-    def assert_value(self, actual, err, c):
+    def assert_value(self, fut, c):
         if c.ok:
-            self.assertFalse(err)
+            actual = fut()
             self.assertEqual(actual, c.expected)
         else:
-            self.assertTrue(err)
+            from marshmallow import ValidationError
+            with self.assertRaises(ValidationError):
+                fut()
 
     def test_load_atom(self):
         class S(self._getTargetClass()):
@@ -27,8 +29,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().load(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().load(c.value), c)
 
     def test_load_list(self):
         class S(self._getTargetClass()):
@@ -43,8 +44,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().load(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().load(c.value), c)
 
     def test_dump_atom(self):
         class S(self._getTargetClass()):
@@ -59,8 +59,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().dump(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().dump(c.value), c)
 
     def test_dump_list(self):
         class S(self._getTargetClass()):
@@ -75,8 +74,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().dump(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().dump(c.value), c)
 
 
 class AddtioinalSchemaTests(unittest.TestCase):
@@ -84,12 +82,14 @@ class AddtioinalSchemaTests(unittest.TestCase):
         from swagger_marshmallow_codegen.schema import AdditionalPropertiesSchema
         return AdditionalPropertiesSchema
 
-    def assert_value(self, actual, err, c):
+    def assert_value(self, fut, c):
         if c.ok:
-            self.assertFalse(err)
+            actual = fut()
             self.assertEqual(actual, c.expected)
         else:
-            self.assertTrue(err)
+            from marshmallow import ValidationError
+            with self.assertRaises(ValidationError):
+                fut()
 
     def test_load_default(self):
         class S(self._getTargetClass()):
@@ -107,14 +107,13 @@ class AddtioinalSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().load(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().load(c.value), c)
 
     def test_load_specific(self):
         class S(self._getTargetClass()):
             name = fields.String()
 
-            class Meta(object):
+            class Meta:
                 additional_field = fields.Integer()
 
         C = namedtuple("C", "value, expected, ok")
@@ -136,8 +135,7 @@ class AddtioinalSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().load(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().load(c.value), c)
 
     def test_dump_default(self):
         class S(self._getTargetClass()):
@@ -155,14 +153,13 @@ class AddtioinalSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().dump(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().dump(c.value), c)
 
     def test_dump_specific(self):
         class S(self._getTargetClass()):
             name = fields.String()
 
-            class Meta(object):
+            class Meta:
                 additional_field = fields.Integer()
 
         C = namedtuple("C", "value, expected, ok")
@@ -184,5 +181,4 @@ class AddtioinalSchemaTests(unittest.TestCase):
         ]
         for c in candidates:
             with self.subTest(value=c.value, ok=c.ok):
-                actual, err = S().dump(c.value)
-                self.assert_value(actual, err, c)
+                self.assert_value(lambda: S().dump(c.value), c)

@@ -7,4 +7,4 @@ from marshmallow import (
 
 
 class Message(Schema):
-    message = fields.String(required=True, missing=lambda: 'Hello, Adam!')
+    message = fields.String(required=True)
