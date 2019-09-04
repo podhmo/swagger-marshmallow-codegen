@@ -12,9 +12,9 @@ except IOError:
     README = CHANGES = ""
 
 install_requires = [
-    "dictknife[load] >= 0.3.1",
+    "dictknife[load]",
     "prestring",
-    "marshmallow>=3.0.0b11",
+    "marshmallow>=3.0.0",
     "magicalimport",
 ]
 
