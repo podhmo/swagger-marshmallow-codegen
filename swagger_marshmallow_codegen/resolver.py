@@ -130,9 +130,9 @@ class Resolver:
         if "minimum" in field or "maximum" in field:
             range_opts = {
                 "min": field.get("minimum"),
-                "exclusive_min": field.get("exclusiveMinimum", False),
+                "min_inclusive": not field.get("exclusiveMinimum", False),
                 "max": field.get("maximum"),
-                "exclusive_max": field.get("exclusiveMaximum", False),
+                "max_inclusive": not field.get("exclusiveMaximum", False),
             }
             add(validate.Range(**range_opts))
         if "minLength" in field or "maxLength" in field:
