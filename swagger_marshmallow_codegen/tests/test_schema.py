@@ -87,7 +87,7 @@ class PrimitiveValueSchemaTests(unittest.TestCase):
                 self.assert_dump_value(lambda: S().dump(c.value), c)
 
 
-class AddtioinalSchemaTests(unittest.TestCase):
+class AdditioinalSchemaTests(unittest.TestCase):
     def _getTargetClass(self):
         from swagger_marshmallow_codegen.schema import AdditionalPropertiesSchema
 
