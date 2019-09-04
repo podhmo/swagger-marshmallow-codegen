@@ -50,8 +50,6 @@ class FormatDispatcher:
         self.def_map = self.load_def_map(self.type_map) if use_def_map else {}
 
     def dispatch(self, pair, field):
-        if pair.type == "object" and len(field) <= 1:
-            return "marshmallow.fields:Field"
         return self.type_map.get(pair) or self.type_map.get((pair[0], None))
 
     def handle_validator(self, c, value):
