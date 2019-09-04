@@ -26,7 +26,7 @@ class PetsInput:
 
         class Query(Schema):
             animal_type = fields.String(validate=[Regexp(regex=re.compile('^[a-zA-Z0-9]*$'))])
-            limit = fields.Integer(missing=lambda: 100, validate=[Range(min=0, max=None, exclusive_min=False, exclusive_max=False)])
+            limit = fields.Integer(missing=lambda: 100, validate=[Range(min=0, max=None, min_inclusive=True, max_inclusive=True)])
 
 
 

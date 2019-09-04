@@ -15,7 +15,7 @@ class Product(Schema):
 
 
 class ProductList(Schema):
-    products = fields.List(fields.Field('Product'), description='Contains the list of products')
+    products = fields.List(fields.Nested('Product'), description='Contains the list of products')
 
 
 class PriceEstimate(Schema):
@@ -44,7 +44,7 @@ class Activities(Schema):
     offset = fields.Integer(description='Position in pagination.')
     limit = fields.Integer(description='Number of items to retrieve (100 max).')
     count = fields.Integer(description='Total number of items available.')
-    history = fields.List(fields.Field('Activity'))
+    history = fields.List(fields.Nested('Activity'))
 
 
 class Error(Schema):
