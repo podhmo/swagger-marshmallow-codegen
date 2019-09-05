@@ -1,8 +1,13 @@
+PKG := swagger_marshmallow_codegen
+
 test:
 	python setup.py test
 
+lint:
+	flake8 ${PKG} --ignore=E501,E303,E203,W391,W503
+
 format:
-	black swagger_marshmallow_codegen --exclude=dst
+	black ${PKG} --exclude=dst
 
 integration-test:
 	$(MAKE) --silent _find-candidates | xargs -n 1 make -C || (echo "**********NG**********" && exit 1)
