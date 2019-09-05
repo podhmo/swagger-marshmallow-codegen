@@ -143,6 +143,36 @@ class AdditioinalSchemaTests(unittest.TestCase):
             with self.subTest(value=c.value, ok=c.ok):
                 self.assert_value(lambda: S().load(c.value), c)
 
+    def test_load_specific_list(self):
+        from marshmallow import Schema
+
+        class X(Schema):
+            v = fields.Integer(required=True)
+
+        class S(self._getTargetClass()):
+            name = fields.String()
+
+            class Meta:
+                additional_field = fields.List(fields.Nested(X))
+
+        C = namedtuple("C", "value, expected, ok")
+        candidates = [
+            C(
+                value={"name": "foo", "xs": []},
+                expected={"name": "foo", "xs": []},
+                ok=True,
+            ),
+            C(
+                value={"name": "foo", "xs": [{"v": "100"}]},
+                expected={"name": "foo", "xs": [{"v": 100}]},
+                ok=True,
+            ),
+            C(value={"name": "foo", "xs": [{}]}, expected=None, ok=False),
+        ]
+        for c in candidates:
+            with self.subTest(value=c.value, ok=c.ok):
+                self.assert_value(lambda: S().load(c.value), c)
+
     def test_dump_default(self):
         class S(self._getTargetClass()):
             name = fields.String()
@@ -176,6 +206,35 @@ class AdditioinalSchemaTests(unittest.TestCase):
             C(
                 value={"name": "foo", "value": "100"},
                 expected={"name": "foo", "value": 100},
+                ok=True,
+            ),
+        ]
+        for c in candidates:
+            with self.subTest(value=c.value, ok=c.ok):
+                self.assert_value(lambda: S().dump(c.value), c)
+
+    def test_dump_specific_list(self):
+        from marshmallow import Schema
+
+        class X(Schema):
+            v = fields.Integer(required=True)
+
+        class S(self._getTargetClass()):
+            name = fields.String()
+
+            class Meta:
+                additional_field = fields.List(fields.Nested(X))
+
+        C = namedtuple("C", "value, expected, ok")
+        candidates = [
+            C(
+                value={"name": "foo", "xs": [], "ys": [{"v": "100"}]},
+                expected={"name": "foo", "xs": [], "ys": [{"v": 100}]},
+                ok=True,
+            ),
+            C(
+                value={"name": "foo", "xs": [{"v": "100", "*another*": "*another*"}]},
+                expected={"name": "foo", "xs": [{"v": 100}]},
                 ok=True,
             ),
         ]
