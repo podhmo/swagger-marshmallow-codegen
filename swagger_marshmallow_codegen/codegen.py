@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import keyword
 import logging
 from collections import namedtuple
@@ -231,6 +230,8 @@ class SchemaWriter:
                         if ref_name is None:
                             raise CodegenError("$ref %r is not found", subdef["$ref"])
                         self.write_field_one(c, d, ref_name, {}, "additional_field", subdef, OrderedDict())
+                    elif self.resolver.has_many(subdef):
+                        self.write_field_many(c, d, "", subdef, "additional_field", subdef, OrderedDict())
                     else:
                         self.write_field_one(c, d, "", subdef, "additional_field", subdef, OrderedDict())
 
