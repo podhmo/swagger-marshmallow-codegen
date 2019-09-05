@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,7 +15,11 @@ class Accessor:
     def paths(self, d):
         return (d.get("paths") or {}).items()
 
-    def methods(self, d, candidates=set(("get", "post", "put", "head", "delete", "options", "patch"))):
+    def methods(
+        self,
+        d,
+        candidates=set(("get", "post", "put", "head", "delete", "options", "patch")),
+    ):
         for method, definition in d.items():
             if method in candidates:
                 yield method, definition
@@ -50,7 +55,9 @@ class Accessor:
             opts["many"] = True
         if "default" in field and not opts.get("required", False):
             logger.debug("    resolve: default=%r", field["default"])
-            opts["missing"] = self.dispatcher.handle_default(c, field["default"], field)  # xxx
+            opts["missing"] = self.dispatcher.handle_default(
+                c, field["default"], field
+            )  # xxx
         if field.get("readOnly", False):
             logger.debug("    resolve: dump_only=True")
             opts["dump_only"] = True

@@ -1,4 +1,5 @@
 from dictknife import loading  # NOQA
+
 loading.setup()
 
 
