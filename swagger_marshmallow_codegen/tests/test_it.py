@@ -6,17 +6,17 @@ import os.path
 class DiffTestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.addTypeEqualityFunc(str, 'assertDiff')
+        self.addTypeEqualityFunc(str, "assertDiff")
 
     def assertDiff(self, first, second, msg=None):
-        self.assertIsInstance(first, str, 'First argument is not a string')
-        self.assertIsInstance(second, str, 'Second argument is not a string')
+        self.assertIsInstance(first, str, "First argument is not a string")
+        self.assertIsInstance(second, str, "Second argument is not a string")
 
         msg = msg or "{} != {}".format(repr(first)[:40], repr(second)[:40])
 
         if first != second:
             # don't use difflib if the strings are too long
-            if (len(first) > self._diffThreshold or len(second) > self._diffThreshold):
+            if len(first) > self._diffThreshold or len(second) > self._diffThreshold:
                 self._baseAssertEqual(first, second, msg)
 
             firstlines = first.splitlines(keepends=True)
@@ -25,7 +25,11 @@ class DiffTestCase(unittest.TestCase):
                 firstlines[-1] = firstlines[-1] + "\n"
             if not secondlines[-1].endswith("\n"):
                 secondlines[-1] = secondlines[-1] + "\n"
-            diff = '\n' + ''.join(difflib.unified_diff(firstlines, secondlines, fromfile="first", tofile="second"))
+            diff = "\n" + "".join(
+                difflib.unified_diff(
+                    firstlines, secondlines, fromfile="first", tofile="second"
+                )
+            )
             raise self.fail(self._formatMessage(diff, msg))
 
 
@@ -34,21 +38,25 @@ class CodegenTests(DiffTestCase):
 
     def _getTargetClass(self):
         from ..codegen import Codegen
+
         return Codegen
 
     def _makeOne(self):
         from ..accessor import Accessor
         from ..resolver import Resolver
         from ..dispatcher import FormatDispatcher
+
         accessor = Accessor(Resolver(FormatDispatcher()))
         return self._getTargetClass()(accessor)
 
     def _makeContext(self):
         from ..codegen import Context
+
         return Context()
 
     def load_srcfile(self, src):
         from ..loading import load
+
         with open(os.path.join(self.here, src)) as rf:
             return load(rf)
 
@@ -58,6 +66,7 @@ class CodegenTests(DiffTestCase):
 
     def test_it(self):
         from ..lifting import lifting_definition
+
         candidates = [
             ("./src/00person.yaml", "./dst/00person.py"),
             ("./src/01person.yaml", "./dst/01person.py"),
@@ -101,7 +110,12 @@ class CodegenTests(DiffTestCase):
                 target = self._makeOne()
                 ctx = self._makeContext()
 
-                target.codegen(lifting_definition(d), {"schema": True, "input": True, "output": True}, ctx=ctx, test=True)
+                target.codegen(
+                    lifting_definition(d),
+                    {"schema": True, "input": True, "output": True},
+                    ctx=ctx,
+                    test=True,
+                )
 
                 expected = self.load_dstfile(dst_file).rstrip("\n")
                 actual = str(ctx.m).rstrip("\n")
@@ -113,15 +127,18 @@ class FlattenTests(unittest.TestCase):
 
     def _callFUT(self, d):
         from ..lifting import lifting_definition
+
         return lifting_definition(d)
 
     def load_srcfile(self, src):
         from ..loading import load
+
         with open(os.path.join(self.here, src)) as rf:
             return load(rf)
 
     def load_dstfile(self, dst):
         from ..loading import load
+
         with open(os.path.join(self.here, dst)) as rf:
             return load(rf)
 
@@ -136,4 +153,5 @@ class FlattenTests(unittest.TestCase):
                 actual = self._callFUT(noflatten)
                 flatten = self.load_dstfile(dst_file)
                 from dictknife import deepequal
+
                 self.assertTrue(deepequal(flatten, actual))

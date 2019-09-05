@@ -12,6 +12,7 @@ def xxx_modify_field(schema_cls, name):
         fields = schema_cls._declared_fields
         modify(fields[name])
         return modify
+
     return action
 
 
@@ -24,4 +25,5 @@ def xxx_add_processor(cls, tag, pass_many=False, pass_original=False):
         setattr(cls, name, fn)
         cls.__processors__[(tag, pass_many)].append(name)
         return fn
+
     return wrapped

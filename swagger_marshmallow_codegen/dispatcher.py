@@ -3,6 +3,7 @@ import logging
 from functools import partial
 from collections import namedtuple
 from magicalimport import import_symbol
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,7 +27,6 @@ TYPE_MAP = {
     Pair(type="string", format="time"): "marshmallow.fields:Time",
     Pair(type="string", format="email"): "marshmallow.fields:Email",
     Pair(type="string", format="url"): "marshmallow.fields:URL",
-
     Pair(type="array", format=None): "marshmallow.fields:List",
     Pair(type="object", format=None): "marshmallow.fields:Nested",
     Pair(type="any", format=None): "marshmallow.fields:Field",
@@ -56,17 +56,9 @@ class FormatDispatcher:
         return ReprWrapValidator(self.dispatch_validator(c, value))
 
     def dispatch_validator(self, c, value):
-        from marshmallow.validate import (
-            Length,
-            Regexp,
-            OneOf,
-        )
-        from .validate import (
-            Range,
-            MultipleOf,
-            Unique,
-            ItemsRange
-        )
+        from marshmallow.validate import Length, Regexp, OneOf
+        from .validate import Range, MultipleOf, Unique, ItemsRange
+
         if isinstance(value, (Regexp)):
             c.import_("re")  # xxx
             c.from_("marshmallow.validate", value.__class__.__name__)
@@ -80,8 +72,9 @@ class FormatDispatcher:
         return ReprWrapDefault(self.dispatch_default(c, value, field))
 
     def dispatch_default(self, c, value, field):
-        from datetime import (datetime, time, date)  # xxx
+        from datetime import datetime, time, date  # xxx
         from collections import OrderedDict  # xxx
+
         if isinstance(value, (time, date, datetime)):
             c.import_("datetime")
         elif isinstance(value, OrderedDict):
@@ -103,7 +96,9 @@ class ReprWrap:
 
 class ReprWrapValidator(ReprWrap):
     def __repr__(self):
-        return "{self.__class__.__name__}({args})".format(self=self, args=self.value._repr_args())
+        return "{self.__class__.__name__}({args})".format(
+            self=self, args=self.value._repr_args()
+        )
 
 
 class ReprWrapDefault(ReprWrap):

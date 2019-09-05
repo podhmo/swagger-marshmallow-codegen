@@ -42,7 +42,9 @@ class SchemaWriter:
         self.accessor = accessor
         self.schema_class = schema_class
         self.arrived = set()
-        self.extra_schema_module = extra_schema_module or self.__class__.extra_schema_module
+        self.extra_schema_module = (
+            extra_schema_module or self.__class__.extra_schema_module
+        )
 
     @classmethod
     def override(cls, extra_schema_module):
@@ -52,21 +54,29 @@ class SchemaWriter:
     def resolver(self):
         return self.accessor.resolver
 
-    def write_field_one(self, c, d, schema_name, definition, name, field, opts, wrap=None):
+    def write_field_one(
+        self, c, d, schema_name, definition, name, field, opts, wrap=None
+    ):
         field_class_name = None
         if self.resolver.has_ref(field):
-            field_class_name, field = self.resolver.resolve_ref_definition(d, field, level=1)
+            field_class_name, field = self.resolver.resolve_ref_definition(
+                d, field, level=1
+            )
             if field_class_name == schema_name and deepequal(field, definition):
                 field_class_name = "self"
 
             if self.resolver.has_many(field):
-                return self.write_field_many(c, d, field_class_name, definition, name, field, opts)
+                return self.write_field_many(
+                    c, d, field_class_name, definition, name, field, opts
+                )
 
             # finding original definition
             if self.resolver.has_ref(field):
                 ref_name, field = self.resolver.resolve_ref_definition(d, field)
                 if self.resolver.has_many(field):
-                    return self.write_field_many(c, d, field_class_name, definition, name, field, opts)
+                    return self.write_field_many(
+                        c, d, field_class_name, definition, name, field, opts
+                    )
                 if ref_name is None:
                     raise CodegenError("ref: %r is not found", field["$ref"])
 
@@ -74,7 +84,11 @@ class SchemaWriter:
         self.accessor.update_option_on_property(c, field, opts)
         caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
         if caller_name is None:
-            raise CodegenError("matched field class is not found. name=%r, schema=%r", name, schema_name)
+            raise CodegenError(
+                "matched field class is not found. name=%r, schema=%r",
+                name,
+                schema_name,
+            )
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
@@ -106,7 +120,11 @@ class SchemaWriter:
 
         caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
         if caller_name is None:
-            raise CodegenError("matched field class is not found. name=%r, schema=%r", name, schema_name)
+            raise CodegenError(
+                "matched field class is not found. name=%r, schema=%r",
+                name,
+                schema_name,
+            )
 
         normalized_name = self.resolver.resolve_normalized_name(name)
         if normalized_name != name:
@@ -117,12 +135,23 @@ class SchemaWriter:
 
         def wrap(value, opts=opts):
             if opts:
-                return LazyFormat("{}({}, {})", caller_name, value, LazyKeywordsRepr(opts))
+                return LazyFormat(
+                    "{}({}, {})", caller_name, value, LazyKeywordsRepr(opts)
+                )
             else:
                 return LazyFormat("{}({})", caller_name, value)
 
         field = field["items"]
-        return self.write_field_one(c, d, schema_name, definition, normalized_name, field, OrderedDict(), wrap=wrap)
+        return self.write_field_one(
+            c,
+            d,
+            schema_name,
+            definition,
+            normalized_name,
+            field,
+            OrderedDict(),
+            wrap=wrap,
+        )
 
     def write_primitive_schema(self, c, d, clsname, definition, many=False):
         c.im.from_(self.extra_schema_module, "PrimitiveValueSchema")
@@ -134,13 +163,17 @@ class SchemaWriter:
                 else:
                     self.write_field_one(c, d, clsname, {}, "value", definition, {})
 
-    def write_schema(self, c, d, clsname, definition, force=False, meta_writer=None, many=False):
+    def write_schema(
+        self, c, d, clsname, definition, force=False, meta_writer=None, many=False
+    ):
         if not force and clsname in self.arrived:
             return
         self.arrived.add(clsname)
         base_classes = [self.schema_class]
         if self.resolver.has_ref(definition):
-            ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition)
+            ref_name, ref_definition = self.resolver.resolve_ref_definition(
+                d, definition
+            )
             if ref_name is None:
                 raise CodegenError("$ref %r is not found", definition["$ref"])
             elif "items" in ref_definition:
@@ -148,35 +181,50 @@ class SchemaWriter:
                 many = True
                 items = ref_definition["items"]
                 if self.resolver.has_ref(items):
-                    _, items = self.resolver.resolve_ref_definition(d, ref_definition["items"])
+                    _, items = self.resolver.resolve_ref_definition(
+                        d, ref_definition["items"]
+                    )
                 if not self.resolver.has_schema(d, items):
-                    return self.write_primitive_schema(c, d, clsname, ref_definition, many=many)
+                    return self.write_primitive_schema(
+                        c, d, clsname, ref_definition, many=many
+                    )
                 else:
                     self.write_schema(c, d, ref_name, items)
                     base_classes = [ref_name]
             else:
                 if not self.resolver.has_schema(d, ref_definition):
-                    return self.write_primitive_schema(c, d, clsname, ref_definition, many=many)
+                    return self.write_primitive_schema(
+                        c, d, clsname, ref_definition, many=many
+                    )
                 self.write_schema(c, d, ref_name, ref_definition)
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
-            ref_list, ref_definition = self.resolver.resolve_allof_definition(d, definition)
+            ref_list, ref_definition = self.resolver.resolve_allof_definition(
+                d, definition
+            )
             definition = deepmerge(ref_definition, definition)
             if ref_list:
                 base_classes = []
                 for ref_name, ref_definition in ref_list:
                     if ref_name is None:
-                        raise CodegenError("$ref %r is not found", ref_definition)  # xxx
+                        raise CodegenError(
+                            "$ref %r is not found", ref_definition
+                        )  # xxx
                     else:
                         self.write_schema(c, d, ref_name, ref_definition)
                         base_classes.append(ref_name)
 
         # supporting additional properties
-        if "additionalProperties" in definition and base_classes[0] == self.schema_class:
+        if (
+            "additionalProperties" in definition
+            and base_classes[0] == self.schema_class
+        ):
             c.from_(self.extra_schema_module, "AdditionalPropertiesSchema")
             base_classes[0] = "AdditionalPropertiesSchema"
 
-        if "properties" not in definition and ("object" != definition.get("type", "object") and "items" not in definition):
+        if "properties" not in definition and (
+            "object" != definition.get("type", "object") and "items" not in definition
+        ):
             return self.write_primitive_schema(c, d, clsname, definition, many=many)
 
         if "items" in definition:
@@ -184,9 +232,13 @@ class SchemaWriter:
             if not self.resolver.has_ref(definition["items"]):
                 return self.write_primitive_schema(c, d, clsname, definition, many=many)
             else:
-                ref_name, ref_definition = self.resolver.resolve_ref_definition(d, definition["items"])
+                ref_name, ref_definition = self.resolver.resolve_ref_definition(
+                    d, definition["items"]
+                )
                 if ref_name is None:
-                    return self.write_primitive_schema(c, d, clsname, definition, many=many)
+                    return self.write_primitive_schema(
+                        c, d, clsname, definition, many=many
+                    )
                 else:
                     self.write_schema(c, d, ref_name, ref_definition)
                     base_classes = [ref_name]
@@ -214,9 +266,13 @@ class SchemaWriter:
                 for name, field in properties.items():
                     name = str(name)
                     if self.resolver.has_many(field):
-                        self.write_field_many(c, d, clsname, definition, name, field, opts[name])
+                        self.write_field_many(
+                            c, d, clsname, definition, name, field, opts[name]
+                        )
                     else:
-                        self.write_field_one(c, d, clsname, definition, name, field, opts[name])
+                        self.write_field_one(
+                            c, d, clsname, definition, name, field, opts[name]
+                        )
 
             # supporting additional properties
             subdef = definition.get("additionalProperties")
@@ -229,11 +285,23 @@ class SchemaWriter:
                         ref_name, _ = self.resolver.resolve_ref_definition(d, subdef)
                         if ref_name is None:
                             raise CodegenError("$ref %r is not found", subdef["$ref"])
-                        self.write_field_one(c, d, ref_name, {}, "additional_field", subdef, OrderedDict())
+                        self.write_field_one(
+                            c,
+                            d,
+                            ref_name,
+                            {},
+                            "additional_field",
+                            subdef,
+                            OrderedDict(),
+                        )
                     elif self.resolver.has_many(subdef):
-                        self.write_field_many(c, d, "", subdef, "additional_field", subdef, OrderedDict())
+                        self.write_field_many(
+                            c, d, "", subdef, "additional_field", subdef, OrderedDict()
+                        )
                     else:
-                        self.write_field_one(c, d, "", subdef, "additional_field", subdef, OrderedDict())
+                        self.write_field_one(
+                            c, d, "", subdef, "additional_field", subdef, OrderedDict()
+                        )
 
             if need_pass_statement:
                 c.m.stmt("pass")
@@ -290,25 +358,38 @@ class PathsSchemaWriter:
                         if "summary" in definition or "description" in definition:
                             ssc.m.stmt('"""')
                             if "summary" in definition:
-                                for line in definition["summary"].rstrip("\n").split("\n"):
+                                for line in (
+                                    definition["summary"].rstrip("\n").split("\n")
+                                ):
                                     ssc.m.stmt(line)
                             elif "description" in definition:
-                                for line in definition["description"].rstrip("\n").split("\n"):
+                                for line in (
+                                    definition["description"].rstrip("\n").split("\n")
+                                ):
                                     ssc.m.stmt(line)
                             ssc.m.stmt('"""')
                             ssc.m.stmt("")
 
-                        path_info = self.build_path_info(d, toplevel_parameters, self.accessor.parameters(definition))
+                        path_info = self.build_path_info(
+                            d, toplevel_parameters, self.accessor.parameters(definition)
+                        )
                         for section, properties in sorted(path_info.info.items()):
                             if section is None:
                                 continue
                             clsname = titleize(section)
                             if section == "body":
                                 definition = next(iter(properties.values()))["schema"]
-                                self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
+                                self.schema_writer.write_schema(
+                                    ssc, d, clsname, definition, force=True
+                                )
                             else:
-                                definition = {"properties": properties, "required": path_info.required[section]}
-                                self.schema_writer.write_schema(ssc, d, clsname, definition, force=True)
+                                definition = {
+                                    "properties": properties,
+                                    "required": path_info.required[section],
+                                }
+                                self.schema_writer.write_schema(
+                                    ssc, d, clsname, definition, force=True
+                                )
                         if path_info and not path_info.info:
                             ssc.m.stmt("pass")
 
@@ -362,7 +443,9 @@ class ResponsesSchemaWriter:
                 for method, definition in self.accessor.methods(methods):
                     for status, definition in self.accessor.responses(definition):
                         if self.resolver.has_ref(definition):
-                            _, definition = self.resolver.resolve_ref_definition(d, definition)
+                            _, definition = self.resolver.resolve_ref_definition(
+                                d, definition
+                            )
                         if "schema" in definition:
                             found = True
                             clsname = titleize(method) + status
@@ -372,7 +455,14 @@ class ResponsesSchemaWriter:
                                 if "description" in definition:
                                     m.stmt('"""{}"""'.format(definition["description"]))
 
-                            self.schema_writer.write_schema(sc, d, clsname, schema_definition, force=True, meta_writer=meta)
+                            self.schema_writer.write_schema(
+                                sc,
+                                d,
+                                clsname,
+                                schema_definition,
+                                force=True,
+                                meta_writer=meta,
+                            )
             if not found:
                 sc.m.clear()
 
@@ -392,7 +482,9 @@ class Codegen:
     def __init__(self, accessor, *, schema_class_path=None, schema_writer_factory=None):
         self.accessor = accessor
         self.schema_class_path = schema_class_path or self.__class__.schema_class_path
-        self.schema_writer_factory = schema_writer_factory or self.__class__.schema_writer_factory
+        self.schema_writer_factory = (
+            schema_writer_factory or self.__class__.schema_writer_factory
+        )
         self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
     @property
@@ -428,4 +520,5 @@ class Codegen:
 
 def lazy_json_dump(s):
     import json
+
     return LazyCallString(json.dumps, s)

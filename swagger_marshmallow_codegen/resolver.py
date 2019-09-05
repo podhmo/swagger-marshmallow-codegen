@@ -6,6 +6,7 @@ import dictknife
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair
 from . import validate
+
 logger = logging.getLogger(__name__)
 
 
@@ -100,7 +101,9 @@ class Resolver:
         # on array
         if "items" in d:
             definition = d
-            name, _ = self.resolve_ref_definition(fulldata, d["items"], name=name, i=i, level=level + 1)  # xxx
+            name, _ = self.resolve_ref_definition(
+                fulldata, d["items"], name=name, i=i, level=level + 1
+            )  # xxx
             return name, definition
 
         if "$ref" not in d:
@@ -110,14 +113,16 @@ class Resolver:
 
         logger.debug("    resolve: %sref=%r", "  " * i, d["$ref"])
 
-        path = d["$ref"][len("#/"):].split("/")
+        path = d["$ref"][len("#/") :].split("/")
         name = path[-1]
 
         parent = self.accessor.maybe_access_container(fulldata, path)
         if parent is None:
             sys.stderr.write("\t{!r} is not found\n".format(d["$ref"]))
             return self.resolve_schema_name(name), d
-        return self.resolve_ref_definition(fulldata, parent[name], name=name, i=i + 1, level=level - 1)
+        return self.resolve_ref_definition(
+            fulldata, parent[name], name=name, i=i + 1, level=level - 1
+        )
 
     def resolve_validators_on_property(self, c, field):
         validators = []
@@ -136,25 +141,16 @@ class Resolver:
             }
             add(validate.Range(**range_opts))
         if "minLength" in field or "maxLength" in field:
-            length_opts = {
-                "min": field.get("minLength"),
-                "max": field.get("maxLength")
-            }
+            length_opts = {"min": field.get("minLength"), "max": field.get("maxLength")}
             add(validate.Length(**length_opts))
         if "pattern" in field:
-            regex_opts = {
-                "regex": field["pattern"]
-            }
+            regex_opts = {"regex": field["pattern"]}
             add(validate.Regexp(**regex_opts))
         if "enum" in field:
-            enum_opts = {
-                "choices": field["enum"]
-            }
+            enum_opts = {"choices": field["enum"]}
             add(validate.OneOf(**enum_opts))
         if "multipleOf" in field:
-            multipleof_opts = {
-                "n": field["multipleOf"]
-            }
+            multipleof_opts = {"n": field["multipleOf"]}
             add(validate.MultipleOf(**multipleof_opts))
         if "maxItems" in field or "minItems" in field:
             itemrange_opts = {

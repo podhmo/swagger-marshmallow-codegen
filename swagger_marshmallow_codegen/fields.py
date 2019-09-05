@@ -33,7 +33,8 @@ class PatternProperties(fields.Field):  # not supported yet
 
     def _serialize(self, value, attr, obj):
         return {
-            self.key_field._serialize(k, attr, obj):
-            self.nested_field.serialize(k, self.get_value(attr, obj))
+            self.key_field._serialize(k, attr, obj): self.nested_field.serialize(
+                k, self.get_value(attr, obj)
+            )
             for k, v in value.items()
         }
