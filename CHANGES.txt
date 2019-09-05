@@ -2,6 +2,7 @@
 
 - marshmallow 3.0.x support
 - drop python 3.5 support
+- support additionalProperties for array
 
 0.4.0
 
