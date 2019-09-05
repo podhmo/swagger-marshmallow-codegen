@@ -1,0 +1,12 @@
+definitions:
+  person:
+    type: object
+    properties:
+      name:
+        type: string
+  data:
+    type: object
+    additionalProperties:
+      type: array
+      items:
+        $ref: "#/definitions/person"
