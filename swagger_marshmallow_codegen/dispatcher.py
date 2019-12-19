@@ -43,7 +43,7 @@ class FormatDispatcher:
 
     @classmethod
     def load_def_map(cls, type_map):
-        return {pair: import_symbol(path) for pair, path in type_map.items()}
+        return {pair: import_symbol(path, cwd=True) for pair, path in type_map.items()}
 
     def __init__(self, type_map=None, use_def_map=True):
         self.type_map = type_map or self.__class__.type_map
