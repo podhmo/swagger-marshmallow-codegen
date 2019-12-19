@@ -36,7 +36,7 @@ def main():
     else:
         options = {"targets": {"schema": True}}
 
-    driver = import_symbol(driver_cls)(options)
+    driver = import_symbol(driver_cls, cwd=True)(options)
 
     if args.file is None:
         driver.run(sys.stdin, sys.stdout)
