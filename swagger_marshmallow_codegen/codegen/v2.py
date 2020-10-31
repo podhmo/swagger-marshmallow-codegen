@@ -1,3 +1,4 @@
+from __future__ import annotations
 import keyword
 import logging
 from collections import namedtuple
@@ -13,6 +14,8 @@ from swagger_marshmallow_codegen.langhelpers import (
     titleize,
     clsname_from_path,
 )
+from .options import CodegenTargetDict
+
 
 logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
@@ -504,7 +507,7 @@ class Codegen:
         c.from_(*self.schema_class_path.rsplit(":", 1))
         c.from_("marshmallow", "fields")
 
-    def write_body(self, c, d, targets):
+    def write_body(self, c, d, targets: CodegenTargetDict):
         sw = self.schema_writer_factory(self.accessor, self.schema_class)
         if targets.get("schema", False):
             DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
@@ -513,7 +516,7 @@ class Codegen:
         if targets.get("output", False):
             ResponsesSchemaWriter(self.accessor, sw).write(c.new_child(), d)
 
-    def codegen(self, d, targets, ctx=None, test=False):
+    def codegen(self, d, targets: CodegenTargetDict, ctx=None, test=False):
         c = ctx or Context()
         self.write_header(c, test=test)
         c.m.sep()
