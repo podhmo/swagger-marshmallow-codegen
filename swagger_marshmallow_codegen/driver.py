@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
 from . import loading
-from .accessor import Accessor
 from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
 from .dispatcher import FormatDispatcher
@@ -13,13 +12,15 @@ logger = logging.getLogger(__name__)
 class Driver:
     dispatcher_factory = FormatDispatcher
     resolver_factory = Resolver
-    accessor_factory = Accessor
     codegen_factory = Codegen
 
     def __init__(self, options):
         self.options = options
 
     def load(self, fp):
+        # hack:
+        # import dictknife.loading._yaml as xxx
+        # xxx.make_dict = dict
         return loading.load(fp)
 
     def dump(self, m, fp):
@@ -37,8 +38,7 @@ class Driver:
     def create_codegen(self):
         dispatcher = self.dispatcher_factory()
         resolver = self.resolver_factory(dispatcher)
-        accessor = self.accessor_factory(resolver)
-        return self.codegen_factory(accessor)
+        return self.codegen_factory(resolver)
 
 
 class LegacyDriver(Driver):
