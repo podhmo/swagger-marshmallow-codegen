@@ -6,7 +6,7 @@ class V2CodegenTests(CodegenTests):
         from swagger_marshmallow_codegen.lifting import lifting_definition
 
         candidates = [
-            ("./v3src/00person.yaml", "./v3dst/00person.py"),
+            ("./v3src/person.json", "./v3dst/person.py"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
