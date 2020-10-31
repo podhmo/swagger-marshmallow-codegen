@@ -1,4 +1,4 @@
-from marshmallow import (
+from marshmallow import (  # noqa:F401
     Schema,
     fields
 )
