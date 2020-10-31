@@ -16,6 +16,7 @@ install_requires = [
     "prestring",
     "marshmallow>=3.0.0",
     "magicalimport",
+    "typing_extensions",
 ]
 
 docs_extras = []
