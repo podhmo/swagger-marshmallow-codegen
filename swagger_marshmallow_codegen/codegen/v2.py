@@ -8,7 +8,11 @@ from prestring.utils import LazyFormat, LazyKeywordsRepr
 from dictknife import deepequal, deepmerge
 from collections import defaultdict
 from collections import OrderedDict
-from .langhelpers import LazyCallString, titleize, clsname_from_path
+from swagger_marshmallow_codegen.langhelpers import (
+    LazyCallString,
+    titleize,
+    clsname_from_path,
+)
 
 logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
