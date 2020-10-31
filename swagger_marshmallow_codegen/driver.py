@@ -18,6 +18,9 @@ class Driver:
         self.options = options
 
     def load(self, fp):
+        # hack:
+        # import dictknife.loading._yaml as xxx
+        # xxx.make_dict = dict
         return loading.load(fp)
 
     def dump(self, m, fp):
