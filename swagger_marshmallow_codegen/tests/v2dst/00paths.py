@@ -1,10 +1,10 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from marshmallow.validate import (
     Length,
-    Regexp
+    Regexp,
 )
 import re
 from swagger_marshmallow_codegen.validate import Range

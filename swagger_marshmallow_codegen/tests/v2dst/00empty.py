@@ -1,6 +1,6 @@
-from marshmallow import (  # noqa:F401
+from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 
 

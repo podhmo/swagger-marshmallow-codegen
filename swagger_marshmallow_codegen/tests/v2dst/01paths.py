@@ -1,14 +1,12 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
 from marshmallow.validate import (
     Length,
-    Regexp
+    Regexp,
 )
-from swagger_marshmallow_codegen.schema import (
-    PrimitiveValueSchema
-)
+from swagger_marshmallow_codegen.schema import PrimitiveValueSchema
 import re
 
 

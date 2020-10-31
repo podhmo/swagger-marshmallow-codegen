@@ -1,10 +1,8 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
-from swagger_marshmallow_codegen.schema import (
-    PrimitiveValueSchema
-)
+from swagger_marshmallow_codegen.schema import PrimitiveValueSchema
 
 
 class IntsInput:

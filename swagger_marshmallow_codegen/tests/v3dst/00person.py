@@ -5,5 +5,5 @@ from marshmallow import (
 
 
 class Person(Schema):
-    name = fields.String(required=True)
+    name = fields.String()
     age = fields.Integer()

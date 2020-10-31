@@ -1,10 +1,8 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
-from swagger_marshmallow_codegen.schema import (
-    AdditionalPropertiesSchema
-)
+from swagger_marshmallow_codegen.schema import AdditionalPropertiesSchema
 
 
 class Box(AdditionalPropertiesSchema):

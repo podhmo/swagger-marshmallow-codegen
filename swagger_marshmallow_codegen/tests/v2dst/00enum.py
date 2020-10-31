@@ -1,10 +1,8 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
-from marshmallow.validate import (
-    OneOf
-)
+from marshmallow.validate import OneOf
 from swagger_marshmallow_codegen.validate import MultipleOf
 
 

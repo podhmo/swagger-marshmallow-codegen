@@ -1,10 +1,8 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
-from swagger_marshmallow_codegen.validate import (
-    Range
-)
+from swagger_marshmallow_codegen.validate import Range
 
 
 class X(Schema):

@@ -1,10 +1,8 @@
 from marshmallow import (
     Schema,
-    fields
+    fields,
 )
-from marshmallow.validate import (
-    Length
-)
+from marshmallow.validate import Length
 
 
 class X(Schema):
