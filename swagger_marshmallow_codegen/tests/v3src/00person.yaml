@@ -1,0 +1,11 @@
+version: 3.x.x
+
+components:
+  schemas:
+    person:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer

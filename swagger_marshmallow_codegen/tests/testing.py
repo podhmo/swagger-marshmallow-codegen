@@ -1,6 +1,6 @@
 import unittest
+import pathlib
 import difflib
-import os.path
 
 
 class DiffTestCase(unittest.TestCase):
@@ -34,7 +34,7 @@ class DiffTestCase(unittest.TestCase):
 
 
 class CodegenTests(DiffTestCase):
-    here = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
+    here = pathlib.Path(__file__).parent
 
     def _getTargetClass(self):
         from swagger_marshmallow_codegen.codegen import Codegen
@@ -56,9 +56,12 @@ class CodegenTests(DiffTestCase):
     def load_srcfile(self, src):
         from swagger_marshmallow_codegen.loading import load
 
-        with open(os.path.join(self.here, src)) as rf:
+        with (self.here / src).open() as rf:
             return load(rf)
 
     def load_dstfile(self, dst):
-        with open(os.path.join(self.here, dst)) as rf:
-            return rf.read()
+        try:
+            with (self.here / dst).open() as rf:
+                return rf.read()
+        except FileNotFoundError:
+            return "# dummy\n"
