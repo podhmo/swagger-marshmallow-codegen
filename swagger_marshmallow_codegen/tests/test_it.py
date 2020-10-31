@@ -37,25 +37,24 @@ class CodegenTests(DiffTestCase):
     here = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
 
     def _getTargetClass(self):
-        from ..codegen import Codegen
+        from swagger_marshmallow_codegen.codegen import Codegen
 
         return Codegen
 
     def _makeOne(self):
-        from ..accessor import Accessor
-        from ..resolver import Resolver
-        from ..dispatcher import FormatDispatcher
+        from swagger_marshmallow_codegen.resolver import Resolver
+        from swagger_marshmallow_codegen.dispatcher import FormatDispatcher
 
-        accessor = Accessor(Resolver(FormatDispatcher()))
-        return self._getTargetClass()(accessor)
+        resolver = Resolver(FormatDispatcher())
+        return self._getTargetClass()(resolver)
 
     def _makeContext(self):
-        from ..codegen import Context
+        from swagger_marshmallow_codegen.codegen import Context
 
         return Context()
 
     def load_srcfile(self, src):
-        from ..loading import load
+        from swagger_marshmallow_codegen.loading import load
 
         with open(os.path.join(self.here, src)) as rf:
             return load(rf)
@@ -65,44 +64,44 @@ class CodegenTests(DiffTestCase):
             return rf.read()
 
     def test_it(self):
-        from ..lifting import lifting_definition
+        from swagger_marshmallow_codegen.lifting import lifting_definition
 
         candidates = [
-            ("./src/00person.yaml", "./dst/00person.py"),
-            ("./src/01person.yaml", "./dst/01person.py"),
-            ("./src/02person.yaml", "./dst/02person.py"),
-            ("./src/03person.yaml", "./dst/03person.py"),
-            ("./src/04person.yaml", "./dst/04person.py"),
-            ("./src/05person.yaml", "./dst/05person.py"),
-            ("./src/00commit.yaml", "./dst/00commit.py"),
-            ("./src/01commit.yaml", "./dst/01commit.py"),
-            ("./src/00emojis.yaml", "./dst/00emojis.py"),
-            ("./src/00stat.yaml", "./dst/00stat.py"),
-            ("./src/00default.yaml", "./dst/00default.py"),
-            ("./src/00maximum.yaml", "./dst/00maximum.py"),
-            ("./src/00length.yaml", "./dst/00length.py"),
-            ("./src/00regex.yaml", "./dst/00regex.py"),
-            ("./src/00enum.yaml", "./dst/00enum.py"),
-            ("./src/00items.yaml", "./dst/00items.py"),
-            ("./src/00readonly.yaml", "./dst/00readonly.py"),
-            ("./src/00allOf.yaml", "./dst/00allOf.py"),
-            ("./src/00allOf2.yaml", "./dst/00allOf2.py"),
-            ("./src/01allOf2.yaml", "./dst/01allOf2.py"),
-            ("./src/02allOf2.yaml", "./dst/02allOf2.py"),
-            ("./src/00paths.yaml", "./dst/00paths.py"),
-            ("./src/01paths.yaml", "./dst/01paths.py"),
-            ("./src/02paths.yaml", "./dst/02paths.py"),
-            ("./src/03paths.yaml", "./dst/03paths.py"),
-            ("./src/00empty.yaml", "./dst/00empty.py"),
-            ("./src/01empty.yaml", "./dst/01empty.py"),
-            ("./src/00list_with_options.yaml", "./dst/00list_with_options.py"),
-            ("./src/00reserved.yaml", "./dst/00reserved.py"),
-            ("./src/00typearray.yaml", "./dst/00typearray.py"),
-            ("./src/00additional.yaml", "./dst/00additional.py"),
-            ("./src/01additional.yaml", "./dst/01additional.py"),
-            ("./src/00nullable.yaml", "./dst/00nullable.py"),
-            ("./src/00primitiveapi.yaml", "./dst/00primitiveapi.py"),
-            # ("./src/00patternProperties.yaml", "./dst/00patternProperties.py"),  not supported yet
+            ("./v2src/00person.yaml", "./v2dst/00person.py"),
+            ("./v2src/01person.yaml", "./v2dst/01person.py"),
+            ("./v2src/02person.yaml", "./v2dst/02person.py"),
+            ("./v2src/03person.yaml", "./v2dst/03person.py"),
+            ("./v2src/04person.yaml", "./v2dst/04person.py"),
+            ("./v2src/05person.yaml", "./v2dst/05person.py"),
+            ("./v2src/00commit.yaml", "./v2dst/00commit.py"),
+            ("./v2src/01commit.yaml", "./v2dst/01commit.py"),
+            ("./v2src/00emojis.yaml", "./v2dst/00emojis.py"),
+            ("./v2src/00stat.yaml", "./v2dst/00stat.py"),
+            ("./v2src/00default.yaml", "./v2dst/00default.py"),
+            ("./v2src/00maximum.yaml", "./v2dst/00maximum.py"),
+            ("./v2src/00length.yaml", "./v2dst/00length.py"),
+            ("./v2src/00regex.yaml", "./v2dst/00regex.py"),
+            ("./v2src/00enum.yaml", "./v2dst/00enum.py"),
+            ("./v2src/00items.yaml", "./v2dst/00items.py"),
+            ("./v2src/00readonly.yaml", "./v2dst/00readonly.py"),
+            ("./v2src/00allOf.yaml", "./v2dst/00allOf.py"),
+            ("./v2src/00allOf2.yaml", "./v2dst/00allOf2.py"),
+            ("./v2src/01allOf2.yaml", "./v2dst/01allOf2.py"),
+            ("./v2src/02allOf2.yaml", "./v2dst/02allOf2.py"),
+            ("./v2src/00paths.yaml", "./v2dst/00paths.py"),
+            ("./v2src/01paths.yaml", "./v2dst/01paths.py"),
+            ("./v2src/02paths.yaml", "./v2dst/02paths.py"),
+            ("./v2src/03paths.yaml", "./v2dst/03paths.py"),
+            ("./v2src/00empty.yaml", "./v2dst/00empty.py"),
+            ("./v2src/01empty.yaml", "./v2dst/01empty.py"),
+            ("./v2src/00list_with_options.yaml", "./v2dst/00list_with_options.py"),
+            ("./v2src/00reserved.yaml", "./v2dst/00reserved.py"),
+            ("./v2src/00typearray.yaml", "./v2dst/00typearray.py"),
+            ("./v2src/00additional.yaml", "./v2dst/00additional.py"),
+            ("./v2src/01additional.yaml", "./v2dst/01additional.py"),
+            ("./v2src/00nullable.yaml", "./v2dst/00nullable.py"),
+            ("./v2src/00primitiveapi.yaml", "./v2dst/00primitiveapi.py"),
+            # ("./v2src/00patternProperties.yaml", "./v2dst/00patternProperties.py"),  not supported yet
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
@@ -126,26 +125,26 @@ class FlattenTests(unittest.TestCase):
     here = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
 
     def _callFUT(self, d):
-        from ..lifting import lifting_definition
+        from swagger_marshmallow_codegen.lifting import lifting_definition
 
         return lifting_definition(d)
 
     def load_srcfile(self, src):
-        from ..loading import load
+        from swagger_marshmallow_codegen.loading import load
 
         with open(os.path.join(self.here, src)) as rf:
             return load(rf)
 
     def load_dstfile(self, dst):
-        from ..loading import load
+        from swagger_marshmallow_codegen.loading import load
 
         with open(os.path.join(self.here, dst)) as rf:
             return load(rf)
 
     def test_it(self):
         candidates = [
-            ("./src/01commit.yaml", "./src/00commit.yaml"),
-            ("./src/01empty.yaml", "./src/02empty.yaml"),
+            ("./v2src/01commit.yaml", "./v2src/00commit.yaml"),
+            ("./v2src/01empty.yaml", "./v2src/02empty.yaml"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):

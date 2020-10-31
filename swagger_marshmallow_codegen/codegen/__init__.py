@@ -26,13 +26,20 @@ class Codegen:
         self.schema_class_path = schema_class_path
         self.schema_writer_factory = schema_writer_factory
 
-    def codegen(self, d, targets: CodegenTargetDict):
+    def codegen(
+        self,
+        d,
+        targets: CodegenTargetDict,
+        *,
+        ctx: t.Optional[Context] = None,
+        test: bool = False,
+    ):
         cls = self.guess_factory(d, path="version")
         codegen = cls(
             schema_class_path=self.schema_class_path,
             schema_writer_factory=self.schema_writer_factory,
         )
-        return codegen.codegen(d, targets=targets)
+        return codegen.codegen(d, targets=targets, ctx=ctx, test=test)
 
     def guess_factory(self, d: t.Dict, *, path: str = "version") -> t.Type[t.Any]:
         version = d.get(path)
