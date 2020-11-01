@@ -15,6 +15,7 @@ from swagger_marshmallow_codegen.langhelpers import (
     clsname_from_path,
 )
 from ..context import Context
+from ..config import ConfigDict
 
 if t.TYPE_CHECKING:
     from swagger_marshmallow_codegen.resolver import Resolver
@@ -307,9 +308,15 @@ class DefinitionsSchemaWriter:
     def resolver(self) -> Resolver:
         return self.accessor.resolver
 
+    @property
+    def config(self) -> ConfigDict:
+        return self.accessor.config
+
     def write(self, c, d):
         for schema_name, definition in self.accessor.definitions(d):
-            if not self.resolver.has_schema(d, definition):
+            if not self.config.get(
+                "emit_schema_even_primitive_type", False
+            ) and not self.resolver.has_schema(d, definition):
                 logger.info("write schema: skip %s", schema_name)
                 continue
 

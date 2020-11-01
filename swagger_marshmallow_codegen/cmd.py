@@ -1,12 +1,16 @@
+from __future__ import annotations
+import typing as t
 import sys
 import logging
 import argparse
 from magicalimport import import_symbol
 
+if t.TYPE_CHECKING:
+    from swagger_marshmallow_codegen.driver import Driver
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--driver", default="Driver")
     parser.add_argument(
@@ -32,12 +36,13 @@ def main():
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
 
     if args.full:
-        options = {"targets": {"schema": True, "input": True, "output": True}}
+        config = {"targets": {"schema": True, "input": True, "output": True}}
     else:
-        options = {"targets": {"schema": True}}
+        config = {"targets": {"schema": True}}
 
-    driver = import_symbol(driver_cls, cwd=True)(options)
-
+    driver = import_symbol(driver_cls, cwd=True)(config)
+    if setup is not None:
+        setup(driver)
     if args.file is None:
         driver.run(sys.stdin, sys.stdout)
     else:

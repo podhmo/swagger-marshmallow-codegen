@@ -28,7 +28,7 @@ class Driver:
 
     def transform(self, d):
         d = lifting_definition(d)
-        return self.create_codegen().codegen(d, targets=self.options["targets"])
+        return self.create_codegen().codegen(d, config=self.options["targets"])
 
     def run(self, inp, outp):
         data = self.load(inp)

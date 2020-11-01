@@ -7,4 +7,5 @@ class ConfigDict(tx.TypedDict):
     input: bool
     output: bool
 
+    emit_schema_even_primitive_type: bool
     skip_header_comment: bool
