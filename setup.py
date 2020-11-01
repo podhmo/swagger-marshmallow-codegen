@@ -21,7 +21,7 @@ install_requires = [
 
 docs_extras = []
 
-tests_require = []
+tests_require = ["pytest"]
 
 testing_extras = tests_require + []
 

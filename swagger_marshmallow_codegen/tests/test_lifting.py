@@ -24,8 +24,8 @@ class FlattenTests(unittest.TestCase):
 
     def test_it(self):
         candidates = [
-            ("./v2src/01commit.yaml", "./v2src/00commit.yaml"),
-            ("./v2src/01empty.yaml", "./v2src/02empty.yaml"),
+            ("./legacy_src/01commit.yaml", "./legacy_src/00commit.yaml"),
+            ("./legacy_src/01empty.yaml", "./legacy_src/02empty.yaml"),
         ]
         for src_file, dst_file in candidates:
             with self.subTest(src_file=src_file, dst_file=dst_file):
