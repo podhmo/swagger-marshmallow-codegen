@@ -1,12 +1,17 @@
-# -*- coding:utf-8 -*-
+from __future__ import annotations
+import typing as t
 import logging
 
+if t.TYPE_CHECKING:
+    from swagger_marshmallow_codegen.resolver import Resolver
+    from swagger_marshmallow_codegen.codegen.config import ConfigDict
 logger = logging.getLogger(__name__)
 
 
 class Accessor:
-    def __init__(self, resolver):
+    def __init__(self, resolver: Resolver, *, config: ConfigDict):
         self.resolver = resolver
+        self.config = config
 
     @property
     def dispatcher(self):

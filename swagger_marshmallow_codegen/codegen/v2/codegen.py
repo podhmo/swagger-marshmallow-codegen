@@ -14,7 +14,7 @@ from swagger_marshmallow_codegen.langhelpers import (
     titleize,
     clsname_from_path,
 )
-from ..options import CodegenTargetDict
+from ..config import ConfigDict
 from ..context import Context
 
 if t.TYPE_CHECKING:
@@ -491,21 +491,22 @@ class Codegen:
         c.from_(*self.schema_class_path.rsplit(":", 1))
         c.from_("marshmallow", "fields")
 
-    def write_body(self, c, d, targets: CodegenTargetDict):
+    def write_body(self, c, d):
         sw = self.schema_writer_factory(self.accessor, self.schema_class)
-        if targets.get("schema", False):
+        config = self.accessor.config
+        if config.get("schema", False):
             DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
-        if targets.get("input", False):
+        if config.get("input", False):
             PathsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
-        if targets.get("output", False):
+        if config.get("output", False):
             ResponsesSchemaWriter(self.accessor, sw).write(c.new_child(), d)
 
-    def codegen(self, d, targets: CodegenTargetDict, ctx=None, test=False):
+    def codegen(self, d, ctx=None, test=False):
         c = ctx or Context()
         self.write_header(c, test=test)
         c.m.sep()
         self.write_import_(c)
-        self.write_body(c, d, targets)
+        self.write_body(c, d)
         return c.m
 
 
