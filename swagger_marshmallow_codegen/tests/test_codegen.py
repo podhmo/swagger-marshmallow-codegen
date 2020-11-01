@@ -2,7 +2,7 @@ import pathlib
 from .testing import CodegenTests
 
 
-CANDIDATES = [("simple", "person.json", "person.py")]
+CANDIDATES = [("simple", "00simple-object.json", "00simple-object.py")]
 
 
 class V2Tests(CodegenTests):
