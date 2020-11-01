@@ -6,7 +6,7 @@ from collections import namedtuple
 from functools import partial
 from prestring import PreString
 from prestring.utils import LazyFormat, LazyKeywordsRepr
-from dictknife import deepequal, deepmerge
+from dictknife import deepmerge
 from collections import defaultdict
 from collections import OrderedDict
 from swagger_marshmallow_codegen.langhelpers import (
@@ -16,9 +16,12 @@ from swagger_marshmallow_codegen.langhelpers import (
 )
 from ..context import Context
 from ..config import ConfigDict
+from .accessor import Accessor
 
 if t.TYPE_CHECKING:
     from swagger_marshmallow_codegen.resolver import Resolver
+
+
 logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
 
@@ -30,7 +33,7 @@ class CodegenError(Exception):
 class SchemaWriter:
     extra_schema_module = "swagger_marshmallow_codegen.schema"
 
-    def __init__(self, accessor, schema_class, *, extra_schema_module=None):
+    def __init__(self, accessor: Accessor, schema_class, *, extra_schema_module=None):
         self.accessor = accessor
         self.schema_class = schema_class
         self.arrived = set()
@@ -54,9 +57,6 @@ class SchemaWriter:
             field_class_name, field = self.resolver.resolve_ref_definition(
                 d, field, level=1
             )
-            if field_class_name == schema_name and deepequal(field, definition):
-                field_class_name = "self"
-
             if self.resolver.has_many(field):
                 return self.write_field_many(
                     c, d, field_class_name, definition, name, field, opts
@@ -95,7 +95,7 @@ class SchemaWriter:
             logger.debug("      nested: %s, %s", caller_name, field_class_name)
             if opts:
                 kwargs = LazyFormat(", {}", kwargs)
-            value = LazyFormat("{}({!r}{})", caller_name, field_class_name, kwargs)
+            value = LazyFormat("{}(lambda: {}{})", caller_name, field_class_name, kwargs)
         else:
             if caller_name == "fields.Nested":
                 caller_name = "fields.Field"
