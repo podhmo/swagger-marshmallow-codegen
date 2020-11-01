@@ -9,6 +9,12 @@
         },
         "age": {
           "type": "integer"
+        },
+        "father": {
+          "$ref": "#/definitions/Person"
+        },
+        "mother": {
+          "$ref": "#/definitions/Person"
         }
       },
       "required": [

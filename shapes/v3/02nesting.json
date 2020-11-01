@@ -1,0 +1,40 @@
+{
+  "components": {
+    "schemas": {
+      "Person": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "memo": {
+            "$ref": "#/components/schemas/Memo"
+          }
+        },
+        "required": [
+          "name",
+          "memo"
+        ]
+      },
+      "Memo": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      }
+    }
+  },
+  "version": "3.x.x"
+}

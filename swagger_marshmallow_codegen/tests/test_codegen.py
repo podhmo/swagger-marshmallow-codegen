@@ -1,8 +1,6 @@
 import pathlib
 from .testing import CodegenTests
-
-
-CANDIDATES = [("simple", "00simple-object.json", "00simple-object.py")]
+from .codegen_candidates import CANDIDATES
 
 
 class V2Tests(CodegenTests):
@@ -20,7 +18,12 @@ class V2Tests(CodegenTests):
 
                 target.codegen(
                     lifting_definition(d),
-                    {"schema": True, "input": True, "output": True},
+                    {
+                        "schema": True,
+                        "input": True,
+                        "output": True,
+                        "emit_schema_even_primitive_type": True,
+                    },
                     ctx=ctx,
                     test=True,
                 )
@@ -45,7 +48,12 @@ class V3Tests(CodegenTests):
 
                 target.codegen(
                     lifting_definition(d),
-                    {"schema": True, "input": True, "output": True},
+                    {
+                        "schema": True,
+                        "input": True,
+                        "output": True,
+                        "emit_schema_even_primitive_type": True,
+                    },
                     ctx=ctx,
                     test=True,
                 )
