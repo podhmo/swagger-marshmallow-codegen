@@ -1,6 +1,8 @@
 gen:
 	python gen.py --logging=INFO \
  defs/00simple-object.py \
+ defs/02nesting.py \
+ defs/03self-nesting.py \
 
 gen-candidates:
 	python gen-candidates.py expected > codegen_candidates.py
@@ -9,7 +11,7 @@ gen-candidates:
 .PHONY: gen
 
 test:
-	pytest ../swagger_marshmallow_codegen/tests/test_codegen.py
+	pytest -vv ../swagger_marshmallow_codegen/tests/test_codegen.py
 
 # TODO: use symlink (even windows environment)
 sync: gen gen-candidates
