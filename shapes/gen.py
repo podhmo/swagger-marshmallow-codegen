@@ -34,4 +34,8 @@ def run(filenames: t.List[str], *, aggressive: bool = True) -> None:
             ctx.result["version"] = "2.0.0"
             ctx.result["definitions"] = ctx.result["components"].pop("schemas")
             ctx.result.pop("components")
-            emit(ctx, output=wf)
+            from io import StringIO
+
+            o = StringIO()
+            emit(ctx, output=o)
+            print(o.getvalue().replace("/components/schemas", "/definitions/"), file=wf)
