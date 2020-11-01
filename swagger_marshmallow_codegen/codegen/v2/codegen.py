@@ -1,4 +1,5 @@
 from __future__ import annotations
+import typing as t
 import keyword
 import logging
 from collections import namedtuple
@@ -16,6 +17,8 @@ from swagger_marshmallow_codegen.langhelpers import (
 from ..options import CodegenTargetDict
 from ..context import Context
 
+if t.TYPE_CHECKING:
+    from swagger_marshmallow_codegen.resolver import Resolver
 logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
 
@@ -40,7 +43,7 @@ class SchemaWriter:
         return partial(cls, extra_schema_module=extra_schema_module)
 
     @property
-    def resolver(self):
+    def resolver(self) -> Resolver:
         return self.accessor.resolver
 
     def write_field_one(
@@ -302,12 +305,11 @@ class DefinitionsSchemaWriter:
         self.schema_writer = schema_writer
 
     @property
-    def resolver(self):
+    def resolver(self) -> Resolver:
         return self.accessor.resolver
 
     def write(self, c, d):
         for schema_name, definition in self.accessor.definitions(d):
-
             if not self.resolver.has_schema(d, definition):
                 logger.info("write schema: skip %s", schema_name)
                 continue
@@ -325,7 +327,7 @@ class PathsSchemaWriter:
         self.schema_writer = schema_writer
 
     @property
-    def resolver(self):
+    def resolver(self) -> Resolver:
         return self.accessor.resolver
 
     def get_lazy_clsname(self, path):
@@ -413,7 +415,7 @@ class ResponsesSchemaWriter:
         self.schema_writer = schema_writer
 
     @property
-    def resolver(self):
+    def resolver(self) -> Resolver:
         return self.accessor.resolver
 
     # todo: move
@@ -477,7 +479,7 @@ class Codegen:
         self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
     @property
-    def resolver(self):
+    def resolver(self) -> Resolver:
         return self.accessor.resolver
 
     def write_header(self, c, test):
