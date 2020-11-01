@@ -1,7 +1,7 @@
 PKG := swagger_marshmallow_codegen
 
 test:
-	python setup.py test
+	pytest -vv $(PKG)
 
 lint:
 	flake8 ${PKG} --ignore=E501,E303,E203,W391,W503
