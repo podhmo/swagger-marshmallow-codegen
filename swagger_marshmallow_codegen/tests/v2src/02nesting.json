@@ -11,7 +11,7 @@
           "type": "integer"
         },
         "memo": {
-          "$ref": "#/definitions//Memo"
+          "$ref": "#/definitions/Memo"
         }
       },
       "required": [
