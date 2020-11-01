@@ -2,13 +2,17 @@ gen:
 	python gen.py --logging=INFO \
  defs/00simple-object.py \
 
+gen-candidates:
+	python gen-candidates.py expected > codegen_candidates.py
+
+
 .PHONY: gen
 
 test:
 	pytest ../swagger_marshmallow_codegen/tests/test_codegen.py
 
 # TODO: use symlink (even windows environment)
-sync: gen
+sync: gen gen-candidates
 	rm -rf ../swagger_marshmallow_codegen/tests/v2src
 	mkdir -p ../swagger_marshmallow_codegen/tests/v2src
 	cp -r ./v2/* ../swagger_marshmallow_codegen/tests/v2src/
@@ -21,5 +25,7 @@ sync: gen
 	rm -rf ../swagger_marshmallow_codegen/tests/v2dst
 	mkdir -p ../swagger_marshmallow_codegen/tests/v2dst
 	cp -r ./expected/* ../swagger_marshmallow_codegen/tests/v2dst/
+	cp codegen_candidates.py ../swagger_marshmallow_codegen/tests
+
 
 .PHONY: test
