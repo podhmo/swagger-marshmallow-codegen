@@ -34,12 +34,16 @@ class Codegen:
         ctx: t.Optional[Context] = None,
         test: bool = False,
     ):
+        if test:
+            # todo: use dataclasses?
+            config["skip_header_comment"] = True
+
         cls = self.guess_factory(d, config=config, path="version")
         codegen = cls(
             schema_class_path=self.schema_class_path,
             schema_writer_factory=self.schema_writer_factory,
         )
-        return codegen.codegen(d, ctx=ctx, test=test)
+        return codegen.codegen(d, ctx=ctx)
 
     def guess_factory(
         self, d: t.Dict, *, config: ConfigDict, path: str = "version"

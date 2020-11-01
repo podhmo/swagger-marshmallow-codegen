@@ -6,3 +6,5 @@ class ConfigDict(tx.TypedDict):
     schema: bool
     input: bool
     output: bool
+
+    skip_header_comment: bool
