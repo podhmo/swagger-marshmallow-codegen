@@ -11,10 +11,10 @@
           "type": "integer"
         },
         "father": {
-          "$ref": "#/definitions//Person"
+          "$ref": "#/definitions/Person"
         },
         "mother": {
-          "$ref": "#/definitions//Person"
+          "$ref": "#/definitions/Person"
         }
       },
       "required": [

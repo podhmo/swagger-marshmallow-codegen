@@ -38,4 +38,4 @@ def run(filenames: t.List[str], *, aggressive: bool = True) -> None:
 
             o = StringIO()
             emit(ctx, output=o)
-            print(o.getvalue().replace("/components/schemas", "/definitions/"), file=wf)
+            print(o.getvalue().replace("/components/schemas", "/definitions"), file=wf)

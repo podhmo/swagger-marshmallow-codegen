@@ -13,3 +13,26 @@ def test_01():
     s = m.MyInt()
     data = 10
     s.load(data)
+
+
+def test_02():
+    m = import_module("./expected/02nesting.py", cwd=False)
+    s = m.Person()
+    data = {
+        "name": "foo",
+        "age": 20,
+        "memo": {"title": "hello", "content": "this is first greeting"},
+    }
+    s.load(data)
+
+
+def test_03():
+    m = import_module("./expected/03self-nesting.py", cwd=False)
+    s = m.Person()
+    data = {
+        "name": "foo",
+        "age": 20,
+        "father": {"name": "bar", "age": 40},
+        "mother": {"name": "boo"},
+    }
+    s.load(data)
