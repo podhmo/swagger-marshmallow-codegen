@@ -1,0 +1,10 @@
+{
+  "components": {
+    "schemas": {
+      "MyInt": {
+        "type": "integer"
+      }
+    }
+  },
+  "version": "3.x.x"
+}

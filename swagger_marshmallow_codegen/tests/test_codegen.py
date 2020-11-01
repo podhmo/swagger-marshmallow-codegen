@@ -2,7 +2,10 @@ import pathlib
 from .testing import CodegenTests
 
 
-CANDIDATES = [("simple", "00simple-object.json", "00simple-object.py")]
+CANDIDATES = [
+    ("simple-object", "00simple-object.json", "00simple-object.py"),
+    ("simple-primitive", "01simple-primitive.json", "01simple-primitive.py"),
+]
 
 
 class V2Tests(CodegenTests):
@@ -20,7 +23,12 @@ class V2Tests(CodegenTests):
 
                 target.codegen(
                     lifting_definition(d),
-                    {"schema": True, "input": True, "output": True},
+                    {
+                        "schema": True,
+                        "input": True,
+                        "output": True,
+                        "emit_schema_even_primitive_type": True,
+                    },
                     ctx=ctx,
                     test=True,
                 )
@@ -45,7 +53,12 @@ class V3Tests(CodegenTests):
 
                 target.codegen(
                     lifting_definition(d),
-                    {"schema": True, "input": True, "output": True},
+                    {
+                        "schema": True,
+                        "input": True,
+                        "output": True,
+                        "emit_schema_even_primitive_type": True,
+                    },
                     ctx=ctx,
                     test=True,
                 )
