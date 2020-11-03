@@ -14,6 +14,10 @@ definitions:
         type: string
         format: date-time
         default: 2000-01-01T01:01:01Z
+      date:
+        type: string
+        format: date
+        default: 2000-01-01
       object:
         type: object
         properties:
