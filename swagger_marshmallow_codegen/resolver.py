@@ -118,7 +118,7 @@ class Resolver:
 
         parent = self.accessor.maybe_access_container(fulldata, path)
         if parent is None:
-            sys.stderr.write("\t{!r} is not found\n".format(d["$ref"]))
+            logger.warning("%r is not found", d["$ref"])
             return self.resolve_schema_name(name), d
         return self.resolve_ref_definition(
             fulldata, parent[name], name=name, i=i + 1, level=level - 1
