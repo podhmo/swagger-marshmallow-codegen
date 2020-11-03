@@ -15,6 +15,19 @@ logger = logging.getLogger(__name__)
 class Codegen:
     version_path: str = "version"
 
+    @classmethod
+    def override(
+        cls,
+        *,
+        schema_class_path: t.Optional[str] = None,
+        schema_writer_factory: t.Callable[[...], SchemaWriter] = None,
+    ):
+        return partial(
+            cls,
+            schema_class_path=schema_class_path,
+            schema_writer_factory=schema_writer_factory,
+        )
+
     def __init__(
         self,
         resolver: Resolver,
