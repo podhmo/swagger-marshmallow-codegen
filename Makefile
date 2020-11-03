@@ -39,3 +39,17 @@ ci:
 _find-candidates:
 	echo $(call findCandidatesT $(WHERE))
 
+
+#### for pypi ########################
+
+build:
+#	pip install wheel
+	python setup.py sdist bdist_wheel
+
+upload:
+#	pip install twine
+	twine check dist/metashape-$(shell cat VERSION)*
+	twine upload dist/metashape-$(shell cat VERSION)*.gz
+	twine upload dist/metashape-$(shell cat VERSION)*.whl
+
+.PHONY: build upload
