@@ -13,13 +13,20 @@ format:
 typing:
 	:
 
-integration-test:
-	$(MAKE) --silent _find-candidates | xargs -n 1 make -C || (echo "**********NG**********" && exit 1)
+examples:
+	python -m pip install bson
+	$(MAKE) ci
 .PHONY: examples
 
+integration-test:
+	$(MAKE) --silent _find-candidates | xargs -n 1 make -C || (echo "**********NG**********" && exit 1)
+.PHONY: integration-test
+
+# for travis
 ci:
 	$(MAKE) --silent _find-candidates | xargs -n 1 echo "OPTS=--logging=WARNING" make --silent -C | bash -x -e || (echo "**********NG**********" && exit 1)
 	test -z `git diff examples/` || (echo  "*********DIFF*********" && git diff examples/ && exit 2)
+.PHONY: ci
 
 WHERE ?= .
 _find-candidates:
