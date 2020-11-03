@@ -1,63 +1,89 @@
+from __future__ import annotations
+import pytest
 import pathlib
-from .testing import CodegenTests
+from .testing import CodegenTests, load_srcfile, load_dstfile
 from .codegen_candidates import CANDIDATES
 
 
-class V2Tests(CodegenTests):
-    src_dir = pathlib.Path("v2src")
-    dst_dir = pathlib.Path("v2dst")
-
-    def test_it(self):
-        from swagger_marshmallow_codegen.lifting import lifting_definition
-
-        for msg, src_file, dst_file in CANDIDATES:
-            with self.subTest(msg=msg, src_file=src_file, dst_file=dst_file):
-                d = self.load_srcfile(self.src_dir / src_file)
-                target = self._makeOne()
-                ctx = self._makeContext()
-
-                target.codegen(
-                    lifting_definition(d),
-                    {
-                        "schema": True,
-                        "input": True,
-                        "output": True,
-                        "emit_schema_even_primitive_type": True,
-                    },
-                    ctx=ctx,
-                    test=True,
-                )
-
-                expected = self.load_dstfile(self.dst_dir / dst_file).rstrip("\n")
-                actual = str(ctx.m).rstrip("\n")
-                self.assertEqual(actual, expected)
+here = pathlib.Path(__file__).parent
 
 
-class V3Tests(CodegenTests):
-    src_dir = pathlib.Path("v3src")
-    dst_dir = pathlib.Path("v3dst")
+def _getTargetClass():
+    from swagger_marshmallow_codegen.codegen import Codegen
 
-    def test_it(self):
-        from swagger_marshmallow_codegen.lifting import lifting_definition
+    return Codegen
 
-        for msg, src_file, dst_file in CANDIDATES:
-            with self.subTest(msg=msg, src_file=src_file, dst_file=dst_file):
-                d = self.load_srcfile(self.src_dir / src_file)
-                target = self._makeOne()
-                ctx = self._makeContext()
 
-                target.codegen(
-                    lifting_definition(d),
-                    {
-                        "schema": True,
-                        "input": True,
-                        "output": True,
-                        "emit_schema_even_primitive_type": True,
-                    },
-                    ctx=ctx,
-                    test=True,
-                )
+def _makeOne():
+    from swagger_marshmallow_codegen.resolver import Resolver
+    from swagger_marshmallow_codegen.dispatcher import FormatDispatcher
 
-                expected = self.load_dstfile(self.dst_dir / dst_file).rstrip("\n")
-                actual = str(ctx.m).rstrip("\n")
-                self.assertEqual(actual, expected)
+    resolver = Resolver(FormatDispatcher())
+    return _getTargetClass()(resolver)
+
+
+@pytest.mark.parametrize("msg, src_file, dst_file", CANDIDATES)
+def test_v2(
+    msg,
+    src_file,
+    dst_file,
+    *,
+    src_dir=pathlib.Path("v2src"),
+    dst_dir=pathlib.Path("v2dst")
+):
+
+    from swagger_marshmallow_codegen.lifting import lifting_definition
+    from swagger_marshmallow_codegen.codegen import Context
+
+    d = load_srcfile(src_dir / src_file, here=here)
+    ctx = Context()
+    target = _makeOne()
+    target.codegen(
+        lifting_definition(d),
+        {
+            "schema": True,
+            "input": True,
+            "output": True,
+            "emit_schema_even_primitive_type": True,
+        },
+        ctx=ctx,
+        test=True,
+    )
+
+    expected = load_dstfile(dst_dir / dst_file, here=here).rstrip("\n")
+    actual = str(ctx.m).rstrip("\n")
+    assert actual == expected
+
+
+@pytest.mark.parametrize("msg, src_file, dst_file", CANDIDATES)
+def test_v3(
+    msg,
+    src_file,
+    dst_file,
+    *,
+    src_dir=pathlib.Path("v3src"),
+    dst_dir=pathlib.Path("v3dst")
+):
+
+    from swagger_marshmallow_codegen.lifting import lifting_definition
+    from swagger_marshmallow_codegen.codegen import Context
+
+    d = load_srcfile(src_dir / src_file, here=here)
+    ctx = Context()
+    target = _makeOne()
+    target.codegen(
+        lifting_definition(d),
+        {
+            "schema": True,
+            "input": True,
+            "output": True,
+            "emit_schema_even_primitive_type": True,
+        },
+        ctx=ctx,
+        test=True,
+    )
+
+    expected = load_dstfile(dst_dir / dst_file, here=here).rstrip("\n")
+    actual = str(ctx.m).rstrip("\n")
+    assert actual == expected
+

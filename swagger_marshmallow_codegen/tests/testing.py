@@ -56,16 +56,24 @@ class CodegenTests(DiffTestCase):
         return Context()
 
     def load_srcfile(self, src: pathlib.Path) -> t.Dict[str, t.Any]:
-        from swagger_marshmallow_codegen.loading import load
-
-        filepath = self.here / src
-        with filepath.open() as rf:
-            return load(rf)
+        return load_srcfile(src, here=self.here)
 
     def load_dstfile(self, dst: pathlib.Path) -> str:
-        try:
-            filepath = self.here / dst
-            with filepath.open() as rf:
-                return rf.read()
-        except FileNotFoundError:
-            return "# dummy\n"
+        return load_dstfile(dst, here=self.here)
+
+
+def load_srcfile(src: pathlib.Path, *, here: pathlib.Path) -> t.Dict[str, t.Any]:
+    from swagger_marshmallow_codegen.loading import load
+
+    filepath = here / src
+    with filepath.open() as rf:
+        return load(rf)
+
+
+def load_dstfile(dst: pathlib.Path, *, here: pathlib.Path) -> str:
+    try:
+        filepath = here / dst
+        with filepath.open() as rf:
+            return rf.read()
+    except FileNotFoundError:
+        return "# dummy\n"
