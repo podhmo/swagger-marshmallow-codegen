@@ -68,13 +68,13 @@ class MyHandler(Handler):
 def lifting_definition(data, replace=True, *, a=Accessor()):
     if "definitions" in data:
         definitions = data["definitions"]
-        w = Flattener(replace=replace, prefix="#/definitions")
+        w = Flattener(replace=replace, prefix="#/definitions/")
     elif "components" in data:
         definitions = data["components"]
         if "schemas" not in definitions:
             return data
         definitions = definitions["schemas"]
-        w = Flattener(replace=replace, prefix="#/componens/schemas")
+        w = Flattener(replace=replace, prefix="#/componens/schemas/")
     else:
         return data
 
