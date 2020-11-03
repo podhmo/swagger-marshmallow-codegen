@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import logging
-import sys
 from collections import OrderedDict
 import dictknife
 from .langhelpers import titleize, normalize
