@@ -1,7 +1,7 @@
 from __future__ import annotations
 import pytest
 import pathlib
-from .testing import load_srcfile, load_dstfile
+from .testing import load_srcfile, load_dstfile, get_codegen
 
 
 here = pathlib.Path(__file__).parent
@@ -54,26 +54,13 @@ def test_v2(
     src_file,
     dst_file,
 ):
-    def _getTargetClass():
-        from swagger_marshmallow_codegen.codegen import Codegen
-
-        return Codegen
-
-    def _makeOne():
-        from swagger_marshmallow_codegen.resolver import Resolver
-        from swagger_marshmallow_codegen.dispatcher import FormatDispatcher
-
-        resolver = Resolver(FormatDispatcher())
-        return _getTargetClass()(resolver)
-
     from swagger_marshmallow_codegen.lifting import lifting_definition
     from swagger_marshmallow_codegen.codegen import Context
 
     d = load_srcfile(src_file, here=here)
-    target = _makeOne()
     ctx = Context()
 
-    target.codegen(
+    get_codegen().codegen(
         lifting_definition(d),
         {"schema": True, "input": True, "output": True},
         ctx=ctx,
