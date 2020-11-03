@@ -1,4 +1,5 @@
 PKG := swagger_marshmallow_codegen
+SHELL := bash
 
 test:
 	pytest -vv $(PKG)
@@ -13,22 +14,28 @@ format:
 typing:
 	:
 
+define runT
+	$(1)
+
+endef
+
+define findCandidatesT
+$(shell find ${1} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | sort -h)
+endef
+
+WHERE ?= .
+
 examples:
 	python -m pip install bson
-	$(MAKE) ci
+	$(foreach x,$(call findCandidatesT $(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
 .PHONY: examples
-
-integration-test:
-	$(MAKE) --silent _find-candidates | xargs -n 1 make -C || (echo "**********NG**********" && exit 1)
-.PHONY: integration-test
 
 # for travis
 ci:
-	$(MAKE) --silent _find-candidates | xargs -n 1 echo "OPTS=--logging=WARNING" make --silent -C | bash -x -e || (echo "**********NG**********" && exit 1)
+	$(foreach x,$(call findCandidatesT $(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
 	test -z `git diff examples/` || (echo  "*********DIFF*********" && git diff examples/ && exit 2)
 .PHONY: ci
 
-WHERE ?= .
 _find-candidates:
-	@find ${WHERE} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | sort -h
+	echo $(call findCandidatesT $(WHERE))
 
