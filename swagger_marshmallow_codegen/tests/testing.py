@@ -35,14 +35,6 @@ class DiffTestCase(unittest.TestCase):
             raise self.fail(self._formatMessage(diff, msg))
 
 
-def _resolve_link_path(p: pathlib.Path) -> pathlib.Path:
-    import sys
-
-    if not sys.platform.lower().startswith("win"):
-        return p
-    return p.parent.with_name(p.parent.name + "_win") / p.name
-
-
 class CodegenTests(DiffTestCase):
     here = pathlib.Path(__file__).parent
 
@@ -66,13 +58,13 @@ class CodegenTests(DiffTestCase):
     def load_srcfile(self, src: pathlib.Path) -> t.Dict[str, t.Any]:
         from swagger_marshmallow_codegen.loading import load
 
-        filepath = _resolve_link_path(self.here / src)
+        filepath = self.here / src
         with filepath.open() as rf:
             return load(rf)
 
     def load_dstfile(self, dst: pathlib.Path) -> str:
         try:
-            filepath = _resolve_link_path(self.here / dst)
+            filepath = self.here / dst
             with filepath.open() as rf:
                 return rf.read()
         except FileNotFoundError:
