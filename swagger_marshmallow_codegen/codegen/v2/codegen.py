@@ -95,7 +95,7 @@ class SchemaWriter:
             logger.debug("      nested: %s, %s", caller_name, field_class_name)
             if opts:
                 kwargs = LazyFormat(", {}", kwargs)
-            value = LazyFormat("{}(lambda: {}{})", caller_name, field_class_name, kwargs)
+            value = LazyFormat("{}(lambda: {}(){})", caller_name, field_class_name, kwargs)
         else:
             if caller_name == "fields.Nested":
                 caller_name = "fields.Field"

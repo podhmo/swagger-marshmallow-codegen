@@ -5,9 +5,9 @@ from marshmallow import (
 
 
 class Commit(Schema):
-    author = fields.Nested('CommitAuthor')
-    commit = fields.Nested('CommitCommit')
-    files = fields.List(fields.Nested('CommitFilesItem'))
+    author = fields.Nested(lambda: CommitAuthor())
+    commit = fields.Nested(lambda: CommitCommit())
+    files = fields.List(fields.Nested(lambda: CommitFilesItem()))
 
 
 class CommitFilesItem(Schema):
@@ -22,10 +22,10 @@ class CommitFilesItem(Schema):
 
 
 class CommitCommit(Schema):
-    author = fields.Nested('CommitCommitAuthor')
-    committer = fields.Nested('CommitCommitCommitter')
+    author = fields.Nested(lambda: CommitCommitAuthor())
+    committer = fields.Nested(lambda: CommitCommitCommitter())
     message = fields.String()
-    tree = fields.Nested('CommitCommitTree')
+    tree = fields.Nested(lambda: CommitCommitTree())
     url = fields.String()
 
 

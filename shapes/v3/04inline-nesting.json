@@ -1,0 +1,37 @@
+{
+  "components": {
+    "schemas": {
+      "Person": {
+        "properties": {
+          "age": {
+            "type": "integer"
+          },
+          "memo": {
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "content"
+            ],
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "memo"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "version": "3.x.x"
+}

@@ -7,9 +7,9 @@ from marshmallow import (
 class Person(Schema):
     name = fields.String(required=True, description='name of something')
     age = fields.Integer(description='age')
-    father = fields.Nested('Father')
-    mother = fields.Nested('Mother')
-    skills = fields.List(fields.Nested('Skill'))
+    father = fields.Nested(lambda: Father())
+    mother = fields.Nested(lambda: Mother())
+    skills = fields.List(fields.Nested(lambda: Skill()))
 
 
 class Father(Person):
