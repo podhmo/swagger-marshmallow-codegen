@@ -74,7 +74,7 @@ def lifting_definition(data, replace=True, *, a=Accessor()):
         if "schemas" not in definitions:
             return data
         definitions = definitions["schemas"]
-        w = Flattener(replace=replace, prefix="#/componens/schemas/")
+        w = Flattener(replace=replace, prefix="#/components/schemas/")
     else:
         return data
 
