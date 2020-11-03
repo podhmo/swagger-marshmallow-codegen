@@ -22,7 +22,7 @@ TYPE_MAP = {
     Pair(type="string", format=None): "marshmallow.fields:String",
     Pair(type="boolean", format=None): "marshmallow.fields:Boolean",
     Pair(type="string", format="uuid"): "marshmallow.fields:UUID",
-    Pair(type="string", format="date-time"): "marshmallow.fields:DateTime",
+    Pair(type="string", format="date-time"): "marshmallow.fields:AwareDateTime",
     Pair(type="string", format="date"): "marshmallow.fields:Date",
     Pair(type="string", format="time"): "marshmallow.fields:Time",
     Pair(type="string", format="email"): "marshmallow.fields:Email",
