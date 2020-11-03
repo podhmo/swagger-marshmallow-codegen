@@ -9,6 +9,10 @@ lint:
 format:
 	black ${PKG} --exclude=dst
 
+# TODO: typing
+typing:
+	:
+
 integration-test:
 	$(MAKE) --silent _find-candidates | xargs -n 1 make -C || (echo "**********NG**********" && exit 1)
 .PHONY: examples
