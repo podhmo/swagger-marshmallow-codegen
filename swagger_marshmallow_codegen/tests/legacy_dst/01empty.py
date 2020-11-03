@@ -5,7 +5,7 @@ from marshmallow import (
 
 
 class Wrap(Schema):
-    empties = fields.List(fields.Nested('WrapEmptiesItem'))
+    empties = fields.List(fields.Nested(lambda: WrapEmptiesItem()))
 
 
 class WrapEmptiesItem(Schema):

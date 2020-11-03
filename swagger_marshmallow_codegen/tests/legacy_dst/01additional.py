@@ -12,4 +12,4 @@ class Person(Schema):
 class Data(AdditionalPropertiesSchema):
 
     class Meta:
-        additional_field = fields.List(fields.Nested('Person'))
+        additional_field = fields.List(fields.Nested(lambda: Person()))
