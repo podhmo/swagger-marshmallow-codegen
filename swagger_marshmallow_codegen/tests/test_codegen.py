@@ -1,7 +1,7 @@
 from __future__ import annotations
 import pytest
 import pathlib
-from .testing import CodegenTests, load_srcfile, load_dstfile
+from .testing import load_srcfile, load_dstfile
 from .codegen_candidates import CANDIDATES
 
 
