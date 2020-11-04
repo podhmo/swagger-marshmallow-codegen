@@ -1,0 +1,48 @@
+{
+  "components": {
+    "schemas": {
+      "D": {
+        "additionalProperties": {
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "O": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "S": {
+        "properties": {
+          "x": {
+            "additionalProperties": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "y": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/O"
+            }
+          },
+          "z": {
+            "$ref": "#/components/schemas/D"
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
+  "version": "3.x.x"
+}
