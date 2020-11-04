@@ -48,8 +48,8 @@ build:
 
 upload:
 #	pip install twine
-	twine check dist/metashape-$(shell cat VERSION)*
-	twine upload dist/metashape-$(shell cat VERSION)*.gz
-	twine upload dist/metashape-$(shell cat VERSION)*.whl
+	twine check dist/swagger-marshmallow-codegen-$(shell cat VERSION)*
+	twine upload dist/swagger*marshmallow*codegen-$(shell cat VERSION)*.gz
+	twine upload dist/swagger*marshmallow*codegen*$(shell cat VERSION)*.whl
 
 .PHONY: build upload
