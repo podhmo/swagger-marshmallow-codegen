@@ -26,7 +26,7 @@ endef
 WHERE ?= .
 
 examples:
-	python -m pip install bson
+	python -m pip install bson || : # hmm
 	$(foreach x,$(call findCandidatesT,$(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
 .PHONY: examples
 
