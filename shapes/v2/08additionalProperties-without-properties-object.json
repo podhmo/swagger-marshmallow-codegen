@@ -1,0 +1,46 @@
+{
+  "definitions": {
+    "D": {
+      "additionalProperties": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "O": {
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "S": {
+      "properties": {
+        "x": {
+          "additionalProperties": {
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "y": {
+          "additionalProperties": {
+            "$ref": "#/definitions/O"
+          }
+        },
+        "z": {
+          "$ref": "#/definitions/D"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "verssion": "2.0.0"
+}
