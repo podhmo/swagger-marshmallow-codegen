@@ -23,7 +23,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput:
         """
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(data_key='X-GitHub-Media-Type', description='You can check the current version of media type in responses.\n')
             Accept = fields.String(description='Is used to set specified media type.')
             X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
             X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
@@ -42,7 +42,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput:
         """
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(data_key='X-GitHub-Media-Type', description='You can check the current version of media type in responses.\n')
             Accept = fields.String(description='Is used to set specified media type.')
             X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
             X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
@@ -66,7 +66,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput:
 
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(data_key='X-GitHub-Media-Type', description='You can check the current version of media type in responses.\n')
             Accept = fields.String(description='Is used to set specified media type.')
             X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
             X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
@@ -91,7 +91,7 @@ class ReposOwnerRepoIssuesNumberLabelsInput:
 
 
         class Header(Schema):
-            X_GitHub_Media_Type = fields.String(description='You can check the current version of media type in responses.\n', data_key='X-GitHub-Media-Type')
+            X_GitHub_Media_Type = fields.String(data_key='X-GitHub-Media-Type', description='You can check the current version of media type in responses.\n')
             Accept = fields.String(description='Is used to set specified media type.')
             X_RateLimit_Limit = fields.Integer(data_key='X-RateLimit-Limit')
             X_RateLimit_Remaining = fields.Integer(data_key='X-RateLimit-Remaining')
