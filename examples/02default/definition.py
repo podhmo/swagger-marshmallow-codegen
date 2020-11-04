@@ -25,7 +25,7 @@ class Default(Schema):
     integer = fields.Integer(missing=lambda: 10)
     boolean = fields.Boolean(missing=lambda: True)
     date = fields.Date(missing=lambda: datetime.date(2000, 1, 1))
-    datetime = fields.AwareDateTime(missing=lambda: datetime.datetime(2000, 1, 1, 1, 1, 1, tzinfo=datetime.timezone.utc))
+    datetime = fields.AwareDateTime(missing=lambda: datetime.datetime(2000, 1, 1, 1, 1, 1))
     object = fields.Nested(lambda: DefaultObject(), missing=lambda: OrderedDict([('name', 'foo'), ('age', 20)]))
     array = fields.List(fields.Integer(), missing=lambda: [1, 2, 3])
 
