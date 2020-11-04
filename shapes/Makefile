@@ -19,5 +19,6 @@ gen-candidates:
 
 test: gen-candidates
 	pytest -vv ../swagger_marshmallow_codegen/tests/test_codegen.py
+	pytest .
 
 .PHONY: test
