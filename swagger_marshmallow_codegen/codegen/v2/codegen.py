@@ -116,6 +116,7 @@ class SchemaWriter:
                 return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
         elif self.resolver.has_nested(d, field) and field_class_name:
             logger.debug("      nested: %s, %s", caller_name, field_class_name)
+            self.accessor.update_option_on_property(c, field, opts)
             opts = {k: repr(v) for k, v in opts.items()}
             return LazyFormat(
                 "fields.Nested({})",
