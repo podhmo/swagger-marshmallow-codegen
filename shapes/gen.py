@@ -13,7 +13,9 @@ here = pathlib.Path(__file__).parent
 
 
 @as_command
-def run(filenames: t.List[str], *, aggressive: bool = True) -> None:
+def run(
+    filenames: t.List[str], *, aggressive: bool = True, verbose: bool = False
+) -> None:
     for filename in filenames:
         m = import_module(filename, cwd=True)
         walker = get_walker(m, aggressive=aggressive)
@@ -26,6 +28,12 @@ def run(filenames: t.List[str], *, aggressive: bool = True) -> None:
         with (here / "v3" / name).open("w") as wf:
             logger.info("write %s", wf.name)
             ctx.result["version"] = "3.x.x"
+            if verbose:
+                for clsname, s in ctx.result["components"]["schemas"].items():
+                    cls = getattr(m, clsname)
+                    v = getattr(cls, "additionalProperties", None)
+                    if v is not None:
+                        s["additionalProperties"] = v
             emit(ctx, output=wf)
 
         # v2
