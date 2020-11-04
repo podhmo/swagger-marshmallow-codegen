@@ -35,10 +35,7 @@ class SchemaWriter:
 
     @classmethod
     def override(cls, *, extra_schema_module=None):
-        return partial(
-            cls,
-            extra_schema_module=extra_schema_module,
-        )
+        return partial(cls, extra_schema_module=extra_schema_module,)
 
     def __init__(self, accessor: Accessor, schema_class, *, extra_schema_module=None):
         self.accessor = accessor
@@ -100,6 +97,19 @@ class SchemaWriter:
                 kwargs = LazyFormat(", {}", kwargs)
             value = LazyFormat(
                 "{}(lambda: {}(){})", caller_name, field_class_name, kwargs
+            )
+        elif caller_name == "fields.Dict":
+            key_name = "fields.String"
+            value_name = self.accessor.resolver.resolve_caller_name(
+                c, name, field["additionalProperties"]
+            )
+            value = LazyFormat(
+                "{}(keys={}(), values={}(){}{})",
+                caller_name,
+                key_name,
+                value_name,
+                ", " if kwargs else "",
+                kwargs,
             )
         else:
             if caller_name == "fields.Nested":
@@ -214,6 +224,7 @@ class SchemaWriter:
         # supporting additional properties
         if (
             "additionalProperties" in definition
+            and "properties" in definition
             and base_classes[0] == self.schema_class
         ):
             c.from_(self.extra_schema_module, "AdditionalPropertiesSchema")
@@ -271,9 +282,9 @@ class SchemaWriter:
                             c, d, clsname, definition, name, field, opts[name]
                         )
 
-            # supporting additional properties
+            # supporting additional properties (with propeties)
             subdef = definition.get("additionalProperties")
-            if subdef and hasattr(subdef, "keys"):
+            if subdef and hasattr(subdef, "keys") and "properties" in definition:
                 need_pass_statement = False
                 c.m.sep()
                 subdef = definition["additionalProperties"]
