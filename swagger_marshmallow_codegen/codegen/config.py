@@ -8,7 +8,7 @@ class ConfigDict(tx.TypedDict, total=False):
     input: bool
     output: bool
 
-    verbose: bool  # emit Meta.unknown=RAISE, explicitly
+    explicit: bool  # emit Meta.unknown=RAISE, explicitly
     additional_properties_default: bool
 
     emit_schema_even_primitive_type: bool

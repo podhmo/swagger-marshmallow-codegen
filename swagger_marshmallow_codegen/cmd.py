@@ -21,7 +21,8 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     parser.add_argument("--full", action="store_true")
     parser.add_argument("--legacy", action="store_true")
     parser.add_argument("--strict-additional-properties", action="store_true")
-    parser.add_argument("file", default=None)
+    parser.add_argument("--explicit", action="store_true")
+  parser.add_argument("file", default=None)
     args = parser.parse_args()
 
     logging.basicConfig(

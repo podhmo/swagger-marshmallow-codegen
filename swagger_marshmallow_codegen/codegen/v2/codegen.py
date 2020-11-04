@@ -322,7 +322,7 @@ class SchemaWriter:
                         is True
                     ):
                         unknown_value = "INCLUDE"
-                    elif self.accessor.config.get("verbose", False):
+                    elif self.accessor.config.get("explicit", False):
                         # marshmallow's default
                         unknown_value = "RAISE"
 
