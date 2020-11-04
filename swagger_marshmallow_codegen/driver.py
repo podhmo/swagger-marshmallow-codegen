@@ -1,12 +1,22 @@
-# -*- coding:utf-8 -*-
+from __future__ import annotations
 import logging
+import sys
+import typing as t
+import typing_extensions as tx
 from . import loading
 from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
 from .dispatcher import FormatDispatcher
 from .lifting import lifting_definition
 
+if t.TYPE_CHECKING:
+    from .codegen.config import ConfigDict
+
 logger = logging.getLogger(__name__)
+
+
+class OptionsDict(tx.TypedDict, total=True):
+    targets: ConfigDict  # TODO: rename
 
 
 class Driver:
@@ -14,8 +24,8 @@ class Driver:
     resolver_factory = Resolver
     codegen_factory = Codegen
 
-    def __init__(self, options):
-        self.options = options
+    def __init__(self, options: OptionsDict):
+        self.options: OptionsDict = options
 
     def load(self, fp):
         # hack:

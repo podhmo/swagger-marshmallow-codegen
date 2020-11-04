@@ -5,8 +5,9 @@ import logging
 import argparse
 from magicalimport import import_symbol
 
+
 if t.TYPE_CHECKING:
-    from swagger_marshmallow_codegen.driver import Driver
+    from swagger_marshmallow_codegen.driver import Driver, OptionsDict
 logger = logging.getLogger(__name__)
 
 
@@ -42,9 +43,11 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
 
     if args.full:
-        config = {"targets": {"schema": True, "input": True, "output": True}}
+        config: OptionsDict = {
+            "targets": {"schema": True, "input": True, "output": True}
+        }
     else:
-        config = {"targets": {"schema": True}}
+        config: OptionsDict = {"targets": {"schema": True}}
 
     config["targets"][
         "additional_properties_default"
