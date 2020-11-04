@@ -224,7 +224,6 @@ class SchemaWriter:
         # supporting additional properties
         if (
             "additionalProperties" in definition
-            and ("properties" in definition or "items" in definition["additionalProperties"])
             and base_classes[0] == self.schema_class
         ):
             c.from_(self.extra_schema_module, "AdditionalPropertiesSchema")
@@ -282,13 +281,9 @@ class SchemaWriter:
                             c, d, clsname, definition, name, field, opts[name]
                         )
 
-            # supporting additional properties (with propeties)
+            # supporting additional properties
             subdef = definition.get("additionalProperties")
-            if (
-                subdef
-                and hasattr(subdef, "keys")
-                and ("properties" in definition or "items" in subdef)
-            ):
+            if subdef and hasattr(subdef, "keys"):
                 need_pass_statement = False
                 c.m.sep()
                 subdef = definition["additionalProperties"]
