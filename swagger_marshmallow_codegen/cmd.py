@@ -22,7 +22,7 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     parser.add_argument("--legacy", action="store_true")
     parser.add_argument("--strict-additional-properties", action="store_true")
     parser.add_argument("--explicit", action="store_true")
-  parser.add_argument("file", default=None)
+    parser.add_argument("file", default=None)
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -42,7 +42,9 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     else:
         config = {"targets": {"schema": True}}
 
-    config["targets"]["additional_properties_default"] = not args.strict_additional_properties
+    config["targets"][
+        "additional_properties_default"
+    ] = not args.strict_additional_properties
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
