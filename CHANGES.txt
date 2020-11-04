@@ -1,3 +1,9 @@
+0.6.0
+
+- add `--strict-additional-properties` options
+- partially support OpenAPI v3
+- use AwareDatetime Field, for tzaware datetime
+
 0.5.1
 
 - catch up magicalimport 0.8.1
