@@ -1,0 +1,17 @@
+definitions:
+  S:
+    type: object
+    properties:
+      x:
+        additionalProperties:
+          type: integer
+      y:
+        additionalProperties:
+          $ref: "#/definitions/P"
+      z:
+        $ref: "#/definitions/D"
+  P:
+    type: integer
+  D:
+    additionalProperties:
+      type: integer
