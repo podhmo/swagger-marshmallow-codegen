@@ -223,7 +223,7 @@ class SchemaWriter:
 
         # supporting additional properties
         if (
-            "additionalProperties" in definition
+            hasattr(definition.get("additionalProperties"), "keys")
             and base_classes[0] == self.schema_class
         ):
             c.from_(self.extra_schema_module, "AdditionalPropertiesSchema")
@@ -309,6 +309,18 @@ class SchemaWriter:
                         self.write_field_one(
                             c, d, "", subdef, "additional_field", subdef, OrderedDict()
                         )
+            elif base_classes[0] != "AdditionalPropertiesSchema" and (
+                self.accessor.config.get("verbose")
+                or "additionalProperties" in definition
+            ):
+                c.m.sep()
+                with c.m.class_("Meta"):
+                    if definition.get("additionalProperties") is True:
+                        c.from_("marshmallow", "INCLUDE")
+                        c.m.stmt("unknown = INCLUDE")
+                    else:  # None/False (this is marshmallow's default)
+                        c.from_("marshmallow", "RAISE")
+                        c.m.stmt("unknown = RAISE")
 
             if need_pass_statement:
                 c.m.stmt("pass")
