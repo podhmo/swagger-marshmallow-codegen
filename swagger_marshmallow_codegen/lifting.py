@@ -27,7 +27,11 @@ class Flattener:
                 hasattr(data.get("additionalProperties"), "keys")
                 and "properties" in data["additionalProperties"]
             ):
-                return self.on_object_has_properties(data["additionalProperties"], ctx)
+                ctx.add_name("__additionalProperties")
+                r = self.on_object_has_properties(data["additionalProperties"], ctx)
+                ctx.pop_name()
+                data["additionalProperties"] = r
+                return data
             else:
                 return data
         else:
