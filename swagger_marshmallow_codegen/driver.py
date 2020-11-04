@@ -1,6 +1,5 @@
 from __future__ import annotations
 import logging
-import sys
 import typing as t
 import typing_extensions as tx
 from . import loading
@@ -17,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class OptionsDict(tx.TypedDict, total=True):
     targets: ConfigDict  # TODO: rename
+    separated: bool
 
 
 class Driver:

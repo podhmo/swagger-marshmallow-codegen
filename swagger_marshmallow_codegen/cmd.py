@@ -42,16 +42,18 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     if ":" not in driver_cls:
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
 
+    config: OptionsDict = {
+        "targets": {
+            "schema": True,
+            "input": False,
+            "output": False,
+            "additional_properties_default": not args.strict_additional_properties,
+        },
+        "separated": args.separated_output,
+    }
     if args.full:
-        config: OptionsDict = {
-            "targets": {"schema": True, "input": True, "output": True}
-        }
-    else:
-        config: OptionsDict = {"targets": {"schema": True}}
-
-    config["targets"][
-        "additional_properties_default"
-    ] = not args.strict_additional_properties
+        config["targets"]["input"] = True
+        config["targets"]["output"] = True
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
