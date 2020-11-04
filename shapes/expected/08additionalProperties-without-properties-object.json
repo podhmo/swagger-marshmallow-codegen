@@ -17,6 +17,10 @@ class O(Schema):
 
 
 class S(Schema):
-    x = fields.Dict(keys=fields.String(), values=fields.Nested())
-    y = fields.Dict(keys=fields.String(), values=fields.Nested())
-    z = fields.Dict(keys=fields.String(), values=fields.Nested())
+    x = fields.Nested(lambda: SX())
+    y = fields.Dict(keys=fields.String(), values=fields.Nested(lambda: O()))
+    z = fields.Dict(keys=fields.String(), values=fields.Nested(lambda: None()))
+
+
+class SX(Schema):
+    name = fields.String()
