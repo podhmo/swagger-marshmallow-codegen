@@ -1,11 +1,20 @@
+import pytest
 from magicalimport import import_module
+from marshmallow import ValidationError
 
 
 def test_00():
     m = import_module("./expected/00simple-object.py", cwd=False)
-    s = m.Person()
     data = {"name": "foo", "age": 20}
-    s.load(data)
+    m.Person().load(data)
+
+    with pytest.raises(ValidationError):
+        data = {"name": "foo", "age": "foo"}
+        m.Person().load(data)
+
+    with pytest.raises(ValidationError):
+        data = {"age": 20}
+        m.Person().load(data)
 
 
 def test_01():
@@ -72,3 +81,29 @@ def test_06():
         "z": 300,
     }
     s.load(data)
+
+    with pytest.raises(ValidationError):
+        data = {
+            "name": "foo",
+            "x": "xxx",
+        }
+        s.load(data)
+
+
+def test_07():
+    m = import_module("./expected/07additionalProperties-with-bool.py", cwd=False)
+    data = {
+        "name": "foo",
+        "xxxx": "xxxx",
+    }
+
+    # default
+    with pytest.raises(ValidationError):
+        m.Person().load(data)
+
+    # true
+    m.Person_AdditionalProperties_True().load(data)
+
+    # false
+    with pytest.raises(ValidationError):
+        m.Person_AdditionalProperties_False().load(data)

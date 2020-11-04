@@ -1,7 +1,8 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    "dictknife[load]",
+    "dictknife",
+    "PyYAML",
     "prestring",
     "marshmallow>=3.0.0",
     "magicalimport",
