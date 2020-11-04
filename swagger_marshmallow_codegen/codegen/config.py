@@ -7,6 +7,7 @@ class ConfigDict(tx.TypedDict, total=False):
     input: bool
     output: bool
 
+    verbose: bool  # emit Meta.unknown=RAISE, explicitly
     emit_schema_even_primitive_type: bool
     skip_header_comment: bool
     header_comment: str
