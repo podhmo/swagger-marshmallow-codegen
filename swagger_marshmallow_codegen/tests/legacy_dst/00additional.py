@@ -30,10 +30,4 @@ class Box3(AdditionalPropertiesSchema):
 
 
 class Box4(Schema):
-    box = fields.Nested(lambda: Box4Box())
-
-
-class Box4Box(AdditionalPropertiesSchema):
-
-    class Meta:
-        additional_field = fields.String()
+    box = fields.Dict(keys=fields.String(), values=fields.String())

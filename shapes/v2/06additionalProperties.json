@@ -1,0 +1,21 @@
+{
+  "definitions": {
+    "Box": {
+      "additionalProperties": {
+        "$ref": "#/definitions/value"
+      },
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "value": {
+      "type": "integer"
+    }
+  },
+  "version": "2.0.0"
+}

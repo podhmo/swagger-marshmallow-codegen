@@ -68,12 +68,14 @@ class Resolver:
             return Pair(type="object", format=None)
 
     def resolve_caller_name(self, c, field_name, field):
-        pair = self.resolve_type_and_format(field_name, field)
-        logger.debug("    resolve: type=%s, format=%s", pair.type, pair.format)
-
-        path = self.dispatcher.dispatch(pair, field)
-        if path is None:
-            return None
+        if "additionalProperties" in field and "properties" not in field:
+            path = "marshmallow.fields:Dict"
+        else:
+            pair = self.resolve_type_and_format(field_name, field)
+            logger.debug("    resolve: type=%s, format=%s", pair.type, pair.format)
+            path = self.dispatcher.dispatch(pair, field)
+            if path is None:
+                return None
 
         module, cls_name = path.rsplit(":", 1)
         if module == "marshmallow.fields":

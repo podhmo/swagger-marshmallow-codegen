@@ -36,3 +36,39 @@ def test_03():
         "mother": {"name": "boo"},
     }
     s.load(data)
+
+
+def test_04():
+    m = import_module("./expected/04inline-nesting.py", cwd=False)
+    s = m.Person()
+    data = {
+        "name": "foo",
+        "age": 20,
+        "memo": {"title": "hello", "content": "hello world"},
+    }
+    s.load(data)
+
+
+def test_05():
+    m = import_module(
+        "./expected/05additionalProperties-without-properties.py", cwd=False
+    )
+    s = m.Person()
+    data = {
+        "name": "foo",
+        "age": 20,
+        "data": {"title": "hello", "content": "hello world"},
+    }
+    s.load(data)
+
+
+def test_06():
+    m = import_module("./expected/06additionalProperties.py", cwd=False)
+    s = m.Box()
+    data = {
+        "name": "foo",
+        "x": 1,
+        "y": 20,
+        "z": 300,
+    }
+    s.load(data)
