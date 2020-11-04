@@ -1,0 +1,22 @@
+from marshmallow import (
+    Schema,
+    fields,
+)
+from swagger_marshmallow_codegen.schema import AdditionalPropertiesSchema
+
+
+class D(AdditionalPropertiesSchema):
+
+    class Meta:
+        additional_field = fields.Field()
+
+
+
+class O(Schema):
+    name = fields.String()
+
+
+class S(Schema):
+    x = fields.Dict(keys=fields.String(), values=fields.Nested())
+    y = fields.Dict(keys=fields.String(), values=fields.Nested())
+    z = fields.Dict(keys=fields.String(), values=fields.Nested())
