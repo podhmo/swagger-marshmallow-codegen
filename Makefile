@@ -23,7 +23,7 @@ define findCandidatesT
 $(shell find ${1} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | sort)
 endef
 
-WHERE ?= .
+WHERE ?= ./examples
 
 examples:
 	python -m pip install bson
