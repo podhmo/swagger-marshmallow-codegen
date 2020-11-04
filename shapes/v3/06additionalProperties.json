@@ -1,0 +1,23 @@
+{
+  "components": {
+    "schemas": {
+      "Box": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/value"
+        },
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "value": {
+        "type": "integer"
+      }
+    }
+  },
+  "version": "3.x.x"
+}
