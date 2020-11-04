@@ -1,7 +1,5 @@
-swagger-marshmallow-codegen
-===========================
-
-[![image][]][1]
+swagger-marshmallow-codegen ![Python package](https://github.com/podhmo/swagger-marshmallow-codegen/workflows/Python%20package/badge.svg) [![PyPi version](https://img.shields.io/pypi/v/swagger-marshmallow-codegen.svg)](https://pypi.python.org/pypi/swagger-marshmallow-codegen) [![](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/download/releases/3.7.0/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/)
+========================================
 
 concepts
 --------
