@@ -61,8 +61,28 @@ class SchemaWriter:
         opts,
         many: bool = False
     ):
+        # {"properties": {"memo": {"$ref": "#/definitions/Memo"}}}
         # name="memo", caller_name="fields.Nested", field_class_name="Memo"
         if many:
+            field = field["items"]
+            if self.resolver.has_ref(field):
+                field_class_name, field = self.resolver.resolve_ref_definition(
+                    d, field, level=1
+                )
+                # finding original definition
+                if self.resolver.has_ref(field):
+                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    if ref_name is None:
+                        raise CodegenError("ref: %r is not found", field["$ref"])
+
+            caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
+            if caller_name is None:
+                raise CodegenError(
+                    "matched field class is not found. name=%r", name,
+                )
+
+            opts.pop("many", None)
+            opts = {k: repr(v) for k, v in opts.items()}
             return LazyFormat(
                 "fields.List({})",
                 LazyArgumentsAndKeywords(
@@ -75,23 +95,79 @@ class SchemaWriter:
                             field_class_name,
                             field,
                             opts={},
-                            many=False,
+                            many=self.resolver.has_many(field),
                         )
                     ],
                     opts,
                 ),
             )
+
         if field is None:
-            return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
+            opts = {k: repr(v) for k, v in opts.items()}
+            if caller_name == "fields.Nested":
+                return LazyFormat(
+                    "fields.Nested({})",
+                    LazyArgumentsAndKeywords(
+                        [LazyFormat("lambda: {}()", field_class_name)], opts,
+                    ),
+                )
+            else:
+                return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
         elif self.resolver.has_nested(d, field) and field_class_name:
             logger.debug("      nested: %s, %s", caller_name, field_class_name)
+            opts = {k: repr(v) for k, v in opts.items()}
             return LazyFormat(
                 "fields.Nested({})",
                 LazyArgumentsAndKeywords(
                     [LazyFormat("lambda: {}()", field_class_name)], opts,
                 ),
             )
+        elif caller_name == "fields.Dict":
+            try:
+                field = field["additionalProperties"]
+            except KeyError:
+                caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
+                return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
+
+            if self.resolver.has_ref(field):
+                field_class_name, field = self.resolver.resolve_ref_definition(
+                    d, field, level=1
+                )
+                # finding original definition
+                if self.resolver.has_ref(field):
+                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    if ref_name is None:
+                        raise CodegenError("ref: %r is not found", field["$ref"])
+
+            caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
+            if caller_name is None:
+                raise CodegenError(
+                    "matched field class is not found. name=%r", name,
+                )
+
+            opts = {k: repr(v) for k, v in opts.items()}
+            return LazyFormat(
+                "fields.Dict(keys=fields.String(), values={})",
+                LazyArgumentsAndKeywords(
+                    [
+                        self._get_caller(
+                            c,
+                            d,
+                            name,
+                            caller_name,
+                            field_class_name,
+                            field.get("additionalProperties"),
+                            opts={},
+                            many=self.resolver.has_many(field),
+                        )
+                    ],
+                    opts,
+                ),
+            )
+
         else:
+            self.accessor.update_option_on_property(c, field, opts)
+            opts = {k: repr(v) for k, v in opts.items()}
             return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
 
     def write_field_one(
@@ -118,7 +194,6 @@ class SchemaWriter:
                     raise CodegenError("ref: %r is not found", field["$ref"])
 
         logger.debug("      field: %s", lazy_json_dump(field))
-        self.accessor.update_option_on_property(c, field, opts)
         caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
         if caller_name is None:
             raise CodegenError(
@@ -139,7 +214,7 @@ class SchemaWriter:
             "{} = {}",
             normalized_name,
             self._get_caller(
-                d, c, name, caller_name, field_class_name, field, opts=opts, many=many
+                c, d, name, caller_name, field_class_name, field, opts=opts, many=many
             ),
         )
 
