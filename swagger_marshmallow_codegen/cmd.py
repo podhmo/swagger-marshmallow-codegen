@@ -56,8 +56,9 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
         setup(driver)
+
     if args.file is None:
-        driver.run(sys.stdin, sys.stdout)
+        driver.run(sys.stdin)
     else:
         with open(args.file) as rf:
-            driver.run(rf, sys.stdout)
+            driver.run(rf)

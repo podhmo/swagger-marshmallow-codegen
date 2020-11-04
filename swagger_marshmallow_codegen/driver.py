@@ -33,17 +33,19 @@ class Driver:
         # xxx.make_dict = dict
         return loading.load(fp)
 
-    def dump(self, m, fp):
-        return print(m, file=fp)
+    def dump(self, m, *, out: t.Optional[str] = None):
+        if out is None:
+            return print(m)
+        raise NotImplementedError(out)
 
     def transform(self, d):
         d = lifting_definition(d)
         return self.create_codegen().codegen(d, config=self.options["targets"])
 
-    def run(self, inp, outp):
+    def run(self, inp):
         data = self.load(inp)
         result = self.transform(data)
-        self.dump(result, outp)
+        self.dump(result)
 
     def create_codegen(self):
         dispatcher = self.dispatcher_factory()
@@ -63,26 +65,26 @@ class LegacyDriver(Driver):
 
 
 class Flatten:
-    def __init__(self, options):
-        self.options = options
+    def __init__(self, options: OptionsDict) -> None:
+        self.options: OptionsDict = options
 
     def load(self, fp):
         return loading.load(fp)
 
-    def dump(self, d, fp):
-        return loading.dump(d, fp)
+    def dump(self, d, *, out: t.Optional[str] = None):
+        return loading.dump(d, out)
 
     def transform(self, d):
         return lifting_definition(d)
 
-    def run(self, inp, outp):
+    def run(self, inp):
         data = self.load(inp)
         result = self.transform(data)
-        self.dump(result, outp)
+        self.dump(result)
 
 
 class ProfileDriver(Driver):
-    def run(self, inp, outp):
+    def run(self, inp):
         import cProfile
         import pstats
 
@@ -93,4 +95,4 @@ class ProfileDriver(Driver):
         profile.disable()
         s = pstats.Stats(profile)
         s.dump_stats("swagger-marshmallow-codegen.prof")
-        self.dump(result, outp)
+        self.dump(result)
