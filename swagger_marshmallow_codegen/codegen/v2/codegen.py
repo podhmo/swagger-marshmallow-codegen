@@ -104,13 +104,26 @@ class SchemaWriter:
                 c, name, field["additionalProperties"]
             )
 
-            if value_name == "fields.Nested":
-                field_class_name, field = self.resolver.resolve_ref_definition(
-                    d, field["additionalProperties"], level=1
-                )
-                value = "{}(lambda: {}())".format(value_name, field_class_name)
-            else:
+            if value_name != "fields.Nested":
                 value = "{}()".format(value_name)
+            else:
+                field = field["additionalProperties"]
+                field_class_name, field = self.resolver.resolve_ref_definition(
+                    d, field, level=1
+                )
+                # finding original definition
+                if self.resolver.has_ref(field):
+                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    if ref_name is None:
+                        raise CodegenError("ref: %r is not found", field["$ref"])
+
+                if self.resolver.has_nested(d, field):
+                    value = "{}(lambda: {}())".format(value_name, field_class_name)
+                else:
+                    value_name = self.accessor.resolver.resolve_caller_name(
+                        c, name, field,
+                    )
+                    value = "{}()".format(value_name)
             value = LazyFormat(
                 "{}(keys={}(), values={}{}{})",
                 caller_name,
