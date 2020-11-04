@@ -64,6 +64,7 @@ class SchemaWriter:
         # {"properties": {"memo": {"$ref": "#/definitions/Memo"}}}
         # name="memo", caller_name="fields.Nested", field_class_name="Memo"
         if many:
+            self.accessor.update_option_on_property(c, field, opts)
             field = field["items"]
             if self.resolver.has_ref(field):
                 field_class_name, field = self.resolver.resolve_ref_definition(
@@ -123,6 +124,7 @@ class SchemaWriter:
                 ),
             )
         elif caller_name == "fields.Dict":
+            self.accessor.update_option_on_property(c, field, opts)
             try:
                 field = field["additionalProperties"]
             except KeyError:
@@ -168,6 +170,8 @@ class SchemaWriter:
         else:
             self.accessor.update_option_on_property(c, field, opts)
             opts = {k: repr(v) for k, v in opts.items()}
+            if caller_name == "fields.Nested":
+                caller_name = "fields.Field"
             return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
 
     def write_field_one(
