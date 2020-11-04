@@ -1,3 +1,7 @@
+0.6.1
+
+- fix bug at additionalProperties
+
 0.6.0
 
 - add `--strict-additional-properties` options
