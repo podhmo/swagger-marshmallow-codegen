@@ -20,24 +20,24 @@ define runT
 endef
 
 define findCandidatesT
-$(shell find ${1} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | sort -h)
+$(shell find ${1} -mindepth 2 -name Makefile | xargs -n 1 -I{} dirname {} | sort)
 endef
 
 WHERE ?= .
 
 examples:
 	python -m pip install bson
-	$(foreach x,$(call findCandidatesT $(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
+	$(foreach x,$(call findCandidatesT,$(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
 .PHONY: examples
 
 # for travis
 ci:
-	$(foreach x,$(call findCandidatesT $(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
+	$(foreach x,$(call findCandidatesT,$(WHERE)),$(call runT,OPTS=--logging=WARNING make --silent -C $(x)))
 	test -z `git diff examples/` || (echo  "*********DIFF*********" && git diff examples/ && exit 2)
 .PHONY: ci
 
 _find-candidates:
-	echo $(call findCandidatesT $(WHERE))
+	echo $(call findCandidatesT,$(WHERE))
 
 
 #### for pypi ########################
