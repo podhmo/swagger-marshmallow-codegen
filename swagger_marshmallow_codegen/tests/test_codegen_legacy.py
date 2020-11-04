@@ -47,6 +47,7 @@ here = pathlib.Path(__file__).parent
         ("./legacy_src/00additional.yaml", "./legacy_dst/00additional.py", ""),
         ("./legacy_src/01additional.yaml", "./legacy_dst/01additional.py", ""),
         ("./legacy_src/02additional.yaml", "./legacy_dst/02additional.py", ""),
+        ("./legacy_src/03additional.yaml", "./legacy_dst/03additional.py", ""),
         ("./legacy_src/00nullable.yaml", "./legacy_dst/00nullable.py", ""),
         ("./legacy_src/00primitiveapi.yaml", "./legacy_dst/00primitiveapi.py", ""),
         # ("./legacy_src/00patternProperties.yaml", "./legacy_dst/00patternProperties.py"),  not supported yet

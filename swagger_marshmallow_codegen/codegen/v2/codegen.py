@@ -129,7 +129,11 @@ class SchemaWriter:
                 field = field["additionalProperties"]
             except KeyError:
                 caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
-                return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
+                return LazyFormat(
+                    "fields.Dict(keys=fields.String(), values={})",
+                    caller_name,
+                    LazyKeywords(opts),
+                )
 
             if self.resolver.has_ref(field):
                 field_class_name, field = self.resolver.resolve_ref_definition(
