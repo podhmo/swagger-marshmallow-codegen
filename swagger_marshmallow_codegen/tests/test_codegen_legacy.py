@@ -52,9 +52,7 @@ here = pathlib.Path(__file__).parent
     ],
 )
 def test(
-    src_file: str,
-    dst_file: str,
-    header_comment: str,
+    src_file: str, dst_file: str, header_comment: str,
 ):
     from swagger_marshmallow_codegen.lifting import lifting_definition
     from swagger_marshmallow_codegen.codegen import Context
@@ -64,7 +62,13 @@ def test(
 
     get_codegen().codegen(
         lifting_definition(d),
-        {"schema": True, "input": True, "output": True, "header_comment": header_comment},
+        {
+            "schema": True,
+            "input": True,
+            "output": True,
+            "header_comment": header_comment,
+            "additional_properties_default": False,
+        },
         ctx=ctx,
     )
 
