@@ -3,8 +3,9 @@ gen:
  defs/00simple-object.py \
  defs/02nesting.py \
  defs/03self-nesting.py \
+ defs/05additionalProperties-without-properties.py \
 
-# 01 and 04 are added by hand.
+# 01,04,06 are added by hand.
 
 gen-candidates:
 	python gen-candidates.py expected > codegen_candidates.py
