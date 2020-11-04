@@ -103,11 +103,19 @@ class SchemaWriter:
             value_name = self.accessor.resolver.resolve_caller_name(
                 c, name, field["additionalProperties"]
             )
+
+            if value_name == "fields.Nested":
+                field_class_name, field = self.resolver.resolve_ref_definition(
+                    d, field["additionalProperties"], level=1
+                )
+                value = "{}(lambda: {}())".format(value_name, field_class_name)
+            else:
+                value = "{}()".format(value_name)
             value = LazyFormat(
-                "{}(keys={}(), values={}(){}{})",
+                "{}(keys={}(), values={}{}{})",
                 caller_name,
                 key_name,
-                value_name,
+                value,
                 ", " if kwargs else "",
                 kwargs,
             )
