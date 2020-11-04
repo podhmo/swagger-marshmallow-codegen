@@ -20,6 +20,7 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     )
     parser.add_argument("--full", action="store_true")
     parser.add_argument("--legacy", action="store_true")
+    parser.add_argument("--strict-additional-properties", action="store_true")
     parser.add_argument("file", default=None)
     args = parser.parse_args()
 
@@ -39,6 +40,8 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
         config = {"targets": {"schema": True, "input": True, "output": True}}
     else:
         config = {"targets": {"schema": True}}
+
+    config["targets"]["additional_properties_default"] = not args.strict_additional_properties
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
