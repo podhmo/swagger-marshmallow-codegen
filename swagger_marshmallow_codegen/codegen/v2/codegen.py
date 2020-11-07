@@ -15,6 +15,10 @@ from swagger_marshmallow_codegen.langhelpers import (
     titleize,
     clsname_from_path,
 )
+from swagger_marshmallow_codegen.constants import (
+    X_MARSHMALLOW_NAME,
+    X_MARSHMALLOW_INLINE,
+)
 from ..context import Context
 from ..config import ConfigDict
 from .accessor import Accessor
@@ -24,7 +28,7 @@ if t.TYPE_CHECKING:
     from ..context import ContextFactory, InputData, OutputData
 
 logger = logging.getLogger(__name__)
-NAME_MARKER = "x-marshmallow-name"
+NAME_MARKER = X_MARSHMALLOW_NAME
 
 
 class CodegenError(Exception):
@@ -436,7 +440,7 @@ class DefinitionsSchemaWriter:
                 continue
 
             c = context_factory(
-                definition.get("x-marshmallow-inline") or schema_name, part=part
+                definition.get(X_MARSHMALLOW_INLINE) or schema_name, part=part
             )
             clsname = self.resolver.resolve_schema_name(schema_name)
             logger.info("write schema: write %s", schema_name)

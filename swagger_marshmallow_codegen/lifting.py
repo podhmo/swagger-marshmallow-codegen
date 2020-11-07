@@ -2,6 +2,7 @@ from __future__ import annotations
 import copy
 from dictknife.jsonknife.lifting import Handler
 from dictknife.accessing import Accessor
+from swagger_marshmallow_codegen.constants import X_MARSHMALLOW_INLINE
 from .langhelpers import titleize
 
 
@@ -53,7 +54,7 @@ class Flattener:
             return data
         fullname = ctx.full_name()
 
-        data["x-marshmallow-inline"] = ctx.path[0]
+        data[X_MARSHMALLOW_INLINE] = ctx.path[0]
         ctx.save_object(fullname, data)
         return self.return_definition(data, fullname, typ="object")
 
@@ -64,7 +65,7 @@ class Flattener:
         ctx.add_array_item()
         data["items"] = self._extract(data["items"], ctx, from_array=True)
 
-        data["x-marshmallow-inline"] = ctx.path[0]
+        data[X_MARSHMALLOW_INLINE] = ctx.path[0]
         ctx.save_array(fullname, data)
 
         ctx.pop_name()

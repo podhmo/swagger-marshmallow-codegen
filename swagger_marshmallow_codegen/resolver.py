@@ -3,6 +3,7 @@ import typing as t
 import logging
 from collections import OrderedDict
 import dictknife
+from .constants import X_MARSHMALLOW_INLINE
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair
 from . import validate
@@ -143,7 +144,7 @@ class Resolver:
         )
 
         # import for separated output
-        if "x-marshmallow-inline" not in definition:
+        if X_MARSHMALLOW_INLINE not in definition:
             c.relative_import(ref_name)
         return ref_name, definition
 
