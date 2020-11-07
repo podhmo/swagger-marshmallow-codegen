@@ -1,26 +1,32 @@
-# -*- coding:utf-8 -*-
+from __future__ import annotations
+import typing as t
 import logging
 from collections import OrderedDict
 import dictknife
+from .constants import X_MARSHMALLOW_INLINE
 from .langhelpers import titleize, normalize
 from .dispatcher import Pair
 from . import validate
+
+if t.TYPE_CHECKING:
+    from .dispatcher import FormatDispatcher
+    from .codegen.context import Context
 
 logger = logging.getLogger(__name__)
 
 
 class Resolver:
-    def __init__(self, dispatcher):
+    def __init__(self, dispatcher: FormatDispatcher) -> None:
         self.dispatcher = dispatcher
         self.accessor = dictknife.Accessor()  # todo: rename
 
-    def has_ref(self, d):
+    def has_ref(self, d) -> bool:
         return "$ref" in d
 
-    def has_allof(self, d):
+    def has_allof(self, d) -> bool:
         return "allOf" in d
 
-    def has_schema(self, fulldata, d, cand=("object",), fullscan=True):
+    def has_schema(self, fulldata, d, cand=("object",), fullscan=True) -> bool:
         typ = d.get("type", None)
         if typ in cand:
             return True
@@ -32,24 +38,24 @@ class Resolver:
             return False
         if not fullscan:
             return False
-        _, definition = self.resolve_ref_definition(fulldata, d)
+        _, definition = self.resolve_ref_definition(None, fulldata, d)
         return self.has_schema(fulldata, definition, fullscan=False)
 
-    def has_nested(self, fulldata, d):
+    def has_nested(self, fulldata, d) -> bool:
         if self.has_schema(fulldata, d, fullscan=False):
             return True
         return self.has_many(d) and self.has_schema(fulldata, d["items"])
 
-    def has_many(self, d):
+    def has_many(self, d) -> bool:
         return d.get("type") == "array" or "items" in d
 
-    def resolve_normalized_name(self, name):
+    def resolve_normalized_name(self, name: str) -> str:
         return normalize(name)
 
-    def resolve_schema_name(self, name):
+    def resolve_schema_name(self, name: str) -> str:
         return titleize(name)
 
-    def resolve_type_and_format(self, name, field):
+    def resolve_type_and_format(self, name: str, field: t.Dict[str, t.Any]) -> Pair:
         try:
             typ = field["type"]
             if isinstance(typ, (list, tuple)):
@@ -67,7 +73,9 @@ class Resolver:
                 return Pair(type="any", format=None)
             return Pair(type="object", format=None)
 
-    def resolve_caller_name(self, c, field_name, field):
+    def resolve_caller_name(
+        self, c: Context, field_name: str, field: t.Dict[str, t.Any]
+    ) -> t.Optional[str]:
         if "additionalProperties" in field and "properties" not in field:
             path = "marshmallow.fields:Dict"
         else:
@@ -86,24 +94,34 @@ class Resolver:
         logger.debug("    resolve: field=%s", caller_name)
         return caller_name
 
-    def resolve_allof_definition(self, fulldata, d):
+    def resolve_allof_definition(
+        self, c: Context, fulldata: t.Dict[str, t.Any], d: t.Dict[str, t.Any]
+    ) -> t.Tuple[t.List[t.Dict[str, t.Any]], t.Dict[str, t.Any]]:
         ref_list = []
         r = OrderedDict()
         for subdef in d["allOf"]:
             if self.has_ref(subdef):
-                ref_list.append(self.resolve_ref_definition(fulldata, subdef))
+                ref_list.append(self.resolve_ref_definition(c, fulldata, subdef))
             else:
                 r = dictknife.deepmerge(r, subdef)
         return ref_list, r
 
-    def resolve_ref_definition(self, fulldata, d, name=None, i=0, level=-1):
+    def resolve_ref_definition(
+        self,
+        c: t.Optional[Context],  # xxx
+        fulldata: t.Dict[str, t.Any],
+        d: t.Dict[str, t.Any],
+        name: t.Optional[str] = None,
+        i: int = 0,
+        level: int = -1,
+    ) -> t.Tuple[str, t.Dict[str, t.Any]]:
         # return schema_name, definition_dict
         # todo: support quoted "/"
         # on array
         if "items" in d:
             definition = d
             name, _ = self.resolve_ref_definition(
-                fulldata, d["items"], name=name, i=i, level=level + 1
+                c, fulldata, d["items"], name=name, i=i, level=level + 1
             )  # xxx
             return name, definition
 
@@ -121,11 +139,19 @@ class Resolver:
         if parent is None:
             logger.warning("%r is not found", d["$ref"])
             return self.resolve_schema_name(name), d
-        return self.resolve_ref_definition(
-            fulldata, parent[name], name=name, i=i + 1, level=level - 1
+        ref_name, definition = self.resolve_ref_definition(
+            c, fulldata, parent[name], name=name, i=i + 1, level=level - 1
         )
 
-    def resolve_validators_on_property(self, c, field):
+        # import for separated output
+        if X_MARSHMALLOW_INLINE not in definition:
+            if c is not None:
+                c.relative_import(ref_name)
+        return ref_name, definition
+
+    def resolve_validators_on_property(
+        self, c: Context, field: t.Dict[str, t.Any]
+    ) -> t.List[t.Any]:
         validators = []
 
         def add(validator):

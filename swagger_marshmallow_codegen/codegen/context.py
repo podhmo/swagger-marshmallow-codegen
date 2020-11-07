@@ -10,20 +10,50 @@ logger = logging.getLogger(__name__)
 
 
 class Context:
-    def __init__(self, m=None, im=None):
+    def __init__(
+        self,
+        *,
+        m: t.Optional[Module] = None,
+        im: t.Optional[Module] = None,
+        rm: t.Optional[Module] = None,
+        relative_imported: t.Optional[t.Dict[str, Symbol]] = None,
+        separated: bool = False,
+    ):
         self.m: Module = m or Module()
         self.im: Module = im or self.m.submodule()
+        self.rm: Module = rm or self.m.submodule()
+        self.separated = separated
+        self._relative_imported = relative_imported
+        if relative_imported is None:
+            self._relative_imported = {}
 
-    def from_(self, module, name) -> FromStatement:
+    def from_(self, module: str, name: str) -> FromStatement:
         logger.debug("      import: module=%s, name=%s", module, name)
         return self.im.from_(module, name)
 
-    def import_(self, module) -> Symbol:
+    def import_(self, module: str) -> Symbol:
         logger.debug("      import: module=%s", module)
         return self.im.import_(module)
 
-    def new_child(self):
-        return self.__class__(self.m.submodule(newline=False), self.im)
+    def relative_import(self, name: str) -> None:
+        if not self.separated:
+            return
+
+        imported = self._relative_imported.get(name)
+        if imported is not None:
+            return None
+        logger.debug("      relative import: module=.%s	symbol:%s", name, name)
+        self._relative_imported[name] = self.rm.from_("." + name, name)
+        return None
+
+    def new_child(self) -> Context:
+        return self.__class__(
+            m=self.m.submodule(newline=False),
+            im=self.im,
+            rm=self.rm,
+            relative_imported=self._relative_imported,
+            separated=self.separated,
+        )
 
 
 @tx.runtime_checkable
@@ -51,7 +81,8 @@ class SeparatedFilesContextFactory:
     def __call__(self, name: str, *, part: t.Optional[str] = None) -> Context:
         ctx = self._files.get(name)
         if ctx is None:
-            ctx = self._files[name] = Context()
+            ctx = self._files[name] = Context(separated=True)
+            ctx._relative_imported[name] = Symbol(name)
             self._setup(ctx)
 
         sctx = self._parts.get((name, part))

@@ -1,0 +1,27 @@
+{
+  "definitions": {
+    "team": {
+      "properties": {
+        "members": {
+          "items": {
+            "$ref": "#/definitions/user"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "user": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "team": {
+          "$ref": "#/definitions/team"
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 import copy
 from dictknife.jsonknife.lifting import Handler
 from dictknife.accessing import Accessor
+from swagger_marshmallow_codegen.constants import X_MARSHMALLOW_INLINE
 from .langhelpers import titleize
 
 
@@ -52,7 +53,10 @@ class Flattener:
         if "$ref" in data:
             return data
         fullname = ctx.full_name()
+
+        data[X_MARSHMALLOW_INLINE] = ctx.path[0]
         ctx.save_object(fullname, data)
+
         return self.return_definition(data, fullname, typ="object")
 
     def on_array_has_items(self, data, ctx):
@@ -61,7 +65,10 @@ class Flattener:
         fullname = ctx.full_name()
         ctx.add_array_item()
         data["items"] = self._extract(data["items"], ctx, from_array=True)
+
+        data[X_MARSHMALLOW_INLINE] = ctx.path[0]
         ctx.save_array(fullname, data)
+
         ctx.pop_name()
         return self.return_definition(data, fullname, typ="array")
 
