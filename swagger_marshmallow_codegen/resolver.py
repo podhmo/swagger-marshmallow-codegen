@@ -145,7 +145,12 @@ class Resolver:
 
         # import for separated output
         if X_MARSHMALLOW_INLINE not in definition:
-            if c is not None:
+            if c is not None and (
+                "properties" in definition
+                or "additionalProperties" in definition
+                or "items" in definition
+                or "allOf" in definition
+            ):
                 c.relative_import_from_lazy(ref_name)
         return ref_name, definition
 
