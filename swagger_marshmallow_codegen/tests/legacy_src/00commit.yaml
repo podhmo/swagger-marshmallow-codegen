@@ -1,5 +1,6 @@
 definitions:
   commit:
+    x-marshmallow-inline: commit
     properties:
       author:
         $ref: '#/definitions/commitAuthor'
@@ -9,10 +10,12 @@ definitions:
         $ref: '#/definitions/commitFiles'
     type: object
   commitFiles:
+    x-marshmallow-inline: commit
     type: array
     items:
       $ref: '#/definitions/commitFilesItem'
   commitFilesItem:
+    x-marshmallow-inline: commit
     type: object
     properties:
       additions:
@@ -32,6 +35,7 @@ definitions:
       status:
         type: string
   commitCommit:
+    x-marshmallow-inline: commit
     type: object
     properties:
       author:
@@ -45,6 +49,7 @@ definitions:
       url:
         type: string
   commitCommitTree:
+    x-marshmallow-inline: commit
     type: object
     properties:
       sha:
@@ -52,6 +57,7 @@ definitions:
       url:
         type: string
   commitCommitCommitter:
+    x-marshmallow-inline: commit
     type: object
     properties:
       date:
@@ -62,6 +68,7 @@ definitions:
       name:
         type: string
   commitCommitAuthor:
+    x-marshmallow-inline: commit
     type: object
     properties:
       date:
@@ -72,6 +79,7 @@ definitions:
       name:
         type: string
   commitAuthor:
+    x-marshmallow-inline: commit
     type: object
     properties:
       avatar_url:
