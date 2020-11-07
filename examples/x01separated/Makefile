@@ -1,4 +1,4 @@
-GREP := $(shell which ggrep || grep)
+GREP := $(shell which ggrep || which grep)
 
 default: clean
 	$(MAKE) $(shell cat Makefile | $(GREP) -P '^[0-9]+:' | tr ':' ' ')
