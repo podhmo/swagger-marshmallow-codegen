@@ -5,8 +5,9 @@ import logging
 import argparse
 from magicalimport import import_symbol
 
+
 if t.TYPE_CHECKING:
-    from swagger_marshmallow_codegen.driver import Driver
+    from swagger_marshmallow_codegen.driver import Driver, OptionsDict
 logger = logging.getLogger(__name__)
 
 
@@ -22,6 +23,10 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     parser.add_argument("--legacy", action="store_true")
     parser.add_argument("--strict-additional-properties", action="store_true")
     parser.add_argument("--explicit", action="store_true")
+
+    parser.add_argument("--output")
+    parser.add_argument("-d", "--separated-output", action="store_true")
+
     parser.add_argument("file", default=None)
     args = parser.parse_args()
 
@@ -37,20 +42,25 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     if ":" not in driver_cls:
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
 
+    config: OptionsDict = {
+        "targets": {
+            "schema": True,
+            "input": False,
+            "output": False,
+            "additional_properties_default": not args.strict_additional_properties,
+        },
+        "separated": args.separated_output,
+    }
     if args.full:
-        config = {"targets": {"schema": True, "input": True, "output": True}}
-    else:
-        config = {"targets": {"schema": True}}
-
-    config["targets"][
-        "additional_properties_default"
-    ] = not args.strict_additional_properties
+        config["targets"]["input"] = True
+        config["targets"]["output"] = True
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
         setup(driver)
+
     if args.file is None:
-        driver.run(sys.stdin, sys.stdout)
+        driver.run(sys.stdin)
     else:
         with open(args.file) as rf:
-            driver.run(rf, sys.stdout)
+            driver.run(rf)

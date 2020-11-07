@@ -3,24 +3,26 @@ import typing as t
 import keyword
 import logging
 from collections import namedtuple
-from functools import partial
-from prestring import PreString
-from prestring.utils import LazyFormat, LazyArgumentsAndKeywords, LazyKeywords
-from dictknife import deepmerge
 from collections import defaultdict
 from collections import OrderedDict
+from functools import partial
+from prestring import PreString
+from prestring.python import Module
+from prestring.utils import LazyFormat, LazyArgumentsAndKeywords, LazyKeywords
+from dictknife import deepmerge
 from swagger_marshmallow_codegen.langhelpers import (
     LazyCallString,
     titleize,
     clsname_from_path,
 )
+from ..context import OnceContextFactory
 from ..context import Context
 from ..config import ConfigDict
 from .accessor import Accessor
 
 if t.TYPE_CHECKING:
     from swagger_marshmallow_codegen.resolver import Resolver
-
+    from ..context import ContextFactory, InputData, OutputData
 
 logger = logging.getLogger(__name__)
 NAME_MARKER = "x-marshmallow-name"
@@ -35,7 +37,10 @@ class SchemaWriter:
 
     @classmethod
     def override(cls, *, extra_schema_module=None):
-        return partial(cls, extra_schema_module=extra_schema_module,)
+        return partial(
+            cls,
+            extra_schema_module=extra_schema_module,
+        )
 
     def __init__(self, accessor: Accessor, schema_class, *, extra_schema_module=None):
         self.accessor = accessor
@@ -79,7 +84,8 @@ class SchemaWriter:
             caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
             if caller_name is None:
                 raise CodegenError(
-                    "matched field class is not found. name=%r", name,
+                    "matched field class is not found. name=%r",
+                    name,
                 )
 
             opts.pop("many", None)
@@ -109,7 +115,8 @@ class SchemaWriter:
                 return LazyFormat(
                     "fields.Nested({})",
                     LazyArgumentsAndKeywords(
-                        [LazyFormat("lambda: {}()", field_class_name)], opts,
+                        [LazyFormat("lambda: {}()", field_class_name)],
+                        opts,
                     ),
                 )
             else:
@@ -121,7 +128,8 @@ class SchemaWriter:
             return LazyFormat(
                 "fields.Nested({})",
                 LazyArgumentsAndKeywords(
-                    [LazyFormat("lambda: {}()", field_class_name)], opts,
+                    [LazyFormat("lambda: {}()", field_class_name)],
+                    opts,
                 ),
             )
         elif caller_name == "fields.Dict":
@@ -149,7 +157,8 @@ class SchemaWriter:
             caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
             if caller_name is None:
                 raise CodegenError(
-                    "matched field class is not found. name=%r", name,
+                    "matched field class is not found. name=%r",
+                    name,
                 )
 
             opts = {k: repr(v) for k, v in opts.items()}
@@ -425,7 +434,8 @@ class DefinitionsSchemaWriter:
     def config(self) -> ConfigDict:
         return self.accessor.config
 
-    def write(self, c, d):
+    def write(self, d: InputData, *, context_factory: ContextFactory) -> None:
+        part = self.__class__.__name__
         for schema_name, definition in self.accessor.definitions(d):
             if not self.config.get(
                 "emit_schema_even_primitive_type", False
@@ -433,6 +443,7 @@ class DefinitionsSchemaWriter:
                 logger.info("write schema: skip %s", schema_name)
                 continue
 
+            c = context_factory(schema_name, part=part)
             clsname = self.resolver.resolve_schema_name(schema_name)
             logger.info("write schema: write %s", schema_name)
             self.schema_writer.write_schema(c, d, clsname, definition)
@@ -452,9 +463,10 @@ class PathsSchemaWriter:
     def get_lazy_clsname(self, path):
         return PreString(clsname_from_path(path))
 
-    def write(self, c, d):
+    def write(self, d: InputData, *, context_factory: ContextFactory) -> None:
+        part = self.__class__.__name__
         for path, methods in self.accessor.paths(d):
-            sc = c.new_child()
+            sc = context_factory(path, part=part)
             found = False
             lazy_clsname = self.get_lazy_clsname(path)
             with sc.m.class_(LazyFormat("{}Input", lazy_clsname)):
@@ -541,10 +553,11 @@ class ResponsesSchemaWriter:
     def get_lazy_clsname(self, path):
         return PreString(clsname_from_path(path))
 
-    def write(self, c, d):
+    def write(self, d: InputData, *, context_factory: ContextFactory) -> None:
+        part = self.__class__.__name__
         for path, methods in self.accessor.paths(d):
             lazy_clsname = self.get_lazy_clsname(path)
-            sc = c.new_child()
+            sc = context_factory(path, part=part)
             found = False
             with sc.m.class_(LazyFormat("{}Output", lazy_clsname)):
                 if self.OVERRIDE_NAME_MARKER in methods:
@@ -589,11 +602,13 @@ class Codegen:
         )
         self.schema_class = self.schema_class_path.rsplit(":", 1)[-1]
 
+        self.files: t.Dict[str, Module] = {}
+
     @property
     def resolver(self) -> Resolver:
         return self.accessor.resolver
 
-    def write_header(self, c, *, comment: t.Optional[str] = None):
+    def write_header(self, c: Context, *, comment: t.Optional[str] = None) -> None:
         if comment is None:
             comment = """\
 # this is auto-generated by swagger-marshmallow-codegen
@@ -602,28 +617,42 @@ from __future__ import annotations
         for line in comment.splitlines():
             c.im.stmt(line)
 
-    def write_import_(self, c):
+    def write_import_(self, c: Context) -> None:
         c.from_(*self.schema_class_path.rsplit(":", 1))
         c.from_("marshmallow", "fields")
 
-    def write_body(self, c, d):
+    def write_body(self, d: InputData, *, context_factory: ContextFactory) -> None:
+        # TODO: get from context
         sw = self.schema_writer_factory(self.accessor, self.schema_class)
+
         config = self.accessor.config
         if config.get("schema", False):
-            DefinitionsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+            DefinitionsSchemaWriter(self.accessor, sw).write(
+                d, context_factory=context_factory
+            )
         if config.get("input", False):
-            PathsSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+            PathsSchemaWriter(self.accessor, sw).write(
+                d, context_factory=context_factory
+            )
         if config.get("output", False):
-            ResponsesSchemaWriter(self.accessor, sw).write(c.new_child(), d)
+            ResponsesSchemaWriter(self.accessor, sw).write(
+                d, context_factory=context_factory
+            )
 
-    def codegen(self, d, ctx=None):
-        c = ctx or Context()
-        if not self.accessor.config.get("skip_header_comment", False):
-            self.write_header(c, comment=self.accessor.config.get("header_comment"))
-        c.m.sep()
-        self.write_import_(c)
-        self.write_body(c, d)
-        return c.m
+    def codegen(self, d: InputData, ctx: t.Optional[Context] = None) -> OutputData:
+        ctx = ctx or Context()
+
+        def setup(ctx: Context) -> None:
+            if not self.accessor.config.get("skip_header_comment", False):
+                self.write_header(
+                    ctx, comment=self.accessor.config.get("header_comment")
+                )
+            ctx.m.sep()
+            self.write_import_(ctx)
+
+        factory = OnceContextFactory(ctx, setup=setup)
+        self.write_body(d, context_factory=factory)
+        return factory
 
 
 def lazy_json_dump(s):

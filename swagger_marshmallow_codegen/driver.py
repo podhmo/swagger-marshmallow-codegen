@@ -1,12 +1,23 @@
-# -*- coding:utf-8 -*-
+from __future__ import annotations
 import logging
+import typing as t
+import typing_extensions as tx
 from . import loading
 from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
 from .dispatcher import FormatDispatcher
 from .lifting import lifting_definition
 
+if t.TYPE_CHECKING:
+    from .codegen.config import ConfigDict
+    from .codegen.context import InputData, OutputData
+
 logger = logging.getLogger(__name__)
+
+
+class OptionsDict(tx.TypedDict, total=True):
+    targets: ConfigDict  # TODO: rename
+    separated: bool
 
 
 class Driver:
@@ -14,26 +25,30 @@ class Driver:
     resolver_factory = Resolver
     codegen_factory = Codegen
 
-    def __init__(self, options):
-        self.options = options
+    def __init__(self, options: OptionsDict):
+        self.options: OptionsDict = options
 
-    def load(self, fp):
+    def load(self, fp: t.Any) -> InputData:
         # hack:
         # import dictknife.loading._yaml as xxx
         # xxx.make_dict = dict
         return loading.load(fp)
 
-    def dump(self, m, fp):
-        return print(m, file=fp)
+    def dump(self, d: OutputData, *, out: t.Optional[str] = None) -> None:
+        if out is None:
+            for name, m in d.files:
+                print(m)
+            return
+        raise NotImplementedError(out)
 
-    def transform(self, d):
+    def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)
         return self.create_codegen().codegen(d, config=self.options["targets"])
 
-    def run(self, inp, outp):
+    def run(self, inp):
         data = self.load(inp)
         result = self.transform(data)
-        self.dump(result, outp)
+        self.dump(result)
 
     def create_codegen(self):
         dispatcher = self.dispatcher_factory()
@@ -53,26 +68,34 @@ class LegacyDriver(Driver):
 
 
 class Flatten:
-    def __init__(self, options):
-        self.options = options
+    def __init__(self, options: OptionsDict) -> None:
+        self.options: OptionsDict = options
 
-    def load(self, fp):
+    def load(self, fp: t.Any) -> InputData:
         return loading.load(fp)
 
-    def dump(self, d, fp):
-        return loading.dump(d, fp)
+    def dump(self, d: OutputData, *, out: t.Optional[str] = None) -> None:
+        return loading.dump(d, out)
 
-    def transform(self, d):
-        return lifting_definition(d)
+    def transform(self, d: InputData) -> OutputData:
+        lifted = lifting_definition(d)
 
-    def run(self, inp, outp):
+        class _Data:
+            @property
+            def files(self) -> t.Iterator[t.Tuple[str, t.Any]]:
+                yield lifted
+
+        return _Data()
+
+    def run(self, inp):
         data = self.load(inp)
         result = self.transform(data)
-        self.dump(result, outp)
+        for _, d in result.files:
+            self.dump(d)
 
 
 class ProfileDriver(Driver):
-    def run(self, inp, outp):
+    def run(self, inp):
         import cProfile
         import pstats
 
@@ -83,4 +106,4 @@ class ProfileDriver(Driver):
         profile.disable()
         s = pstats.Stats(profile)
         s.dump_stats("swagger-marshmallow-codegen.prof")
-        self.dump(result, outp)
+        self.dump(result)
