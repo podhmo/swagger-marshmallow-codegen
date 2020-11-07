@@ -6,6 +6,7 @@ from marshmallow import (
     INCLUDE,
 )
 from marshmallow.validate import OneOf
+from ._lazy import _usePet
 from .Pet import Pet
 
 

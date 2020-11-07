@@ -7,7 +7,7 @@ from marshmallow import (
 )
 import re
 from marshmallow.validate import Regexp
-from .Id import Id
+from ._lazy import _useId
 
 
 class Shop(Schema):

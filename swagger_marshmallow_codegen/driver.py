@@ -43,12 +43,6 @@ class Driver:
                 with fs.open(name, "w") as wf:
                     print(m, file=wf)
 
-            name = "__init__"
-            if name not in seen:
-                with fs.open(name, "w") as wf:
-                    for name, _ in d.files:
-                        print(f"from .{name} import {name}", file=wf)
-
     def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)
         return self.create_codegen().codegen(d, config=self.config)

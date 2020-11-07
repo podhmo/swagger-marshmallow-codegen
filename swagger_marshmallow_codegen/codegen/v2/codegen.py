@@ -115,9 +115,7 @@ class SchemaWriter:
             if caller_name == "fields.Nested":
                 return LazyFormat(
                     "fields.Nested({})",
-                    LazyArgumentsAndKeywords(
-                        [LazyFormat("lambda: {}()", field_class_name)], opts,
-                    ),
+                    LazyArgumentsAndKeywords([c.use_relative(field_class_name)], opts,),
                 )
             else:
                 return LazyFormat("{}({})", caller_name, LazyKeywords(opts))
@@ -127,9 +125,7 @@ class SchemaWriter:
             opts = {k: repr(v) for k, v in opts.items()}
             return LazyFormat(
                 "fields.Nested({})",
-                LazyArgumentsAndKeywords(
-                    [LazyFormat("lambda: {}()", field_class_name)], opts,
-                ),
+                LazyArgumentsAndKeywords([c.use_relative(field_class_name)], opts,),
             )
         elif caller_name == "fields.Dict":
             self.accessor.update_option_on_property(c, field, opts)
@@ -443,7 +439,7 @@ class DefinitionsSchemaWriter:
                 continue
 
             c = context_factory(
-                definition.get(X_MARSHMALLOW_INLINE) or schema_name, part=part
+                definition.get(X_MARSHMALLOW_INLINE) or schema_name, part=part,
             )
             clsname = self.resolver.resolve_schema_name(schema_name)
             logger.info("write schema: write %s", schema_name)

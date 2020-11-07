@@ -7,7 +7,10 @@ from marshmallow import (
 )
 import re
 from marshmallow.validate import Regexp
-from .Id import Id
+from ._lazy import (
+    _useId,
+    _useShop,
+)
 
 
 class Pet(Schema):
@@ -15,7 +18,7 @@ class Pet(Schema):
     id = fields.String(required=True, description='ObjectId', validate=[Regexp(regex=re.compile('[0-9a-f]{24}'))])
     mother = fields.Nested(lambda: Pet())
     name = fields.String(required=True)
-    shop = fields.Nested(lambda: Shop())
+    shop = fields.Nested(_useShop)
     tag = fields.String()
 
     class Meta:
