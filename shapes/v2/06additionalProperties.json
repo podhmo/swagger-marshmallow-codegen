@@ -17,5 +17,5 @@
       "type": "integer"
     }
   },
-  "version": "2.0.0"
+  "openapi": "2.0.0"
 }

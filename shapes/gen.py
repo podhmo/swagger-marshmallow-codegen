@@ -27,7 +27,7 @@ def run(
         # v3
         with (here / "v3" / name).open("w") as wf:
             logger.info("write %s", wf.name)
-            ctx.result["version"] = "3.x.x"
+            ctx.result["openapi"] = "3.1.0"
             if verbose:
                 for clsname, s in ctx.result["components"]["schemas"].items():
                     cls = getattr(m, clsname)
@@ -39,7 +39,7 @@ def run(
         # v2
         with (here / "v2" / name).open("w") as wf:
             logger.info("write %s", wf.name)
-            ctx.result["version"] = "2.0.0"
+            ctx.result["openapi"] = "2.0.0"
             ctx.result["definitions"] = ctx.result["components"].pop("schemas")
             ctx.result.pop("components")
             from io import StringIO
