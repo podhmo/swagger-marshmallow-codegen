@@ -8,6 +8,7 @@ from magicalimport import import_symbol
 
 if t.TYPE_CHECKING:
     from swagger_marshmallow_codegen.driver import Driver, ConfigDict
+
 logger = logging.getLogger(__name__)
 
 
@@ -52,6 +53,8 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     if args.full:
         config["emit_input"] = True
         config["emit_output"] = True
+
+    logger.debug("config is %r", config)
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
