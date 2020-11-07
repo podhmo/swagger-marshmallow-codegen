@@ -43,17 +43,8 @@ class Codegen:
         self.schema_writer_factory = schema_writer_factory
 
     def codegen(
-        self,
-        d: InputData,
-        config: ConfigDict,
-        *,
-        ctx: t.Optional[Context] = None,
-        test: bool = False,
+        self, d: InputData, config: ConfigDict, *, ctx: t.Optional[Context] = None,
     ) -> OutputData:
-        if test:
-            # todo: use dataclasses?
-            config["header_comment"] = ""
-
         cls = self.guess_factory(d, config=config, path=self.version_path)
         codegen = cls(
             schema_class_path=self.schema_class_path,
