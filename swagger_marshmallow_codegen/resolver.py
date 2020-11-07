@@ -146,7 +146,7 @@ class Resolver:
         # import for separated output
         if X_MARSHMALLOW_INLINE not in definition:
             if c is not None:
-                c.relative_import(ref_name)
+                c.relative_import_from_lazy(ref_name)
         return ref_name, definition
 
     def resolve_validators_on_property(
