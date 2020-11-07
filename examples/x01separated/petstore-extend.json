@@ -7,6 +7,16 @@
         "example": "541a9fd949b5ac0b00000000",
         "pattern": "[0-9a-f]{24}"
       },
+      "errorCategory": {
+        "type": "string",
+        "enum": ["API", "Internal", "Bug", "Human"]
+      },
+      "errorCategories": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/errorCategory"
+        }
+      },
       "Error": {
         "properties": {
           "code": {
@@ -15,6 +25,9 @@
           },
           "message": {
             "type": "string"
+          },
+          "categoris": {
+            "$ref": "#/components/schemas/errorCategories"
           }
         },
         "required": [

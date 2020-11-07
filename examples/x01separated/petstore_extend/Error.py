@@ -5,11 +5,13 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
+from marshmallow.validate import OneOf
 
 
 class Error(Schema):
     code = fields.Integer(required=True)
     message = fields.String(required=True)
+    categoris = fields.List(fields.String(validate=[OneOf(choices=['API', 'Internal', 'Bug', 'Human'], labels=[])]))
 
     class Meta:
         unknown = INCLUDE
