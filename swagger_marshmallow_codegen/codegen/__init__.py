@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class Codegen:
-    version_path: str = "version"
+    version_path: str = "openapi"
 
     @classmethod
     def override(
