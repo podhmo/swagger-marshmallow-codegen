@@ -632,10 +632,10 @@ from __future__ import annotations
             )
 
     def setup_context(self, ctx: Context) -> None:
-        if not self.accessor.config.get("skip_header_comment", False):
+        if self.accessor.config.get("header_comment", ""):
             self.write_header(ctx, comment=self.accessor.config.get("header_comment"))
-        ctx.m.sep()
         self.write_import_(ctx)
+        ctx.m.sep()
 
     def codegen(self, d: InputData, context_factory) -> OutputData:
         self.write_body(d, context_factory=context_factory)

@@ -52,14 +52,16 @@ class Codegen:
     ) -> OutputData:
         if test:
             # todo: use dataclasses?
-            config["skip_header_comment"] = True
+            config["header_comment"] = ""
 
         cls = self.guess_factory(d, config=config, path=self.version_path)
         codegen = cls(
             schema_class_path=self.schema_class_path,
             schema_writer_factory=self.schema_writer_factory,
         )
-        context_factory = OnceContextFactory(Context(), setup=codegen.setup_context)
+        context_factory = OnceContextFactory(
+            ctx or Context(), setup=codegen.setup_context
+        )
         return codegen.codegen(d, context_factory=context_factory)
 
     def guess_factory(
