@@ -61,7 +61,7 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
         setup(driver)
 
     if args.file is None:
-        driver.run(sys.stdin)
+        driver.run(sys.stdin, output=args.output)
     else:
         with open(args.file) as rf:
-            driver.run(rf)
+            driver.run(rf, output=args.output)
