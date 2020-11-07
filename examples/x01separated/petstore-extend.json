@@ -51,6 +51,42 @@
         },
         "type": "array"
       },
+      "Cat": {
+        "description": "A representation of a cat",
+        "required": ["huntingSkill"],
+        "allOf": [
+          {"$ref": "#/components/schemas/Pet"},
+          {
+            "type": "object",
+            "properties": {
+              "huntingSkill": {
+                "type": "string",
+                "description": "The measured skill for hunting",
+                "default": "lazy",
+                "enum": ["clueless", "lazy", "adventurous", "aggressive"]
+              }
+            }
+          }
+        ]
+      },
+      "Dog": {
+        "description": "A representation of a dog",
+        "required": ["packSize"],
+        "allOf": [
+          {"$ref": "#/components/schemas/Pet"},
+          {
+            "type": "object",
+            "properties": {
+              "packSize": {
+                "type": "integer",
+                "description": "the size of the pack the dog is from",
+                "default": 0,
+                "minimum": 0
+              }
+            }
+          }
+        ]
+      },
       "Shop": {
         "properties": {
           "id": {
