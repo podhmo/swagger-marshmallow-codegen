@@ -626,15 +626,15 @@ from __future__ import annotations
         sw = self.schema_writer_factory(self.accessor, self.schema_class)
 
         config = self.accessor.config
-        if config.get("schema", False):
+        if config.get("emit_schema", False):
             DefinitionsSchemaWriter(self.accessor, sw).write(
                 d, context_factory=context_factory
             )
-        if config.get("input", False):
+        if config.get("emit_input", False):
             PathsSchemaWriter(self.accessor, sw).write(
                 d, context_factory=context_factory
             )
-        if config.get("output", False):
+        if config.get("emit_output", False):
             ResponsesSchemaWriter(self.accessor, sw).write(
                 d, context_factory=context_factory
             )

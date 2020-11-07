@@ -43,15 +43,15 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
 
     config: ConfigDict = {
-        "schema": True,
-        "input": False,
-        "output": False,
+        "emit_schema": True,
+        "emit_input": False,
+        "emit_output": False,
         "additional_properties_default": not args.strict_additional_properties,
         "separated_output": args.separated_output,
     }
     if args.full:
-        config["input"] = True
-        config["output"] = True
+        config["emit_input"] = True
+        config["emit_output"] = True
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:

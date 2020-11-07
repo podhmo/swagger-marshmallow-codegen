@@ -68,9 +68,9 @@ def test(
     get_codegen().codegen(
         lifting_definition(d),
         {
-            "schema": True,
-            "input": True,
-            "output": True,
+            "emit_schema": True,
+            "emit_input": True,
+            "emit_output": True,
             "header_comment": header_comment,
             "additional_properties_default": False,
         },

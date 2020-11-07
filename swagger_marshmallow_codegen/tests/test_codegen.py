@@ -26,9 +26,9 @@ def test_v2(
     get_codegen().codegen(
         lifting_definition(d),
         {
-            "schema": True,
-            "input": True,
-            "output": True,
+            "emit_schema": True,
+            "emit_input": True,
+            "emit_output": True,
             "emit_schema_even_primitive_type": True,
             "additional_properties_default": False,
         },
@@ -59,9 +59,9 @@ def test_v3(
     get_codegen().codegen(
         lifting_definition(d),
         {
-            "schema": True,
-            "input": True,
-            "output": True,
+            "emit_schema": True,
+            "emit_input": True,
+            "emit_output": True,
             "emit_schema_even_primitive_type": True,
             "additional_properties_default": False,
         },

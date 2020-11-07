@@ -3,9 +3,9 @@ import typing_extensions as tx
 
 
 class ConfigDict(tx.TypedDict, total=False):
-    schema: bool  # emit definitions schemas
-    input: bool  # emit input schema
-    output: bool  # emit output schema
+    emit_schema: bool  # emit definitions schemas
+    emit_input: bool  # emit input schema
+    emit_output: bool  # emit output schema
 
     separated_output: bool  # activate separated output
 
