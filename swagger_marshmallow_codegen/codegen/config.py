@@ -7,6 +7,8 @@ class ConfigDict(tx.TypedDict, total=False):
     input: bool  # emit input schema
     output: bool  # emit output schema
 
+    separated_output: bool  # activate separated output
+
     explicit: bool  # emit Meta.unknown=RAISE, explicitly
     additional_properties_default: bool  # if true meta.unknown=INCLUDE
 

@@ -7,7 +7,7 @@ from magicalimport import import_symbol
 
 
 if t.TYPE_CHECKING:
-    from swagger_marshmallow_codegen.driver import Driver, OptionsDict
+    from swagger_marshmallow_codegen.driver import Driver, ConfigDict
 logger = logging.getLogger(__name__)
 
 
@@ -42,18 +42,16 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     if ":" not in driver_cls:
         driver_cls = "swagger_marshmallow_codegen.driver:{}".format(driver_cls)
 
-    config: OptionsDict = {
-        "targets": {
-            "schema": True,
-            "input": False,
-            "output": False,
-            "additional_properties_default": not args.strict_additional_properties,
-        },
-        "separated": args.separated_output,
+    config: ConfigDict = {
+        "schema": True,
+        "input": False,
+        "output": False,
+        "additional_properties_default": not args.strict_additional_properties,
+        "separated_output": args.separated_output,
     }
     if args.full:
-        config["targets"]["input"] = True
-        config["targets"]["output"] = True
+        config["input"] = True
+        config["output"] = True
 
     driver = import_symbol(driver_cls, cwd=True)(config)
     if setup is not None:
