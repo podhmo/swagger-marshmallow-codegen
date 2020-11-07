@@ -7,20 +7,13 @@ from marshmallow import (
 )
 import re
 from marshmallow.validate import Regexp
-from ._lazy import (
-    _useShop,
-    _useOwner,
-)
+from ._lazy import _usePet
 
 
-class Pet(Schema):
-    father = fields.Nested(lambda: Pet())
+class Owner(Schema):
     id = fields.String(required=True, description='ObjectId', validate=[Regexp(regex=re.compile('[0-9a-f]{24}'))])
-    mother = fields.Nested(lambda: Pet())
     name = fields.String(required=True)
-    shop = fields.Nested(_useShop)
-    owners = fields.List(fields.Nested(_useOwner))
-    tag = fields.String()
+    pets = fields.List(fields.Nested(_usePet))
 
     class Meta:
         unknown = INCLUDE
