@@ -37,10 +37,7 @@ class SchemaWriter:
 
     @classmethod
     def override(cls, *, extra_schema_module=None):
-        return partial(
-            cls,
-            extra_schema_module=extra_schema_module,
-        )
+        return partial(cls, extra_schema_module=extra_schema_module)
 
     def __init__(self, accessor: Accessor, schema_class, *, extra_schema_module=None):
         self.accessor = accessor
@@ -84,8 +81,7 @@ class SchemaWriter:
             caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
             if caller_name is None:
                 raise CodegenError(
-                    "matched field class is not found. name=%r",
-                    name,
+                    "matched field class is not found. name=%r", name,
                 )
 
             opts.pop("many", None)
@@ -115,8 +111,7 @@ class SchemaWriter:
                 return LazyFormat(
                     "fields.Nested({})",
                     LazyArgumentsAndKeywords(
-                        [LazyFormat("lambda: {}()", field_class_name)],
-                        opts,
+                        [LazyFormat("lambda: {}()", field_class_name)], opts,
                     ),
                 )
             else:
@@ -128,8 +123,7 @@ class SchemaWriter:
             return LazyFormat(
                 "fields.Nested({})",
                 LazyArgumentsAndKeywords(
-                    [LazyFormat("lambda: {}()", field_class_name)],
-                    opts,
+                    [LazyFormat("lambda: {}()", field_class_name)], opts,
                 ),
             )
         elif caller_name == "fields.Dict":
@@ -157,8 +151,7 @@ class SchemaWriter:
             caller_name = self.accessor.resolver.resolve_caller_name(c, name, field)
             if caller_name is None:
                 raise CodegenError(
-                    "matched field class is not found. name=%r",
-                    name,
+                    "matched field class is not found. name=%r", name,
                 )
 
             opts = {k: repr(v) for k, v in opts.items()}
