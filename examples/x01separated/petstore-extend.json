@@ -1,6 +1,12 @@
 {
   "components": {
     "schemas": {
+      "id": {
+        "type": "string",
+        "description": "ObjectId",
+        "example": "541a9fd949b5ac0b00000000",
+        "pattern": "[0-9a-f]{24}"
+      },
       "Error": {
         "properties": {
           "code": {
@@ -23,8 +29,7 @@
             "$ref": "#/components/schemas/Pet"
           },
           "id": {
-            "format": "int64",
-            "type": "integer"
+            "$ref": "#/components/schemas/id"
           },
           "mother": {
             "$ref": "#/components/schemas/Pet"
@@ -90,8 +95,7 @@
       "Shop": {
         "properties": {
           "id": {
-            "format": "int64",
-            "type": "integer"
+            "$ref": "#/components/schemas/id"
           },
           "name": {
             "type": "string"

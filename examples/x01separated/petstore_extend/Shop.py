@@ -5,10 +5,13 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
+import re
+from marshmallow.validate import Regexp
+from .Id import Id
 
 
 class Shop(Schema):
-    id = fields.Integer(required=True)
+    id = fields.String(required=True, description='ObjectId', validate=[Regexp(regex=re.compile('[0-9a-f]{24}'))])
     name = fields.String(required=True)
     description = fields.Nested(lambda: ShopDescription())
 
