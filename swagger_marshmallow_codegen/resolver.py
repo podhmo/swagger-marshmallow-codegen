@@ -38,7 +38,7 @@ class Resolver:
             return False
         if not fullscan:
             return False
-        _, definition = self.resolve_ref_definition(fulldata, d)
+        _, definition = self.resolve_ref_definition(None, fulldata, d)
         return self.has_schema(fulldata, definition, fullscan=False)
 
     def has_nested(self, fulldata, d) -> bool:
@@ -95,20 +95,20 @@ class Resolver:
         return caller_name
 
     def resolve_allof_definition(
-        self, fulldata: t.Dict[str, t.Any], d: t.Dict[str, t.Any]
+        self, c: Context, fulldata: t.Dict[str, t.Any], d: t.Dict[str, t.Any]
     ) -> t.Tuple[t.List[t.Dict[str, t.Any]], t.Dict[str, t.Any]]:
         ref_list = []
         r = OrderedDict()
         for subdef in d["allOf"]:
             if self.has_ref(subdef):
-                ref_list.append(self.resolve_ref_definition(fulldata, subdef))
+                ref_list.append(self.resolve_ref_definition(c, fulldata, subdef))
             else:
                 r = dictknife.deepmerge(r, subdef)
         return ref_list, r
 
     def resolve_ref_definition(
         self,
-        c: Context,
+        c: t.Optional[Context],  # xxx
         fulldata: t.Dict[str, t.Any],
         d: t.Dict[str, t.Any],
         name: t.Optional[str] = None,
@@ -145,7 +145,8 @@ class Resolver:
 
         # import for separated output
         if X_MARSHMALLOW_INLINE not in definition:
-            c.relative_import(ref_name)
+            if c is not None:
+                c.relative_import(ref_name)
         return ref_name, definition
 
     def resolve_validators_on_property(

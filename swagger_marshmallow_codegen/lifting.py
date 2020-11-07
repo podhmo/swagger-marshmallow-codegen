@@ -56,6 +56,7 @@ class Flattener:
 
         data[X_MARSHMALLOW_INLINE] = ctx.path[0]
         ctx.save_object(fullname, data)
+
         return self.return_definition(data, fullname, typ="object")
 
     def on_array_has_items(self, data, ctx):

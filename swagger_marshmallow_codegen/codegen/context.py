@@ -16,9 +16,11 @@ class Context:
         m: t.Optional[Module] = None,
         im: t.Optional[Module] = None,
         relative_imported: t.Optional[t.Dict[str, Symbol]] = None,
+        separated: bool = False,
     ):
         self.m: Module = m or Module()
         self.im: Module = im or self.m.submodule()
+        self.separated = separated
         self._relative_imported = relative_imported
         if relative_imported is None:
             self._relative_imported = {}
@@ -31,19 +33,23 @@ class Context:
         logger.debug("      import: module=%s", module)
         return self.im.import_(module)
 
-    def relative_import(self, name: str) -> Symbol:
+    def relative_import(self, name: str) -> None:
+        if not self.separated:
+            return
+
         imported = self._relative_imported.get(name)
         if imported is not None:
-            return imported
+            return None
         logger.debug("      relative import: module=.%s	symbol:%s", name, name)
-        sym = self._relative_imported[name] = self.im.from_("." + name, name)
-        return sym
+        self._relative_imported[name] = self.im.from_("." + name, name)
+        return None
 
     def new_child(self) -> Context:
         return self.__class__(
             m=self.m.submodule(newline=False),
             im=self.im,
             relative_imported=self._relative_imported,
+            separated=self.separated,
         )
 
 
@@ -72,7 +78,7 @@ class SeparatedFilesContextFactory:
     def __call__(self, name: str, *, part: t.Optional[str] = None) -> Context:
         ctx = self._files.get(name)
         if ctx is None:
-            ctx = self._files[name] = Context()
+            ctx = self._files[name] = Context(separated=True)
             ctx._relative_imported[name] = Symbol(name)
             self._setup(ctx)
 

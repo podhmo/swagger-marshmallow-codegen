@@ -30,6 +30,8 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 NAME_MARKER = X_MARSHMALLOW_NAME
 
+PathInfo = namedtuple("PathInfo", "info, required")
+
 
 class CodegenError(Exception):
     pass
@@ -281,12 +283,13 @@ class SchemaWriter:
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
             ref_list, ref_definition = self.resolver.resolve_allof_definition(
-                d, definition
+                c, d, definition
             )
             definition = deepmerge(ref_definition, definition)
             if ref_list:
                 base_classes = []
                 for ref_name, ref_definition in ref_list:
+                    c.relative_import(ref_name)
                     if ref_name is None:
                         raise CodegenError(
                             "$ref %r is not found", ref_definition
@@ -491,7 +494,10 @@ class PathsSchemaWriter:
                             ssc.m.stmt("")
 
                         path_info = self.build_path_info(
-                            d, toplevel_parameters, self.accessor.parameters(definition)
+                            sc,
+                            d,
+                            toplevel_parameters,
+                            self.accessor.parameters(definition),
                         )
                         for section, properties in sorted(path_info.info.items()):
                             if section is None:
@@ -519,9 +525,12 @@ class PathsSchemaWriter:
             if not found:
                 sc.m.clear()
 
-    PathInfo = namedtuple("PathInfo", "info, required")
-
-    def build_path_info(self, fulldata, *paramaters_set):
+    def build_path_info(
+        self,
+        c: Context,
+        fulldata: t.Dict[str, t.Any],
+        *paramaters_set: t.List[t.Dict[str, t.Any]]
+    ) -> PathInfo:
         info = defaultdict(OrderedDict)
         required = defaultdict(list)
         for parameters in paramaters_set:
@@ -533,7 +542,7 @@ class PathsSchemaWriter:
                 info[section][name] = p
                 if p.get("required"):
                     required[section].append(name)
-        return self.PathInfo(info=info, required=required)
+        return PathInfo(info=info, required=required)
 
 
 class ResponsesSchemaWriter:
@@ -565,7 +574,7 @@ class ResponsesSchemaWriter:
                     for status, definition in self.accessor.responses(definition):
                         if self.resolver.has_ref(definition):
                             _, definition = self.resolver.resolve_ref_definition(
-                                c, d, definition
+                                sc, d, definition
                             )
                         if "schema" in definition:
                             found = True
