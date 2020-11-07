@@ -40,6 +40,12 @@
           "shop": {
             "$ref": "#/components/schemas/Shop"
           },
+          "owners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Owner"
+            }
+          },
           "tag": {
             "type": "string"
           }
@@ -110,6 +116,24 @@
               }
             },
             "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "Owner": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pets": {
+            "$ref": "#/components/schemas/Pets"
           }
         },
         "required": [

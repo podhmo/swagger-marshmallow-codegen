@@ -13,6 +13,11 @@ def _useError():
     return Error
 
 
+def _useOwner():
+    from .Owner import Owner
+    return Owner
+
+
 def _usePet():
     from .Pet import Pet
     return Pet
