@@ -9,11 +9,11 @@ from .Shop import Shop
 
 
 class Pet(Schema):
+    father = fields.Nested(lambda: Pet())
     id = fields.Integer(required=True)
+    mother = fields.Nested(lambda: Pet())
     name = fields.String(required=True)
     shop = fields.Nested(lambda: Shop())
-    father = fields.Nested(lambda: Pet())
-    mother = fields.Nested(lambda: Pet())
     tag = fields.String()
 
     class Meta:

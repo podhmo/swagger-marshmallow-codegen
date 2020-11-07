@@ -19,21 +19,21 @@
       },
       "Pet": {
         "properties": {
+          "father": {
+            "$ref": "#/components/schemas/Pet"
+          },
           "id": {
             "format": "int64",
             "type": "integer"
+          },
+          "mother": {
+            "$ref": "#/components/schemas/Pet"
           },
           "name": {
             "type": "string"
           },
           "shop": {
             "$ref": "#/components/schemas/Shop"
-          },
-          "father": {
-            "$ref": "#/components/schemas/Pet"
-          },
-          "mother": {
-            "$ref": "#/components/schemas/Pet"
           },
           "tag": {
             "type": "string"
@@ -59,6 +59,17 @@
           },
           "name": {
             "type": "string"
+          },
+          "description": {
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "position": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
         "required": [
