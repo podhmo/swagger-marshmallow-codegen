@@ -22,14 +22,15 @@ class Context:
         separated: bool = False,
     ):
         self.name = name
+        self.separated = separated
+
         self.m: Module = m or Module()
         self.im: Module = im or self.m.submodule()
-        self.separated = separated
+        self.rim: Module = rim or self.m.submodule()
+
         self._relative_imported = relative_imported
         if relative_imported is None:
             self._relative_imported = {}
-        if separated:
-            self.rim: Module = rim or self.m.submodule()
 
     def from_(self, module: str, name: str) -> FromStatement:
         logger.debug("      import: module=%s, name=%s", module, name)
