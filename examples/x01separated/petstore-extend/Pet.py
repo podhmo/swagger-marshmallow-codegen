@@ -5,7 +5,6 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
-from .Shop import Shop
 
 
 class Pet(Schema):

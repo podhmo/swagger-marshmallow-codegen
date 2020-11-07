@@ -5,13 +5,21 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
-from .ShopDescription import ShopDescription
 
 
 class Shop(Schema):
     id = fields.Integer(required=True)
     name = fields.String(required=True)
     description = fields.Nested(lambda: ShopDescription())
+
+    class Meta:
+        unknown = INCLUDE
+
+
+
+class ShopDescription(Schema):
+    content = fields.String()
+    position = fields.String()
 
     class Meta:
         unknown = INCLUDE
