@@ -2,12 +2,14 @@ from __future__ import annotations
 import typing as t
 import logging
 from functools import partial
+from .config import ConfigDict
 from .context import Context  # noqa:F401
 from .v2.codegen import SchemaWriter  # noqa:F401
-from .config import ConfigDict
 
 if t.TYPE_CHECKING:
     from swagger_marshmallow_codegen.resolver import Resolver
+    from .context import InputData
+    from .context import OutputData
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +43,12 @@ class Codegen:
 
     def codegen(
         self,
-        d,
+        d: InputData,
         config: ConfigDict,
         *,
         ctx: t.Optional[Context] = None,
         test: bool = False,
-    ):
+    ) -> OutputData:
         if test:
             # todo: use dataclasses?
             config["skip_header_comment"] = True

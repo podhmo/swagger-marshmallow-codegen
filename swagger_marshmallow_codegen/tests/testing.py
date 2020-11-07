@@ -1,6 +1,7 @@
 from __future__ import annotations
 import typing as t
 import pathlib
+from swagger_marshmallow_codegen.codegen.context import Context  # noqa:F401
 
 
 def get_codegen():

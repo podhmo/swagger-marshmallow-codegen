@@ -10,6 +10,7 @@ from .lifting import lifting_definition
 
 if t.TYPE_CHECKING:
     from .codegen.config import ConfigDict
+    from .codegen.context import InputData, OutputData
 
 logger = logging.getLogger(__name__)
 
@@ -27,18 +28,20 @@ class Driver:
     def __init__(self, options: OptionsDict):
         self.options: OptionsDict = options
 
-    def load(self, fp):
+    def load(self, fp: t.Any) -> InputData:
         # hack:
         # import dictknife.loading._yaml as xxx
         # xxx.make_dict = dict
         return loading.load(fp)
 
-    def dump(self, m, *, out: t.Optional[str] = None):
+    def dump(self, d: OutputData, *, out: t.Optional[str] = None) -> None:
         if out is None:
-            return print(m)
+            for name, m in d.files:
+                print(m)
+            return
         raise NotImplementedError(out)
 
-    def transform(self, d):
+    def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)
         return self.create_codegen().codegen(d, config=self.options["targets"])
 
@@ -68,19 +71,27 @@ class Flatten:
     def __init__(self, options: OptionsDict) -> None:
         self.options: OptionsDict = options
 
-    def load(self, fp):
+    def load(self, fp: t.Any) -> InputData:
         return loading.load(fp)
 
-    def dump(self, d, *, out: t.Optional[str] = None):
+    def dump(self, d: OutputData, *, out: t.Optional[str] = None) -> None:
         return loading.dump(d, out)
 
-    def transform(self, d):
-        return lifting_definition(d)
+    def transform(self, d: InputData) -> OutputData:
+        lifted = lifting_definition(d)
+
+        class _Data:
+            @property
+            def files(self) -> t.Iterator[t.Tuple[str, t.Any]]:
+                yield lifted
+
+        return _Data()
 
     def run(self, inp):
         data = self.load(inp)
         result = self.transform(data)
-        self.dump(result)
+        for _, d in result.files:
+            self.dump(d)
 
 
 class ProfileDriver(Driver):
