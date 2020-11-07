@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 import typing as t
+from prestring.output import output as create_separated_output
 from . import loading
 from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
@@ -33,7 +34,18 @@ class Driver:
             for name, m in d.files:
                 print(m)
             return
-        raise NotImplementedError(output)
+
+        with create_separated_output(output, suffix=".py") as fs:
+            seen = set()
+            for name, m in d.files:
+                seen.add(name)
+                with fs.open(name, "w") as wf:
+                    print(m, file=wf)
+
+            name = "__init__"
+            if name not in seen:
+                with fs.open(name, "w") as wf:
+                    pass
 
     def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)

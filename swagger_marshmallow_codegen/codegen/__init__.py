@@ -4,7 +4,7 @@ import logging
 from functools import partial
 from .config import ConfigDict
 from .context import Context
-from .context import OnceContextFactory
+from .context import OneFileContextFactory, SeparatedFilesContextFactory
 from .v2.codegen import SchemaWriter  # noqa:F401
 
 if t.TYPE_CHECKING:
@@ -45,12 +45,17 @@ class Codegen:
     def codegen(
         self, d: InputData, config: ConfigDict, *, ctx: t.Optional[Context] = None,
     ) -> OutputData:
-        cls = self.guess_factory(d, config=config, path=self.version_path)
-        codegen = cls(
+        codegen_cls = self.guess_factory(d, config=config, path=self.version_path)
+        codegen = codegen_cls(
             schema_class_path=self.schema_class_path,
             schema_writer_factory=self.schema_writer_factory,
         )
-        context_factory = OnceContextFactory(
+        if config.get("separated_output", False):
+            context_factory_cls = SeparatedFilesContextFactory
+        else:
+            context_factory_cls = OneFileContextFactory
+
+        context_factory = context_factory_cls(
             ctx or Context(), setup=codegen.setup_context
         )
         return codegen.codegen(d, context_factory=context_factory)
