@@ -1,7 +1,6 @@
 from __future__ import annotations
 import logging
 import typing as t
-import typing_extensions as tx
 from . import loading
 from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
@@ -15,18 +14,13 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class OptionsDict(tx.TypedDict, total=True):
-    targets: ConfigDict  # TODO: rename
-    separated: bool
-
-
 class Driver:
     dispatcher_factory = FormatDispatcher
     resolver_factory = Resolver
     codegen_factory = Codegen
 
-    def __init__(self, options: OptionsDict):
-        self.options: OptionsDict = options
+    def __init__(self, config: ConfigDict):
+        self.config: ConfigDict = config
 
     def load(self, fp: t.Any) -> InputData:
         # hack:
@@ -43,7 +37,7 @@ class Driver:
 
     def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)
-        return self.create_codegen().codegen(d, config=self.options["targets"])
+        return self.create_codegen().codegen(d, config=self.config)
 
     def run(self, inp):
         data = self.load(inp)
@@ -68,8 +62,8 @@ class LegacyDriver(Driver):
 
 
 class Flatten:
-    def __init__(self, options: OptionsDict) -> None:
-        self.options: OptionsDict = options
+    def __init__(self, config: ConfigDict) -> None:
+        self.config: ConfigDict = config
 
     def load(self, fp: t.Any) -> InputData:
         return loading.load(fp)
