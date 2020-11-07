@@ -28,6 +28,8 @@ class Context:
 
 @tx.runtime_checkable
 class ContextFactory(tx.Protocol):
+    setup: t.Optional[t.Callable[[Context], None]]
+
     def __call__(self, name: str, *, part: t.Optional[str] = None) -> Context:
         ...
 
@@ -39,9 +41,32 @@ class OutputData(tx.Protocol):
         ...
 
 
-class OnceContextFactory:
-    def __init__(self, ctx: Context, *, setup: t.Callable[Context]) -> None:
-        self._parts: t.Dict[str, Context] = {}
+class SeparatedFilesContextFactory:
+    def __init__(self, ctx: Context, *, setup: t.Callable[[Context], None]) -> None:
+        self._files: t.Dict[str, Context] = {}
+        self._parts: t.Dict[t.Tuple[str, t.Optional[str]], Context] = {}
+        self._root = ctx
+        self._setup = setup
+
+    def __call__(self, name: str, *, part: t.Optional[str] = None) -> Context:
+        ctx = self._files.get(name)
+        if ctx is None:
+            ctx = self._files[name] = Context()
+            self._setup(ctx)
+
+        sctx = self._parts.get((name, part))
+        if sctx is None:
+            sctx = self._parts[(name, part)] = ctx.new_child()
+        return sctx
+
+    @property
+    def files(self) -> t.Iterator[t.Tuple[str, t.Any]]:
+        return sorted([(name, ctx.m) for name, ctx in self._files.items()])
+
+
+class OneFileContextFactory:
+    def __init__(self, ctx: Context, *, setup: t.Callable[[Context], None]) -> None:
+        self._parts: t.Dict[t.Optional[str], Context] = {}
         self._root = ctx
         self.setup = setup
         self.setup(ctx)

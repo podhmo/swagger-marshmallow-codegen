@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 import typing as t
+from prestring.output import output as create_separated_output
 from . import loading
 from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
@@ -28,21 +29,32 @@ class Driver:
         # xxx.make_dict = dict
         return loading.load(fp)
 
-    def dump(self, d: OutputData, *, out: t.Optional[str] = None) -> None:
-        if out is None:
+    def dump(self, d: OutputData, *, output: t.Optional[str] = None) -> None:
+        if output is None:
             for name, m in d.files:
                 print(m)
             return
-        raise NotImplementedError(out)
+
+        with create_separated_output(output, suffix=".py") as fs:
+            seen = set()
+            for name, m in d.files:
+                seen.add(name)
+                with fs.open(name, "w") as wf:
+                    print(m, file=wf)
+
+            name = "__init__"
+            if name not in seen:
+                with fs.open(name, "w") as wf:
+                    pass
 
     def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)
         return self.create_codegen().codegen(d, config=self.config)
 
-    def run(self, inp):
+    def run(self, inp, *, output: t.Optional[str] = None):
         data = self.load(inp)
         result = self.transform(data)
-        self.dump(result)
+        self.dump(result, output=output)
 
     def create_codegen(self):
         dispatcher = self.dispatcher_factory()
@@ -68,8 +80,9 @@ class Flatten:
     def load(self, fp: t.Any) -> InputData:
         return loading.load(fp)
 
-    def dump(self, d: OutputData, *, out: t.Optional[str] = None) -> None:
-        return loading.dump(d, out)
+    def dump(self, result: OutputData, *, output: t.Optional[str] = None) -> None:
+        for _, d in result.files:
+            return loading.dump(d, output)
 
     def transform(self, d: InputData) -> OutputData:
         lifted = lifting_definition(d)
@@ -81,15 +94,14 @@ class Flatten:
 
         return _Data()
 
-    def run(self, inp):
+    def run(self, inp, *, output: t.Optional[str] = None):
         data = self.load(inp)
         result = self.transform(data)
-        for _, d in result.files:
-            self.dump(d)
+        self.dump(result, output=output)
 
 
 class ProfileDriver(Driver):
-    def run(self, inp):
+    def run(self, inp, *, output: t.Optional[str] = None):
         import cProfile
         import pstats
 
@@ -100,4 +112,4 @@ class ProfileDriver(Driver):
         profile.disable()
         s = pstats.Stats(profile)
         s.dump_stats("swagger-marshmallow-codegen.prof")
-        self.dump(result)
+        self.dump(result, output=output)

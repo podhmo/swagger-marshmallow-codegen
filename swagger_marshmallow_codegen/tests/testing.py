@@ -12,7 +12,9 @@ def get_codegen():
     return _TargetClass(resolver=resolver)
 
 
-def load_srcfile(src: pathlib.Path, *, here: pathlib.Path) -> t.Dict[str, t.Any]:
+def load_srcfile(
+    src: t.Union[str, pathlib.Path], *, here: pathlib.Path
+) -> t.Dict[str, t.Any]:
     from swagger_marshmallow_codegen.loading import load
 
     filepath = here / src
@@ -20,7 +22,7 @@ def load_srcfile(src: pathlib.Path, *, here: pathlib.Path) -> t.Dict[str, t.Any]
         return load(rf)
 
 
-def load_dstfile(dst: pathlib.Path, *, here: pathlib.Path) -> str:
+def load_dstfile(dst: t.Union[str, pathlib.Path], *, here: pathlib.Path) -> str:
     try:
         filepath = here / dst
         with filepath.open() as rf:
