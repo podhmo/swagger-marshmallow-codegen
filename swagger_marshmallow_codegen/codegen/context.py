@@ -41,7 +41,7 @@ class OutputData(tx.Protocol):
 
 class OnceContextFactory:
     def __init__(self, ctx: Context, *, setup: t.Callable[Context]) -> None:
-        self._parts: t.Dict[str, Context] = {}
+        self._parts: t.Dict[t.Optional[str], Context] = {}
         self._root = ctx
         self.setup = setup
         self.setup(ctx)
