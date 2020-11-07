@@ -29,6 +29,12 @@
           "shop": {
             "$ref": "#/components/schemas/Shop"
           },
+          "father": {
+            "$ref": "#/components/schemas/Pet"
+          },
+          "mother": {
+            "$ref": "#/components/schemas/Pet"
+          },
           "tag": {
             "type": "string"
           }

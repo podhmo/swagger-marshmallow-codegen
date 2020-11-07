@@ -5,12 +5,16 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
+from .Shop import Shop
+from .Pet import Pet
 
 
 class Pet(Schema):
     id = fields.Integer(required=True)
     name = fields.String(required=True)
     shop = fields.Nested(lambda: Shop())
+    father = fields.Nested(lambda: Pet())
+    mother = fields.Nested(lambda: Pet())
     tag = fields.String()
 
     class Meta:
