@@ -28,6 +28,8 @@ class Context:
 
 @tx.runtime_checkable
 class ContextFactory(tx.Protocol):
+    setup: t.Optional[t.Callable[[Context], None]]
+
     def __call__(self, name: str, *, part: t.Optional[str] = None) -> Context:
         ...
 
@@ -40,7 +42,7 @@ class OutputData(tx.Protocol):
 
 
 class OnceContextFactory:
-    def __init__(self, ctx: Context, *, setup: t.Callable[Context]) -> None:
+    def __init__(self, ctx: Context, *, setup: t.Callable[[Context], None]) -> None:
         self._parts: t.Dict[t.Optional[str], Context] = {}
         self._root = ctx
         self.setup = setup

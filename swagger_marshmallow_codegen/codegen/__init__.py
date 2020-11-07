@@ -3,7 +3,8 @@ import typing as t
 import logging
 from functools import partial
 from .config import ConfigDict
-from .context import Context  # noqa:F401
+from .context import Context
+from .context import OnceContextFactory
 from .v2.codegen import SchemaWriter  # noqa:F401
 
 if t.TYPE_CHECKING:
@@ -58,7 +59,8 @@ class Codegen:
             schema_class_path=self.schema_class_path,
             schema_writer_factory=self.schema_writer_factory,
         )
-        return codegen.codegen(d, ctx=ctx)
+        context_factory = OnceContextFactory(Context(), setup=codegen.setup_context)
+        return codegen.codegen(d, context_factory=context_factory)
 
     def guess_factory(
         self, d: t.Dict, *, config: ConfigDict, path: str

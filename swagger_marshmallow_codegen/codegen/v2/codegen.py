@@ -15,7 +15,6 @@ from swagger_marshmallow_codegen.langhelpers import (
     titleize,
     clsname_from_path,
 )
-from ..context import OnceContextFactory
 from ..context import Context
 from ..config import ConfigDict
 from .accessor import Accessor
@@ -632,20 +631,15 @@ from __future__ import annotations
                 d, context_factory=context_factory
             )
 
-    def codegen(self, d: InputData, ctx: t.Optional[Context] = None) -> OutputData:
-        ctx = ctx or Context()
+    def setup_context(self, ctx: Context) -> None:
+        if not self.accessor.config.get("skip_header_comment", False):
+            self.write_header(ctx, comment=self.accessor.config.get("header_comment"))
+        ctx.m.sep()
+        self.write_import_(ctx)
 
-        def setup(ctx: Context) -> None:
-            if not self.accessor.config.get("skip_header_comment", False):
-                self.write_header(
-                    ctx, comment=self.accessor.config.get("header_comment")
-                )
-            ctx.m.sep()
-            self.write_import_(ctx)
-
-        factory = OnceContextFactory(ctx, setup=setup)
-        self.write_body(d, context_factory=factory)
-        return factory
+    def codegen(self, d: InputData, context_factory) -> OutputData:
+        self.write_body(d, context_factory=context_factory)
+        return context_factory
 
 
 def lazy_json_dump(s):
