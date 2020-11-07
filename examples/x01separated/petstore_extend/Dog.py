@@ -5,8 +5,8 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
-from .Pet import Pet
 from swagger_marshmallow_codegen.validate import Range
+from .Pet import Pet
 
 
 class Dog(Pet):

@@ -15,11 +15,13 @@ class Context:
         *,
         m: t.Optional[Module] = None,
         im: t.Optional[Module] = None,
+        rm: t.Optional[Module] = None,
         relative_imported: t.Optional[t.Dict[str, Symbol]] = None,
         separated: bool = False,
     ):
         self.m: Module = m or Module()
         self.im: Module = im or self.m.submodule()
+        self.rm: Module = rm or self.m.submodule()
         self.separated = separated
         self._relative_imported = relative_imported
         if relative_imported is None:
@@ -41,13 +43,14 @@ class Context:
         if imported is not None:
             return None
         logger.debug("      relative import: module=.%s	symbol:%s", name, name)
-        self._relative_imported[name] = self.im.from_("." + name, name)
+        self._relative_imported[name] = self.rm.from_("." + name, name)
         return None
 
     def new_child(self) -> Context:
         return self.__class__(
             m=self.m.submodule(newline=False),
             im=self.im,
+            rm=self.rm,
             relative_imported=self._relative_imported,
             separated=self.separated,
         )

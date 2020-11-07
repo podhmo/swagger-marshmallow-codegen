@@ -5,8 +5,8 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
-from .Pet import Pet
 from marshmallow.validate import OneOf
+from .Pet import Pet
 
 
 class Cat(Pet):
