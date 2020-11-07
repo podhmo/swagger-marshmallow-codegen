@@ -1,2 +1,2 @@
-from .team import team
-from .user import user
+from .team import Team
+from .user import User

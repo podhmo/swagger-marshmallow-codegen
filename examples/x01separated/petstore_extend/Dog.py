@@ -6,6 +6,7 @@ from marshmallow import (
     INCLUDE,
 )
 from swagger_marshmallow_codegen.validate import Range
+from ._lazy import _usePet
 from .Pet import Pet
 
 
