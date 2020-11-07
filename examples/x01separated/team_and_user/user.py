@@ -5,11 +5,12 @@ from marshmallow import (
     fields,
     INCLUDE,
 )
+from ._lazy import _useTeam
 
 
 class User(Schema):
     name = fields.String()
-    team = fields.Nested(lambda: Team())
+    team = fields.Nested(_useTeam)
 
     class Meta:
         unknown = INCLUDE

@@ -58,7 +58,11 @@ class Codegen:
         context_factory = context_factory_cls(
             ctx or Context(), setup=codegen.setup_context
         )
-        return codegen.codegen(d, context_factory=context_factory)
+        try:
+            return codegen.codegen(d, context_factory=context_factory)
+        finally:
+            if context_factory.teardown is not None:
+                context_factory.teardown(codegen.accessor.resolver)
 
     def guess_factory(
         self, d: t.Dict, *, config: ConfigDict, path: str
