@@ -25,8 +25,7 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
     parser.add_argument("--strict-additional-properties", action="store_true")
     parser.add_argument("--explicit", action="store_true")
 
-    parser.add_argument("--output")
-    parser.add_argument("-d", "--separated-output", action="store_true")
+    parser.add_argument("-d", "--separated-output", default=None)
 
     parser.add_argument("file", default=None)
     args = parser.parse_args()
@@ -48,7 +47,7 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
         "emit_input": False,
         "emit_output": False,
         "additional_properties_default": not args.strict_additional_properties,
-        "separated_output": args.separated_output,
+        "separated_output": bool(args.separated_output),
     }
     if args.full:
         config["emit_input"] = True
@@ -61,7 +60,7 @@ def main(setup: t.Optional[t.Callable[[Driver], None]] = None):
         setup(driver)
 
     if args.file is None:
-        driver.run(sys.stdin, output=args.output)
+        driver.run(sys.stdin, output=args.separated_output)
     else:
         with open(args.file) as rf:
-            driver.run(rf, output=args.output)
+            driver.run(rf, output=args.separated_output)

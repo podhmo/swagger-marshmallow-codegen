@@ -15,6 +15,10 @@ from swagger_marshmallow_codegen.langhelpers import (
     titleize,
     clsname_from_path,
 )
+from swagger_marshmallow_codegen.constants import (
+    X_MARSHMALLOW_NAME,
+    X_MARSHMALLOW_INLINE,
+)
 from ..context import Context
 from ..config import ConfigDict
 from .accessor import Accessor
@@ -24,7 +28,9 @@ if t.TYPE_CHECKING:
     from ..context import ContextFactory, InputData, OutputData
 
 logger = logging.getLogger(__name__)
-NAME_MARKER = "x-marshmallow-name"
+NAME_MARKER = X_MARSHMALLOW_NAME
+
+PathInfo = namedtuple("PathInfo", "info, required")
 
 
 class CodegenError(Exception):
@@ -69,11 +75,11 @@ class SchemaWriter:
             field = field["items"]
             if self.resolver.has_ref(field):
                 field_class_name, field = self.resolver.resolve_ref_definition(
-                    d, field, level=1
+                    c, d, field, level=1
                 )
                 # finding original definition
                 if self.resolver.has_ref(field):
-                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    ref_name, field = self.resolver.resolve_ref_definition(c, d, field)
                     if ref_name is None:
                         raise CodegenError("ref: %r is not found", field["$ref"])
 
@@ -139,11 +145,11 @@ class SchemaWriter:
 
             if self.resolver.has_ref(field):
                 field_class_name, field = self.resolver.resolve_ref_definition(
-                    d, field, level=1
+                    c, d, field, level=1
                 )
                 # finding original definition
                 if self.resolver.has_ref(field):
-                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    ref_name, field = self.resolver.resolve_ref_definition(c, d, field)
                     if ref_name is None:
                         raise CodegenError("ref: %r is not found", field["$ref"])
 
@@ -186,7 +192,7 @@ class SchemaWriter:
         field_class_name = None
         if self.resolver.has_ref(field):
             field_class_name, field = self.resolver.resolve_ref_definition(
-                d, field, level=1
+                c, d, field, level=1
             )
             if self.resolver.has_many(field):
                 return self.write_field_one(
@@ -195,7 +201,7 @@ class SchemaWriter:
 
             # finding original definition
             if self.resolver.has_ref(field):
-                ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                ref_name, field = self.resolver.resolve_ref_definition(c, d, field)
                 if self.resolver.has_many(field):
                     return self.write_field_one(
                         c, d, field_class_name, definition, name, field, opts, many=True
@@ -249,7 +255,7 @@ class SchemaWriter:
         base_classes = [self.schema_class]
         if self.resolver.has_ref(definition):
             ref_name, ref_definition = self.resolver.resolve_ref_definition(
-                d, definition
+                c, d, definition
             )
             if ref_name is None:
                 raise CodegenError("$ref %r is not found", definition["$ref"])
@@ -259,7 +265,7 @@ class SchemaWriter:
                 items = ref_definition["items"]
                 if self.resolver.has_ref(items):
                     _, items = self.resolver.resolve_ref_definition(
-                        d, ref_definition["items"]
+                        c, d, ref_definition["items"]
                     )
                 if not self.resolver.has_schema(d, items):
                     return self.write_primitive_schema(
@@ -277,12 +283,13 @@ class SchemaWriter:
                 base_classes = [ref_name]
         elif self.resolver.has_allof(definition):
             ref_list, ref_definition = self.resolver.resolve_allof_definition(
-                d, definition
+                c, d, definition
             )
             definition = deepmerge(ref_definition, definition)
             if ref_list:
                 base_classes = []
                 for ref_name, ref_definition in ref_list:
+                    c.relative_import(ref_name)
                     if ref_name is None:
                         raise CodegenError(
                             "$ref %r is not found", ref_definition
@@ -310,7 +317,7 @@ class SchemaWriter:
                 return self.write_primitive_schema(c, d, clsname, definition, many=many)
             else:
                 ref_name, ref_definition = self.resolver.resolve_ref_definition(
-                    d, definition["items"]
+                    c, d, definition["items"]
                 )
                 if ref_name is None:
                     return self.write_primitive_schema(
@@ -361,7 +368,7 @@ class SchemaWriter:
                 subdef = definition["additionalProperties"]
                 with c.m.class_("Meta"):
                     if self.resolver.has_ref(subdef):
-                        ref_name, _ = self.resolver.resolve_ref_definition(d, subdef)
+                        ref_name, _ = self.resolver.resolve_ref_definition(c, d, subdef)
                         if ref_name is None:
                             raise CodegenError("$ref %r is not found", subdef["$ref"])
                         self.write_field_one(
@@ -435,7 +442,9 @@ class DefinitionsSchemaWriter:
                 logger.info("write schema: skip %s", schema_name)
                 continue
 
-            c = context_factory(schema_name, part=part)
+            c = context_factory(
+                definition.get(X_MARSHMALLOW_INLINE) or schema_name, part=part
+            )
             clsname = self.resolver.resolve_schema_name(schema_name)
             logger.info("write schema: write %s", schema_name)
             self.schema_writer.write_schema(c, d, clsname, definition)
@@ -485,7 +494,10 @@ class PathsSchemaWriter:
                             ssc.m.stmt("")
 
                         path_info = self.build_path_info(
-                            d, toplevel_parameters, self.accessor.parameters(definition)
+                            sc,
+                            d,
+                            toplevel_parameters,
+                            self.accessor.parameters(definition),
                         )
                         for section, properties in sorted(path_info.info.items()):
                             if section is None:
@@ -513,21 +525,24 @@ class PathsSchemaWriter:
             if not found:
                 sc.m.clear()
 
-    PathInfo = namedtuple("PathInfo", "info, required")
-
-    def build_path_info(self, fulldata, *paramaters_set):
+    def build_path_info(
+        self,
+        c: Context,
+        fulldata: t.Dict[str, t.Any],
+        *paramaters_set: t.List[t.Dict[str, t.Any]]
+    ) -> PathInfo:
         info = defaultdict(OrderedDict)
         required = defaultdict(list)
         for parameters in paramaters_set:
             for p in parameters:
                 if self.resolver.has_ref(p):
-                    _, p = self.resolver.resolve_ref_definition(fulldata, p)
+                    _, p = self.resolver.resolve_ref_definition(c, fulldata, p)
                 name = p.get("name")
                 section = p.get("in")
                 info[section][name] = p
                 if p.get("required"):
                     required[section].append(name)
-        return self.PathInfo(info=info, required=required)
+        return PathInfo(info=info, required=required)
 
 
 class ResponsesSchemaWriter:
@@ -559,7 +574,7 @@ class ResponsesSchemaWriter:
                     for status, definition in self.accessor.responses(definition):
                         if self.resolver.has_ref(definition):
                             _, definition = self.resolver.resolve_ref_definition(
-                                d, definition
+                                sc, d, definition
                             )
                         if "schema" in definition:
                             found = True

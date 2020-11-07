@@ -4,55 +4,65 @@ import logging
 
 if t.TYPE_CHECKING:
     from swagger_marshmallow_codegen.resolver import Resolver
-    from swagger_marshmallow_codegen.codegen.config import ConfigDict
+    from swagger_marshmallow_codegen.dispatcher import FormatDispatcher
+    from ..config import ConfigDict
+    from ..context import Context
 logger = logging.getLogger(__name__)
 
 
 class Accessor:
-    def __init__(self, resolver: Resolver, *, config: ConfigDict):
+    def __init__(self, resolver: Resolver, *, config: ConfigDict) -> None:
         self.resolver = resolver
         self.config = config
 
     @property
-    def dispatcher(self):
+    def dispatcher(self) -> FormatDispatcher:
         return self.resolver.dispatcher
 
-    def paths(self, d):
+    def paths(self, d: t.Dict[str, t.Any]) -> t.List[t.Dict[str, t.Any]]:
         return (d.get("paths") or {}).items()
 
     def methods(
         self,
-        d,
-        candidates=set(("get", "post", "put", "head", "delete", "options", "patch")),
-    ):
+        d: t.Dict[str, t.Any],
+        candidates: t.Set[str] = set(
+            ("get", "post", "put", "head", "delete", "options", "patch")
+        ),
+    ) -> t.Iterator[t.Tuple[str, t.Dict[str, t.Any]]]:
         for method, definition in d.items():
             if method in candidates:
                 yield method, definition
 
-    def parameters(self, d):
+    def parameters(self, d: t.Dict[str, t.Any]) -> t.List[t.Dict[str, t.Any]]:
         return d.get("parameters") or []
 
-    def responses(self, d):
+    def responses(
+        self, d: t.Dict[str, t.Any]
+    ) -> t.Iterator[t.Tuple[str, t.Dict[str, t.Any]]]:
         for name, definition in (d.get("responses") or {}).items():
             name = str(name)
             if not name.startswith("x-"):
                 yield name, definition
 
-    def definitions(self, d):
+    def definitions(self, d: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
         return (d.get("definitions") or {}).items()
 
-    def properties(self, d):
+    def properties(self, d: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
         return d.get("properties") or {}
 
-    def pattern_properties(self, d):
+    def pattern_properties(self, d: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
         return d.get("patternProperties") or {}
 
-    def update_options_pre_properties(self, d, opts):
+    def update_options_pre_properties(
+        self, d: t.Dict[str, t.Any], opts: t.Dict[str, t.Any]
+    ) -> t.Dict[str, t.Any]:
         for name in d.get("required") or []:
             opts[name]["required"] = True
         return opts
 
-    def update_option_on_property(self, c, field, opts):
+    def update_option_on_property(
+        self, c: Context, field: t.Dict[str, t.Any], opts: t.Dict[str, t.Any]
+    ) -> t.Dict[str, t.Any]:
         if "description" in field:
             opts["description"] = field["description"]
         if self.resolver.has_many(field):

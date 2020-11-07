@@ -1,13 +1,16 @@
 definitions:
   wrap:
+    x-marshmallow-inline: wrap
     type: object
     properties:
       empties:
         $ref: '#/definitions/wrapEmpties'
   wrapEmpties:
+    x-marshmallow-inline: wrap
     type: array
     items:
       $ref: '#/definitions/wrapEmptiesItem'
   wrapEmptiesItem:
+    x-marshmallow-inline: wrap
     type: object
     title: empty
