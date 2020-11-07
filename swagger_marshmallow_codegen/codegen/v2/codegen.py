@@ -435,7 +435,9 @@ class DefinitionsSchemaWriter:
                 logger.info("write schema: skip %s", schema_name)
                 continue
 
-            c = context_factory(schema_name, part=part)
+            c = context_factory(
+                definition.get("x-marshmallow-inline") or schema_name, part=part
+            )
             clsname = self.resolver.resolve_schema_name(schema_name)
             logger.info("write schema: write %s", schema_name)
             self.schema_writer.write_schema(c, d, clsname, definition)

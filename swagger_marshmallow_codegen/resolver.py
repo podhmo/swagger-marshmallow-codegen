@@ -141,7 +141,10 @@ class Resolver:
         ref_name, definition = self.resolve_ref_definition(
             c, fulldata, parent[name], name=name, i=i + 1, level=level - 1
         )
-        c.relative_import(ref_name)  # xxx:
+
+        # import for separated output
+        if "x-marshmallow-inline" not in definition:
+            c.relative_import(ref_name)
         return ref_name, definition
 
     def resolve_validators_on_property(
