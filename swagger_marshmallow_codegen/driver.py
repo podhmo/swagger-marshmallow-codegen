@@ -7,6 +7,7 @@ from .resolver import Resolver
 from .codegen import Codegen, SchemaWriter
 from .dispatcher import FormatDispatcher
 from .lifting import lifting_definition
+from .langhelpers import normalize
 
 if t.TYPE_CHECKING:
     from .codegen.config import ConfigDict
@@ -35,7 +36,7 @@ class Driver:
                 print(m)
             return
 
-        with create_separated_output(output, suffix=".py") as fs:
+        with create_separated_output(normalize(output), suffix=".py") as fs:
             seen = set()
             for name, m in d.files:
                 seen.add(name)
@@ -45,7 +46,8 @@ class Driver:
             name = "__init__"
             if name not in seen:
                 with fs.open(name, "w") as wf:
-                    pass
+                    for name, _ in d.files:
+                        print(f"from .{name} import {name}", file=wf)
 
     def transform(self, d: InputData) -> OutputData:
         d = lifting_definition(d)
