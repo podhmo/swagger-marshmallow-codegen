@@ -10,10 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class Context:
-    def __init__(self, m=None, im=None):
+    def __init__(
+        self,
+        *,
+        m: t.Optional[Module] = None,
+        im: t.Optional[Module] = None,
+        relative_imported: t.Optional[t.Dict[str, Symbol]] = None,
+    ):
         self.m: Module = m or Module()
         self.im: Module = im or self.m.submodule()
-        self._relative_imported: t.Dict[str, Symbol] = {}
+        self._relative_imported = relative_imported
+        if relative_imported is None:
+            self._relative_imported = {}
 
     def from_(self, module: str, name: str) -> FromStatement:
         logger.debug("      import: module=%s, name=%s", module, name)
@@ -32,7 +40,11 @@ class Context:
         return sym
 
     def new_child(self) -> Context:
-        return self.__class__(self.m.submodule(newline=False), self.im)
+        return self.__class__(
+            m=self.m.submodule(newline=False),
+            im=self.im,
+            relative_imported=self._relative_imported,
+        )
 
 
 @tx.runtime_checkable
@@ -61,6 +73,7 @@ class SeparatedFilesContextFactory:
         ctx = self._files.get(name)
         if ctx is None:
             ctx = self._files[name] = Context()
+            ctx._relative_imported[name] = Symbol(name)
             self._setup(ctx)
 
         sctx = self._parts.get((name, part))

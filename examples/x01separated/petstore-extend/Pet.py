@@ -6,7 +6,6 @@ from marshmallow import (
     INCLUDE,
 )
 from .Shop import Shop
-from .Pet import Pet
 
 
 class Pet(Schema):
