@@ -51,7 +51,7 @@ class Codegen:
             # todo: use dataclasses?
             config["skip_header_comment"] = True
 
-        cls = self.guess_factory(d, config=config, path="version")
+        cls = self.guess_factory(d, config=config, path=self.version_path)
         codegen = cls(
             schema_class_path=self.schema_class_path,
             schema_writer_factory=self.schema_writer_factory,
@@ -59,7 +59,7 @@ class Codegen:
         return codegen.codegen(d, ctx=ctx)
 
     def guess_factory(
-        self, d: t.Dict, *, config: ConfigDict, path: str = "version"
+        self, d: t.Dict, *, config: ConfigDict, path: str
     ) -> t.Type[t.Any]:
         version = d.get(path)
         if version is None:
@@ -72,7 +72,7 @@ class Codegen:
 
             logger.info("openapi version is v2")
             return partial(Codegen, Accessor(self.resolver, config=config))
-        elif version.strip()[0] == "3":
+        elif version.strip()[0] >= "3":
             from .v3.codegen import Codegen
             from .v3.accessor import Accessor
 
