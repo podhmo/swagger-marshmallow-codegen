@@ -1,6 +1,5 @@
 definitions:
   wrap:
-    x-marshmallow-inline: wrap
     type: object
     properties:
       empties:

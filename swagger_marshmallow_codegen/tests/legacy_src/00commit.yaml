@@ -1,6 +1,5 @@
 definitions:
   commit:
-    x-marshmallow-inline: commit
     properties:
       author:
         $ref: '#/definitions/commitAuthor'
