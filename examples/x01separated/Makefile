@@ -4,7 +4,7 @@ default: clean
 	$(MAKE) $(shell cat Makefile | $(GREP) -P '^[0-9]+:' | tr ':' ' ')
 
 clean:
-	rm -rf petstore petstore-extend
+	rm -rf petstore petstore_extend
 
 # simple
 00:
