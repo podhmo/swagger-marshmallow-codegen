@@ -1,3 +1,11 @@
+GREP := $(shell which ggrep || grep)
+
+default: clean
+	$(MAKE) $(shell cat Makefile | $(GREP) -P '^[0-9]+:' | tr ':' ' ')
+
+clean:
+	rm -rf petstore petstore-extend
+
 # simple
 00:
 	swagger-marshmallow-codegen petstore.json -d --output petstore
