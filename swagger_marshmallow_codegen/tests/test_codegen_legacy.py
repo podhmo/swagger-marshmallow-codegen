@@ -51,6 +51,9 @@ here = pathlib.Path(__file__).parent
         ("./legacy_src/00nullable.yaml", "./legacy_dst/00nullable.py", ""),
         ("./legacy_src/00primitiveapi.yaml", "./legacy_dst/00primitiveapi.py", ""),
         # ("./legacy_src/00patternProperties.yaml", "./legacy_dst/00patternProperties.py"),  not supported yet
+        # x-marshmallow-name
+        ("./legacy_src/00x_marshmallow_name.yaml", "./legacy_dst/00x_marshmallow_name.py", ""),
+        ("./legacy_src/00x_marshmallow_name.yaml", "./legacy_dst/00x_marshmallow_name.py", ""),
     ],
 )
 def test(
