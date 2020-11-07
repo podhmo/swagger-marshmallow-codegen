@@ -107,6 +107,7 @@ class Resolver:
 
     def resolve_ref_definition(
         self,
+        c: Context,
         fulldata: t.Dict[str, t.Any],
         d: t.Dict[str, t.Any],
         name: t.Optional[str] = None,
@@ -119,7 +120,7 @@ class Resolver:
         if "items" in d:
             definition = d
             name, _ = self.resolve_ref_definition(
-                fulldata, d["items"], name=name, i=i, level=level + 1
+                c, fulldata, d["items"], name=name, i=i, level=level + 1
             )  # xxx
             return name, definition
 
@@ -137,9 +138,11 @@ class Resolver:
         if parent is None:
             logger.warning("%r is not found", d["$ref"])
             return self.resolve_schema_name(name), d
-        return self.resolve_ref_definition(
-            fulldata, parent[name], name=name, i=i + 1, level=level - 1
+        ref_name, definition = self.resolve_ref_definition(
+            c, fulldata, parent[name], name=name, i=i + 1, level=level - 1
         )
+        c.relative_import(ref_name)  # xxx:
+        return ref_name, definition
 
     def resolve_validators_on_property(
         self, c: Context, field: t.Dict[str, t.Any]

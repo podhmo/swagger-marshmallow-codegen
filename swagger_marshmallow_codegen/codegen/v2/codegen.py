@@ -69,11 +69,11 @@ class SchemaWriter:
             field = field["items"]
             if self.resolver.has_ref(field):
                 field_class_name, field = self.resolver.resolve_ref_definition(
-                    d, field, level=1
+                    c, d, field, level=1
                 )
                 # finding original definition
                 if self.resolver.has_ref(field):
-                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    ref_name, field = self.resolver.resolve_ref_definition(c, d, field)
                     if ref_name is None:
                         raise CodegenError("ref: %r is not found", field["$ref"])
 
@@ -139,11 +139,11 @@ class SchemaWriter:
 
             if self.resolver.has_ref(field):
                 field_class_name, field = self.resolver.resolve_ref_definition(
-                    d, field, level=1
+                    c, d, field, level=1
                 )
                 # finding original definition
                 if self.resolver.has_ref(field):
-                    ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                    ref_name, field = self.resolver.resolve_ref_definition(c, d, field)
                     if ref_name is None:
                         raise CodegenError("ref: %r is not found", field["$ref"])
 
@@ -186,7 +186,7 @@ class SchemaWriter:
         field_class_name = None
         if self.resolver.has_ref(field):
             field_class_name, field = self.resolver.resolve_ref_definition(
-                d, field, level=1
+                c, d, field, level=1
             )
             if self.resolver.has_many(field):
                 return self.write_field_one(
@@ -195,7 +195,7 @@ class SchemaWriter:
 
             # finding original definition
             if self.resolver.has_ref(field):
-                ref_name, field = self.resolver.resolve_ref_definition(d, field)
+                ref_name, field = self.resolver.resolve_ref_definition(c, d, field)
                 if self.resolver.has_many(field):
                     return self.write_field_one(
                         c, d, field_class_name, definition, name, field, opts, many=True
@@ -249,7 +249,7 @@ class SchemaWriter:
         base_classes = [self.schema_class]
         if self.resolver.has_ref(definition):
             ref_name, ref_definition = self.resolver.resolve_ref_definition(
-                d, definition
+                c, d, definition
             )
             if ref_name is None:
                 raise CodegenError("$ref %r is not found", definition["$ref"])
@@ -259,7 +259,7 @@ class SchemaWriter:
                 items = ref_definition["items"]
                 if self.resolver.has_ref(items):
                     _, items = self.resolver.resolve_ref_definition(
-                        d, ref_definition["items"]
+                        c, d, ref_definition["items"]
                     )
                 if not self.resolver.has_schema(d, items):
                     return self.write_primitive_schema(
@@ -310,7 +310,7 @@ class SchemaWriter:
                 return self.write_primitive_schema(c, d, clsname, definition, many=many)
             else:
                 ref_name, ref_definition = self.resolver.resolve_ref_definition(
-                    d, definition["items"]
+                    c, d, definition["items"]
                 )
                 if ref_name is None:
                     return self.write_primitive_schema(
@@ -361,7 +361,7 @@ class SchemaWriter:
                 subdef = definition["additionalProperties"]
                 with c.m.class_("Meta"):
                     if self.resolver.has_ref(subdef):
-                        ref_name, _ = self.resolver.resolve_ref_definition(d, subdef)
+                        ref_name, _ = self.resolver.resolve_ref_definition(c, d, subdef)
                         if ref_name is None:
                             raise CodegenError("$ref %r is not found", subdef["$ref"])
                         self.write_field_one(
@@ -521,7 +521,7 @@ class PathsSchemaWriter:
         for parameters in paramaters_set:
             for p in parameters:
                 if self.resolver.has_ref(p):
-                    _, p = self.resolver.resolve_ref_definition(fulldata, p)
+                    _, p = self.resolver.resolve_ref_definition(c, fulldata, p)
                 name = p.get("name")
                 section = p.get("in")
                 info[section][name] = p
@@ -559,7 +559,7 @@ class ResponsesSchemaWriter:
                     for status, definition in self.accessor.responses(definition):
                         if self.resolver.has_ref(definition):
                             _, definition = self.resolver.resolve_ref_definition(
-                                d, definition
+                                c, d, definition
                             )
                         if "schema" in definition:
                             found = True

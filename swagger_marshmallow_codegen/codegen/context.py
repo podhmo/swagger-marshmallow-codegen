@@ -13,16 +13,25 @@ class Context:
     def __init__(self, m=None, im=None):
         self.m: Module = m or Module()
         self.im: Module = im or self.m.submodule()
+        self._relative_imported: t.Dict[str, Symbol] = {}
 
-    def from_(self, module, name) -> FromStatement:
+    def from_(self, module: str, name: str) -> FromStatement:
         logger.debug("      import: module=%s, name=%s", module, name)
         return self.im.from_(module, name)
 
-    def import_(self, module) -> Symbol:
+    def import_(self, module: str) -> Symbol:
         logger.debug("      import: module=%s", module)
         return self.im.import_(module)
 
-    def new_child(self):
+    def relative_import(self, name: str) -> Symbol:
+        imported = self._relative_imported.get(name)
+        if imported is not None:
+            return imported
+        logger.debug("      relative import: module=.%s	symbol:%s", name, name)
+        sym = self._relative_imported[name] = self.im.from_("." + name, name)
+        return sym
+
+    def new_child(self) -> Context:
         return self.__class__(self.m.submodule(newline=False), self.im)
 
 
