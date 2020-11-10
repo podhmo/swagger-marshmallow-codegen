@@ -1,3 +1,7 @@
+0.6.3
+
+- support separated output partially
+
 0.6.2
 
 - support nested additionalProperties
