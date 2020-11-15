@@ -13,20 +13,27 @@ if t.TYPE_CHECKING:
     from .codegen.context import Context
 
 logger = logging.getLogger(__name__)
+AnyDict = t.Dict[str, t.Any]
 
 
 class Resolver:
     def __init__(self, dispatcher: FormatDispatcher) -> None:
         self.dispatcher = dispatcher
-        self.accessor = dictknife.Accessor()  # todo: rename
+        self._accessor = dictknife.Accessor()  # todo: rename
 
-    def has_ref(self, d) -> bool:
+    def has_ref(self, d: AnyDict) -> bool:
         return "$ref" in d
 
-    def has_allof(self, d) -> bool:
+    def has_allof(self, d: AnyDict) -> bool:
         return "allOf" in d
 
-    def has_schema(self, fulldata, d, cand=("object",), fullscan=True) -> bool:
+    def has_schema(
+        self,
+        fulldata: AnyDict,
+        d: AnyDict,
+        cand: t.Tuple[str, ...] = ("object",),
+        fullscan: bool = True,
+    ) -> bool:
         typ = d.get("type", None)
         if typ in cand:
             return True
@@ -135,7 +142,7 @@ class Resolver:
         path = d["$ref"][len("#/") :].split("/")
         name = path[-1]
 
-        parent = self.accessor.maybe_access_container(fulldata, path)
+        parent = self._accessor.maybe_access_container(fulldata, path)
         if parent is None:
             logger.warning("%r is not found", d["$ref"])
             return self.resolve_schema_name(name), d
