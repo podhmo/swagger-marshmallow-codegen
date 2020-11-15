@@ -1,0 +1,40 @@
+{
+  "definitions": {
+    "Person": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#definitionsPerson"
+          }
+        },
+        "children2": {
+          "$ref": "#definitionsChildren2"
+        },
+        "children3": {
+          "$ref": "#definitionsChildren3"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Children2": {
+      "type": "array",
+      "items": {
+        "$ref": "#definitionsPerson"
+      }
+    },
+    "Children3": {
+      "$ref": "#definitionsChildren2"
+    }
+  },
+  "openapi": "2.0.0"
+}

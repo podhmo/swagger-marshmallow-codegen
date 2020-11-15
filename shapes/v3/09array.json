@@ -1,0 +1,59 @@
+{
+  "components": {
+    "schemas": {
+      "Person": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Person"
+            }
+          },
+          "children2": {
+            "$ref": "#/components/schemas/Children2"
+          },
+          "children3": {
+            "$ref": "#/components/schemas/Children3"
+          },
+          "children4": {
+            "type": "array",
+            "items": {
+              "name": {
+                "type": "string"
+              },
+              "age": {
+                "type": "integer"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Person"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "Children2": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Person"
+        }
+      },
+      "Children3": {
+        "$ref": "#/components/schemas/Children2"
+      }
+    }
+  },
+  "openapi": "3.1.0"
+}

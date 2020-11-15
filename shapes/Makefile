@@ -9,7 +9,7 @@ gen:
  defs/07additionalProperties-with-bool.py \
 
 
-# 01,04,06 are added by hand.
+# 01,04,06,09 are added by hand.
 
 gen-candidates:
 	python gen-candidates.py expected > codegen_candidates.py
