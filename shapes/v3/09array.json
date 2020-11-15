@@ -25,16 +25,63 @@
           "children4": {
             "type": "array",
             "items": {
-              "name": {
-                "type": "string"
-              },
-              "age": {
-                "type": "integer"
-              },
-              "children": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Person"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "age": {
+                  "type": "integer"
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          },
+          "Nchildren": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Person"
+              }
+            }
+          },
+          "Nchildren2": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Children2"
+            }
+          },
+          "Nchildren3": {
+            "$ref": "#/components/schemas/NChildren3"
+          },
+          "Nchildren4": {
+            "$ref": "#/components/schemas/NChildren4"
+          },
+          "Nchildren5": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "age": {
+                    "type": "integer"
+                  },
+                  "Nchildren": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Person"
+                    }
+                  }
                 }
               }
             }
@@ -52,6 +99,24 @@
       },
       "Children3": {
         "$ref": "#/components/schemas/Children2"
+      },
+      "NChildren2": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Person"
+          }
+        }
+      },
+      "NChildren3": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Children3"
+        }
+      },
+      "NChildren4": {
+        "$ref": "#/components/schemas/NChildren3"
       }
     }
   },

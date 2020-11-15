@@ -20,6 +20,70 @@
         },
         "children3": {
           "$ref": "#definitionsChildren3"
+        },
+        "children4": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "age": {
+                "type": "integer"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#definitionsPerson"
+                }
+              }
+            }
+          }
+        },
+        "Nchildren": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#definitionsPerson"
+            }
+          }
+        },
+        "Nchildren2": {
+          "type": "array",
+          "items": {
+            "$ref": "#definitionsChildren2"
+          }
+        },
+        "Nchildren3": {
+          "$ref": "#definitionsNChildren3"
+        },
+        "Nchildren4": {
+          "$ref": "#definitionsNChildren4"
+        },
+        "Nchildren5": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "age": {
+                  "type": "integer"
+                },
+                "Nchildren": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#definitionsPerson"
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "required": [
@@ -34,6 +98,24 @@
     },
     "Children3": {
       "$ref": "#definitionsChildren2"
+    },
+    "NChildren2": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#definitionsPerson"
+        }
+      }
+    },
+    "NChildren3": {
+      "type": "array",
+      "items": {
+        "$ref": "#definitionsChildren3"
+      }
+    },
+    "NChildren4": {
+      "$ref": "#definitionsNChildren3"
     }
   },
   "openapi": "2.0.0"
