@@ -41,6 +41,8 @@ _find-candidates:
 
 
 #### for pypi ########################
+get-version:
+	python -c 'import swagger_marshmallow_codegen as m; print(m.__version__)'
 
 build:
 #	pip install wheel
@@ -48,8 +50,8 @@ build:
 
 upload:
 #	pip install twine
-	twine check dist/swagger-marshmallow-codegen-$(shell cat VERSION)*
-	twine upload dist/swagger*marshmallow*codegen-$(shell cat VERSION)*.gz
-	twine upload dist/swagger*marshmallow*codegen*$(shell cat VERSION)*.whl
+	twine check dist/swagger-marshmallow-codegen-$(shell make -s get-version)*
+	twine upload dist/swagger*marshmallow*codegen-$(shell make -s get-version)*.gz
+	twine upload dist/swagger*marshmallow*codegen*$(shell make -s get-version)*.whl
 
 .PHONY: build upload
