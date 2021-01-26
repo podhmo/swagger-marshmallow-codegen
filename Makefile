@@ -42,7 +42,7 @@ _find-candidates:
 
 #### for pypi ########################
 get-version:
-	python -c 'import ast; path="swagger_marshmallow_codegen/_version.py"; print(next( ast.literal_eval(statement.value) for statement in ast.parse(open(path).read()).body if isinstance(statement, ast.Assign) for target in statement.targets if isinstance(target, ast.Name) and target.id == "__version__" ))'
+	python -c 'import swagger_marshmallow_codegen as m; print(m.__version__)'
 
 build:
 #	pip install wheel
