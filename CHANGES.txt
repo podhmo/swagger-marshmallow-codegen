@@ -1,3 +1,7 @@
+0.6.4
+
+- bug fix for minItems,maxItems #97
+
 0.6.3
 
 - support separated output partially
