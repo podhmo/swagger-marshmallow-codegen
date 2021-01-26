@@ -1,3 +1,4 @@
+import typing as t
 from marshmallow import validate as v
 from marshmallow.validate import Length, Regexp, OneOf  # NOQA
 
@@ -35,6 +36,9 @@ class ItemsRange(v.Range):
     message_gt = "greater than"
     message_lte = "less than or equal to"
     message_lt = "less than"
+
+    def __call__(self, value: t.Any) -> t.Any:
+        return super().__call__(len(value))
 
 
 class Unique(v.Validator):

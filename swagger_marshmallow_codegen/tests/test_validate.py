@@ -59,6 +59,34 @@ class RangeTests(unittest.TestCase):
                     self.assertFalse(c.ok)
 
 
+class ItemsRangeTests(unittest.TestCase):
+    def _makeOne(self, *args, **kwargs):
+        from swagger_marshmallow_codegen.validate import ItemsRange
+
+        return ItemsRange(*args, **kwargs)
+
+    def test_it(self):
+        from marshmallow.validate import ValidationError
+
+        C = namedtuple("C", "kwargs, value, ok")
+
+        # minItems: 1
+        min1_kwargs = dict(min=1, max=None, min_inclusive=True, max_inclusive=True)
+
+        candidates = [
+            C(kwargs=min1_kwargs, value=[], ok=False),
+            C(kwargs=min1_kwargs, value=[1], ok=True),
+        ]
+        for c in candidates:
+            with self.subTest(kwargs=c.kwargs, value=c.value):
+                target = self._makeOne(**c.kwargs)
+                try:
+                    target(c.value)
+                    self.assertTrue(c.ok)
+                except ValidationError:
+                    self.assertFalse(c.ok)
+
+
 class MultipleOfTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
         from swagger_marshmallow_codegen.validate import MultipleOf
