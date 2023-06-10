@@ -49,7 +49,7 @@ build:
 	python setup.py sdist bdist_wheel
 
 upload:
-#	pip install twine
+#	pip install twine keyrings.alt
 	twine check dist/swagger-marshmallow-codegen-$(shell make -s get-version)*
 	twine upload dist/swagger*marshmallow*codegen-$(shell make -s get-version)*.gz
 	twine upload dist/swagger*marshmallow*codegen*$(shell make -s get-version)*.whl

@@ -1,3 +1,7 @@
+0.6.5
+
+- remove pyyaml dependency (use ruamel.yaml via dictknife.loading >= 0.14 ) 
+
 0.6.4
 
 - bug fix for minItems,maxItems #97
