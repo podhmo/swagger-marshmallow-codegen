@@ -1,8 +1,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    "dictknife",
-    "PyYAML",
+    "dictknife[load]>=0.14.0",  # for ruamel.yaml
     "prestring",
     "marshmallow>=3.0.0",
     "magicalimport",
